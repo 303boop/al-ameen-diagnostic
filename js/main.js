@@ -3,7 +3,9 @@
 // Al-Ameen Diagnostic Center
 // =====================================================
 
-const BASE_PATH = "/al-ameen-diagnostic";
+// main.js (TOP)
+window.BASE_PATH = "/al-ameen-diagnostic";
+
 
 /* =====================================================
    DOM READY

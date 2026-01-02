@@ -2,8 +2,6 @@
 // Authentication Module (HARDENED & FIXED)
 // =====================================================
 
-const BASE_PATH = "/al-ameen-diagnostic";
-
 /* =========================
    SAFETY CHECK
 ========================= */
