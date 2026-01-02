@@ -1,79 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Analytics - Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - Admin Dashboard</title>
 
-  <link rel="icon" href="/assets/images/logo/favicon.png" />
+  <link rel="icon" href="../../assets/images/logo/favicon.png">
 
-  <link rel="stylesheet" href="/css/reset.css">
-  <link rel="stylesheet" href="/css/variables.css">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/layout.css">
-  <link rel="stylesheet" href="/css/dashboards.css">
-  <link rel="stylesheet" href="/css/themes.css">
-  <link rel="stylesheet" href="/css/responsive.css">
-  <link rel="stylesheet" href="/css/utilities.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/variables.css">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/dashboards.css">
+  <link rel="stylesheet" href="../../css/themes.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <link rel="stylesheet" href="../../css/utilities.css">
 </head>
+
 <body>
+  <div class="dashboard-container">
 
-<div class="dashboard-container">
-
-  <aside class="dashboard-sidebar" id="adminSidebar"></aside>
-
-  <main class="dashboard-main">
-
-    <header class="dashboard-header">
-      <h1 class="dashboard-title">Analytics</h1>
-    </header>
-
-    <section class="dashboard-content">
-
-      <!-- KPIs -->
-      <div class="dashboard-grid grid-4">
-        <div class="stat-card">
-          <h4>Total Appointments</h4>
-          <p id="totalAppointments">—</p>
-        </div>
-        <div class="stat-card">
-          <h4>Completed</h4>
-          <p id="completedAppointments">—</p>
-        </div>
-        <div class="stat-card">
-          <h4>Total Patients</h4>
-          <p id="totalPatients">—</p>
-        </div>
-        <div class="stat-card">
-          <h4>Reports Uploaded</h4>
-          <p id="totalReports">—</p>
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="../../assets/images/logo/logo.png" alt="Logo">
+          <span>Admin Panel</span>
         </div>
       </div>
 
-      <!-- Simple chart -->
-      <div class="dashboard-card mt-4">
-        <div class="dashboard-card-body">
-          <h3 class="mb-3">Appointments by Status</h3>
-          <div id="statusChart"></div>
+      <nav class="sidebar-nav">
+        <a href="./index.html" class="sidebar-nav-item">
+          <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+        </a>
+        <a href="./analytics.html" class="sidebar-nav-item active">
+          <i class="fas fa-chart-line"></i><span>Analytics</span>
+        </a>
+        <a href="./appointments.html" class="sidebar-nav-item">
+          <i class="fas fa-calendar"></i><span>Appointments</span>
+        </a>
+        <a href="./tests.html" class="sidebar-nav-item">
+          <i class="fas fa-flask"></i><span>Tests</span>
+        </a>
+        <a href="./coupons.html" class="sidebar-nav-item">
+          <i class="fas fa-ticket-alt"></i><span>Coupons</span>
+        </a>
+        <a href="./users.html" class="sidebar-nav-item">
+          <i class="fas fa-users"></i><span>Users</span>
+        </a>
+        <a href="./settings.html" class="sidebar-nav-item">
+          <i class="fas fa-cog"></i><span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+      <header class="dashboard-header">
+        <h1 class="dashboard-title">Analytics</h1>
+      </header>
+
+      <div class="dashboard-content">
+
+        <div class="row mb-4">
+          <div class="col-lg-6">
+            <div class="dashboard-card">
+              <div class="dashboard-card-header">
+                <h3>Revenue Overview</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <canvas id="revenueChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="dashboard-card">
+              <div class="dashboard-card-header">
+                <h3>Appointments Overview</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <canvas id="appointmentsChart"></canvas>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div class="dashboard-card">
+          <div class="dashboard-card-header">
+            <h3>Top Performing Tests</h3>
+          </div>
+          <div class="dashboard-card-body">
+            <div id="topTestsTable"></div>
+          </div>
+        </div>
+
       </div>
+    </main>
 
-    </section>
+  </div>
 
-  </main>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../js/config/supabase.js"></script>
+  <script src="../../js/utils/helpers.js"></script>
+  <script src="../../js/utils/toast.js"></script>
+  <script src="../../js/core/auth.js"></script>
+  <script src="../../js/components/analytics.js"></script>
+  <script src="../../js/dashboards/admin.js"></script>
 
-<script src="/js/config/supabase.js"></script>
-<script src="/js/utils/helpers.js"></script>
-<script src="/js/utils/toast.js"></script>
-<script src="/js/core/auth.js"></script>
-
-<script src="/js/dashboards/admin/analytics.js"></script>
-
+  <script>
+    window.adminDashboard.loadAnalytics();
+  </script>
 </body>
 </html>
