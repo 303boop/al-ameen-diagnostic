@@ -13,23 +13,46 @@ if (!window.supabase) {
    INTERNAL READY PROMISE
 ========================= */
 let authReadyResolve;
-const authReady = new Promise(resolve => {
+const authReady = new Promise((resolve) => {
   authReadyResolve = resolve;
 });
 
 /* =========================
+   GET CURRENT USER
+========================= */
+async function getCurrentUser() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+}
+
+/* =========================
+   GET USER ROLE
+========================= */
+async function getUserRole() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  return data;
+}
+
+/* =========================
    SIGN UP
 ========================= */
-async function signUp(email, password, fullName, phone) {
+async function signUp({ email, password, full_name, phone }) {
   try {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          full_name: fullName,
-          phone: phone,
-        },
+        data: { full_name, phone },
       },
     });
 
@@ -44,17 +67,16 @@ async function signUp(email, password, fullName, phone) {
       };
     }
 
-    // Update profile safely
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
-        full_name: fullName,
-        phone: phone,
-      })
-      .eq("id", data.user.id);
+    // CREATE PROFILE (ONLY ON FIRST CONFIRMED USER)
+    const { error: profileError } = await supabase.from("profiles").insert({
+      id: data.user.id,
+      full_name,
+      phone,
+      role: "patient",
+    });
 
     if (profileError) {
-      console.warn("Profile update failed:", profileError);
+      console.warn("Profile insert failed:", profileError);
     }
 
     return { success: true, data };
@@ -164,6 +186,8 @@ window.auth = {
   resetPassword,
   updatePassword,
   requireAuth,
+  getCurrentUser,
+  getUserRole,
   ready: authReady,
 };
 

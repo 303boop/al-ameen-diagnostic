@@ -738,3 +738,32 @@ window.adminDashboard = {
   deleteCoupon,
   saveCoupon
 };
+
+async function loadUsers() {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select(`
+      id,
+      full_name,
+      phone,
+      role,
+      created_at
+    `);
+
+  if (error) {
+    toast.error("Failed to load users");
+    return;
+  }
+
+  console.log(data); // render table here
+}
+
+async function updateUserRole(userId, role) {
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role })
+    .eq("id", userId);
+
+  if (error) toast.error("Role update failed");
+  else toast.success("Role updated");
+}
