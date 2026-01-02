@@ -1,80 +1,33 @@
+// js/config/supabase.js
+
 // =====================================================
-// Supabase Configuration (BROWSER + GITHUB PAGES SAFE)
+// Supabase Configuration
 // =====================================================
 
-// ❗ IMPORTANT:
-// This file MUST be loaded AFTER the Supabase CDN script:
-//
-// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+// 1. DYNAMIC BASE PATH (Critical for GitHub Pages)
+// If we are on localhost, path is "". If on GitHub, it's "/al-ameen-diagnostics"
+const HOSTNAME = window.location.hostname;
+// ⚠️ CHANGE '/al-ameen-diagnostics' to your exact repo name if different
+const BASE_PATH = (HOSTNAME === '127.0.0.1' || HOSTNAME === 'localhost') 
+    ? '' 
+    : '/al-ameen-diagnostics'; 
 
-// =========================
-// CONFIG (PUBLIC ONLY)
-// =========================
+// Expose globally
+window.BASE_PATH = BASE_PATH;
+
+// 2. CREDENTIALS
 const SUPABASE_URL = "https://hdlwflzgpphkdhhojldt.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_v9un03jyjabk-HSWoyvZWQ_LD1g9E_B";
 
-// =========================
-// SAFETY CHECK
-// =========================
+// 3. INITIALIZATION
 if (!window.supabase) {
-  console.error("❌ Supabase SDK not loaded. Check script order.");
+    console.error("❌ Supabase SDK not loaded. Check script tags.");
 } else {
-  // =========================
-  // CREATE CLIENT
-  // =========================
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-  // Expose globally
-  window.supabase = supabaseClient;
-
-  console.log("✅ Supabase client initialized");
-
-  // =========================
-  // AUTH HELPERS
-  // =========================
-
-  async function getCurrentUser() {
-    try {
-      const { data, error } = await supabaseClient.auth.getUser();
-      if (error) throw error;
-      return data.user;
-    } catch (err) {
-      console.error("getCurrentUser error:", err);
-      return null;
-    }
-  }
-
-  async function getUserRole() {
-    const user = await getCurrentUser();
-    if (!user) return null;
-
-    try {
-      const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("role, full_name, phone")
-        .eq("id", user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (err) {
-      console.error("getUserRole error:", err);
-      return null;
-    }
-  }
-
-  async function isAuthenticated() {
-    const user = await getCurrentUser();
-    return Boolean(user);
-  }
-
-  // =========================
-  // EXPORT HELPERS
-  // =========================
-  window.getCurrentUser = getCurrentUser;
-  window.getUserRole = getUserRole;
-  window.isAuthenticated = isAuthenticated;
+    // Create Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Attach to Window
+    window.supabase = supabaseClient;
+    
+    console.log("✅ Supabase client initialized");
 }

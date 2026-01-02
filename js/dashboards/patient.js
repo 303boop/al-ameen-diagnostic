@@ -1,313 +1,285 @@
-// Patient Dashboard Functions
+// js/dashboards/patient.js
 
-// Initialize patient dashboard
-async function initPatientDashboard() {
-  const user = await getCurrentUser();
-  if (!user) {
-    window.location.href = '/login.html';
-    return;
-  }
+// =====================================================
+// Patient Dashboard Controller
+// =====================================================
 
-  const profile = await getUserRole();
-  if (profile.role !== 'patient') {
-    window.location.href = '/index.html';
-    return;
-  }
-
-  // Load dashboard data
-  loadDashboardStats(user.id);
-  loadUpcomingAppointments(user.id);
-  loadRecentReports(user.id);
-}
-
-// Load dashboard statistics
-async function loadDashboardStats(userId) {
-  const statsContainer = document.getElementById('patientStats');
-  if (!statsContainer) return;
-
-  loader.showSectionLoader(statsContainer);
-
-  try {
-    // Get all appointments
-    const { data: appointments } = await supabaseClient
-      .from('appointments')
-      .select('*')
-      .eq('patient_id', userId);
-
-    // Get reports count
-    const { count: reportsCount } = await supabaseClient
-      .from('reports')
-      .select('*', { count: 'exact', head: true })
-      .eq('patient_id', userId);
-
-    const stats = {
-      total_appointments: appointments?.length || 0,
-      upcoming: appointments?.filter(a => 
-        new Date(a.appointment_date) >= new Date() && a.status === 'booked'
-      ).length || 0,
-      completed: appointments?.filter(a => a.status === 'completed').length || 0,
-      reports: reportsCount || 0
-    };
-
-    displayPatientStats(stats, statsContainer);
-  } catch (error) {
-    console.error('Error loading stats:', error);
-    toast.error('Failed to load statistics');
-  } finally {
-    loader.hideSectionLoader(statsContainer);
-  }
-}
-
-// Display patient stats
-function displayPatientStats(stats, container) {
-  container.innerHTML = `
-    <div class="row g-4">
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-primary">
-            <i class="fas fa-calendar-check"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.total_appointments}</h3>
-            <p>Total Appointments</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-warning">
-            <i class="fas fa-clock"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.upcoming}</h3>
-            <p>Upcoming</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-success">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.completed}</h3>
-            <p>Completed</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-info">
-            <i class="fas fa-file-medical"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.reports}</h3>
-            <p>Reports</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// Load upcoming appointments
-async function loadUpcomingAppointments(userId) {
-  const container = document.getElementById('upcomingAppointments');
-  if (!container) return;
-
-  loader.showSectionLoader(container);
-
-  try {
-    const today = dateUtils.getTodayDate();
+const PatientDashboard = {
     
-    const { data, error } = await supabaseClient
-      .from('appointments')
-      .select(`
-        *,
-        doctor:doctors(name, specialization, image_url)
-      `)
-      .eq('patient_id', userId)
-      .gte('appointment_date', today)
-      .eq('status', 'booked')
-      .order('appointment_date')
-      .limit(5);
+    // --- 1. INITIALIZATION ---
+    async init() {
+        console.log("🏥 Initializing Patient Dashboard...");
 
-    if (error) throw error;
+        // A. Auth Check
+        const user = await window.auth.getCurrentUser();
+        if (!user) {
+            window.location.href = `${window.BASE_PATH}/login.html`;
+            return;
+        }
 
-    displayUpcomingAppointments(data, container);
-  } catch (error) {
-    console.error('Error loading appointments:', error);
-    container.innerHTML = '<p class="text-danger">Failed to load appointments</p>';
-  } finally {
-    loader.hideSectionLoader(container);
-  }
-}
+        // B. Role Check
+        const profile = await window.auth.getUserRole();
+        if (!profile || profile.role !== 'patient') {
+            console.warn("Unauthorized access: Redirecting to home.");
+            window.location.href = `${window.BASE_PATH}/index.html`;
+            return;
+        }
 
-// Display upcoming appointments
-function displayUpcomingAppointments(appointments, container) {
-  if (!appointments || appointments.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-calendar-times"></i>
-        <p>No upcoming appointments</p>
-        <a href="/booking.html" class="btn btn-primary">Book Appointment</a>
-      </div>
-    `;
-    return;
-  }
+        // C. Update UI with User Info
+        this.updateHeader(profile);
 
-  let html = '<div class="appointments-list">';
-  
-  appointments.forEach(appointment => {
-    html += `
-      <div class="appointment-card">
-        <div class="appointment-doctor">
-          <img src="${appointment.doctor.image_url || '/assets/images/doctors/placeholder.jpg'}" 
-               alt="${appointment.doctor.name}">
-          <div>
-            <h4>${appointment.doctor.name}</h4>
-            <p>${appointment.doctor.specialization}</p>
-          </div>
-        </div>
-        <div class="appointment-details">
-          <div class="detail-item">
-            <i class="fas fa-calendar"></i>
-            <span>${dateUtils.formatDisplayDate(appointment.appointment_date)}</span>
-          </div>
-          <div class="detail-item">
-            <i class="fas fa-clock"></i>
-            <span>${helpers.formatTime(appointment.estimated_time)}</span>
-          </div>
-          <div class="detail-item">
-            <i class="fas fa-hashtag"></i>
-            <span>Serial: ${appointment.serial_number}</span>
-          </div>
-          <div class="detail-item">
-            <i class="fas fa-id-card"></i>
-            <span>${appointment.booking_id}</span>
-          </div>
-        </div>
-        <div class="appointment-actions">
-          <button class="btn btn-sm btn-outline-danger" 
-                  onclick="window.patientDashboard.cancelAppointment('${appointment.id}')">
-            <i class="fas fa-times"></i> Cancel
-          </button>
-        </div>
-      </div>
-    `;
-  });
-  
-  html += '</div>';
-  container.innerHTML = html;
-}
+        // D. Load Data
+        this.loadStats(user.id);
+        this.loadUpcomingAppointments(user.id);
+        this.loadRecentReports(user.id);
+    },
 
-// Load recent reports
-async function loadRecentReports(userId) {
-  const container = document.getElementById('recentReports');
-  if (!container) return;
+    updateHeader(profile) {
+        // Optional: specific logic to update the dashboard sidebar/header with name
+        const nameEl = document.getElementById('patientNameDisplay');
+        if (nameEl) nameEl.innerText = profile.full_name || "Patient";
+    },
 
-  loader.showSectionLoader(container);
+    // --- 2. STATISTICS ---
+    async loadStats(userId) {
+        const container = document.getElementById('patientStats');
+        if (!container) return;
 
-  try {
-    const { data, error } = await supabaseClient
-      .from('reports')
-      .select(`
-        *,
-        appointment:appointments(booking_id),
-        test:tests(name)
-      `)
-      .eq('patient_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(5);
+        // Uses your global loader if available, otherwise silent
+        if (window.loader) window.loader.showSectionLoader(container);
 
-    if (error) throw error;
+        try {
+            // Fetch Appointments
+            const { data: appts, error: apptError } = await window.supabase
+                .from('appointments')
+                .select('status, appointment_date')
+                .eq('patient_id', userId);
 
-    displayRecentReports(data, container);
-  } catch (error) {
-    console.error('Error loading reports:', error);
-    container.innerHTML = '<p class="text-danger">Failed to load reports</p>';
-  } finally {
-    loader.hideSectionLoader(container);
-  }
-}
+            if (apptError) throw apptError;
 
-// Display recent reports
-function displayRecentReports(reports, container) {
-  if (!reports || reports.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-file-medical-alt"></i>
-        <p>No reports available</p>
-      </div>
-    `;
-    return;
-  }
+            // Fetch Reports Count
+            const { count: reportsCount, error: reportError } = await window.supabase
+                .from('reports')
+                .select('*', { count: 'exact', head: true })
+                .eq('patient_id', userId);
 
-  let html = '<div class="reports-list">';
-  
-  reports.forEach(report => {
-    html += `
-      <div class="report-card">
-        <div class="report-icon">
-          <i class="fas fa-file-pdf"></i>
-        </div>
-        <div class="report-info">
-          <h4>${report.test?.name || 'Medical Report'}</h4>
-          <p>Booking ID: ${report.appointment?.booking_id || 'N/A'}</p>
-          <small>${dateUtils.getRelativeTime(report.created_at)}</small>
-        </div>
-        <div class="report-actions">
-          <a href="${report.file_url}" 
-             target="_blank" 
-             class="btn btn-sm btn-primary">
-            <i class="fas fa-download"></i> Download
-          </a>
-        </div>
-      </div>
-    `;
-  });
-  
-  html += '</div>';
-  container.innerHTML = html;
-}
+            if (reportError) throw reportError;
 
-// Cancel appointment
-async function cancelAppointment(appointmentId) {
-  const confirmed = await new Promise((resolve) => {
-    modal.showConfirm(
-      'Cancel Appointment',
-      'Are you sure you want to cancel this appointment?',
-      () => resolve(true),
-      () => resolve(false)
-    );
-  });
+            // Calculate Stats
+            const now = new Date();
+            const stats = {
+                total: appts.length,
+                upcoming: appts.filter(a => new Date(a.appointment_date) >= now && a.status === 'booked').length,
+                completed: appts.filter(a => a.status === 'completed').length,
+                reports: reportsCount || 0
+            };
 
-  if (!confirmed) return;
+            this.renderStats(stats, container);
 
-  loader.showPageLoader('Cancelling appointment...');
+        } catch (error) {
+            console.error("Stats Error:", error);
+            container.innerHTML = `<p class="text-danger">Failed to load statistics.</p>`;
+        } finally {
+            if (window.loader) window.loader.hideSectionLoader(container);
+        }
+    },
 
-  try {
-    const result = await booking.cancelAppointment(appointmentId, 'Cancelled by patient');
-    
-    if (result.success) {
-      toast.success('Appointment cancelled successfully');
-      // Reload appointments
-      const user = await getCurrentUser();
-      loadUpcomingAppointments(user.id);
-      loadDashboardStats(user.id);
-    } else {
-      toast.error(result.error || 'Failed to cancel appointment');
+    renderStats(stats, container) {
+        container.innerHTML = `
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stat-card bg-white p-3 rounded shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-primary text-white rounded-circle p-3 me-3">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">${stats.total}</h3>
+                                <p class="text-muted mb-0">Total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-white p-3 rounded shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-warning text-white rounded-circle p-3 me-3">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">${stats.upcoming}</h3>
+                                <p class="text-muted mb-0">Upcoming</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-white p-3 rounded shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-success text-white rounded-circle p-3 me-3">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">${stats.completed}</h3>
+                                <p class="text-muted mb-0">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card bg-white p-3 rounded shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-info text-white rounded-circle p-3 me-3">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">${stats.reports}</h3>
+                                <p class="text-muted mb-0">Reports</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // --- 3. UPCOMING APPOINTMENTS ---
+    async loadUpcomingAppointments(userId) {
+        const container = document.getElementById('upcomingAppointments');
+        if (!container) return;
+
+        try {
+            const today = new Date().toISOString().split('T')[0];
+
+            // Fetch Data (Including Test or Doctor info)
+            const { data, error } = await window.supabase
+                .from('appointments')
+                .select(`
+                    *,
+                    doctor:doctors(name, specialization, image_url),
+                    test:tests(name)
+                `)
+                .eq('patient_id', userId)
+                .gte('appointment_date', today)
+                .in('status', ['booked', 'checked_in'])
+                .order('appointment_date', { ascending: true })
+                .limit(5);
+
+            if (error) throw error;
+
+            this.renderAppointments(data, container);
+
+        } catch (error) {
+            console.error("Appointments Error:", error);
+            container.innerHTML = `<p class="text-danger">Could not load appointments.</p>`;
+        }
+    },
+
+    renderAppointments(appointments, container) {
+        if (!appointments || appointments.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <p class="text-muted">No upcoming appointments.</p>
+                    <a href="${window.BASE_PATH}/booking.html" class="btn btn-primary">Book Now</a>
+                </div>
+            `;
+            return;
+        }
+
+        // Generate HTML
+        container.innerHTML = appointments.map(appt => {
+            // Determine Title (Doctor Name or Test Name)
+            const title = appt.doctor ? `Dr. ${appt.doctor.name}` : (appt.test ? appt.test.name : "Appointment");
+            const subtitle = appt.doctor ? appt.doctor.specialization : "Lab Test";
+            const img = appt.doctor?.image_url || `${window.BASE_PATH}/assets/images/logo/logo.png`; // Fallback image
+
+            return `
+            <div class="card mb-3 shadow-sm border-0">
+                <div class="card-body d-flex align-items-center">
+                    <img src="${img}" class="rounded-circle me-3" width="50" height="50" style="object-fit:cover;" alt="Avatar">
+                    
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1">${title}</h5>
+                        <p class="mb-1 text-muted small">${subtitle}</p>
+                        <div class="small">
+                            <span class="me-3"><i class="fas fa-calendar-alt text-primary"></i> ${appt.appointment_date}</span>
+                            <span class="me-3"><i class="fas fa-clock text-warning"></i> ${appt.estimated_time}</span>
+                            <span><i class="fas fa-hashtag text-secondary"></i> Serial: ${appt.serial_number}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-outline-danger btn-sm" 
+                            onclick="window.patientDashboard.handleCancel('${appt.id}')">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+    },
+
+    // --- 4. RECENT REPORTS ---
+    async loadRecentReports(userId) {
+        const container = document.getElementById('recentReports');
+        if (!container) return;
+
+        try {
+            const { data, error } = await window.supabase
+                .from('reports')
+                .select(`*, test:tests(name)`)
+                .eq('patient_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (error) throw error;
+
+            this.renderReports(data, container);
+
+        } catch (error) {
+            console.error("Reports Error:", error);
+        }
+    },
+
+    renderReports(reports, container) {
+        if (!reports || reports.length === 0) {
+            container.innerHTML = `<p class="text-muted">No reports available yet.</p>`;
+            return;
+        }
+
+        container.innerHTML = reports.map(report => `
+            <div class="card mb-2 border-0 bg-light">
+                <div class="card-body d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <h6 class="mb-0">${report.test?.name || 'Diagnostic Report'}</h6>
+                        <small class="text-muted">${new Date(report.created_at).toLocaleDateString()}</small>
+                    </div>
+                    <a href="${report.file_url}" target="_blank" class="btn btn-sm btn-primary">
+                        <i class="fas fa-download"></i> View
+                    </a>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    // --- 5. ACTIONS ---
+    async handleCancel(apptId) {
+        if (!confirm("Are you sure you want to cancel this appointment?")) return;
+
+        // Use the global booking module we fixed earlier
+        if (window.booking) {
+            const result = await window.booking.cancelAppointment(apptId, "Cancelled by Patient");
+            if (result.success) {
+                alert("Appointment cancelled.");
+                location.reload(); // Simple reload to refresh data
+            } else {
+                alert("Error: " + result.error);
+            }
+        }
     }
-  } catch (error) {
-    console.error('Error cancelling appointment:', error);
-    toast.error('Failed to cancel appointment');
-  } finally {
-    loader.hidePageLoader();
-  }
-}
-
-// Export
-window.patientDashboard = {
-  initPatientDashboard,
-  cancelAppointment
 };
+
+// Export to Window
+window.patientDashboard = PatientDashboard;
+console.log("✅ Patient Dashboard module loaded");

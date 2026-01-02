@@ -1,268 +1,253 @@
-// Booking Management (Fixed & Production-Safe)
+// js/features/booking.js
 
-/* =========================
-   SAFETY CHECKS
-========================= */
-if (!window.supabase) {
-  console.error("❌ Supabase not initialized");
+// =====================================================
+// Booking Management Feature
+// =====================================================
+
+// Safety Check
+if (!window.supabase || !window.APP_CONSTANTS) {
+    console.error("❌ Critical dependencies missing in booking.js");
 }
 
-/* =========================
-   HELPERS
-========================= */
+const Booking = {
+    
+    // --- 1. HELPERS ---
 
-// Generate Booking ID → ALM-YYYYMMDD-XXXX
-function generateBookingID() {
-  const prefix = APP_CONSTANTS.BOOKING_PREFIX;
-  const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const random = Math.floor(1000 + Math.random() * 9000);
-  return `${prefix}-${date}-${random}`;
-}
+    generateBookingID() {
+        const prefix = window.APP_CONSTANTS.BOOKING_PREFIX || "ALM";
+        const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        const random = Math.floor(1000 + Math.random() * 9000);
+        return `${prefix}-${date}-${random}`;
+    },
 
-/* =========================
-   GET AVAILABLE DOCTORS
-========================= */
-async function getAvailableDoctors() {
-  try {
-    const { data, error } = await supabase
-      .from("doctors")
-      .select("*")
-      .eq("is_active", true)
-      .order("name");
+    calculateEstimatedTime(startTime, serialNumber, avgTime = 15) {
+        if (!startTime) return "09:00"; // Default fallback
+        const [h, m] = startTime.split(":").map(Number);
+        const date = new Date();
+        date.setHours(h, m, 0);
+        date.setMinutes(date.getMinutes() + (serialNumber - 1) * avgTime);
+        return date.toTimeString().slice(0, 5); // HH:MM
+    },
 
-    if (error) throw error;
-    return { success: true, data };
-  } catch (error) {
-    console.error("Error fetching doctors:", error);
-    return { success: false, error: error.message };
-  }
-}
+    // --- 2. DATA FETCHING ---
 
-/* =========================
-   GET AVAILABLE TESTS
-========================= */
-async function getAvailableTests() {
-  try {
-    const { data, error } = await supabase
-      .from("tests")
-      .select("*")
-      .eq("is_active", true)
-      .order("name");
+    async getAvailableDoctors() {
+        try {
+            const { data, error } = await window.supabase
+                .from("doctors")
+                .select("*")
+                .eq("is_active", true)
+                .order("name");
 
-    if (error) throw error;
-    return { success: true, data };
-  } catch (error) {
-    console.error("Error fetching tests:", error);
-    return { success: false, error: error.message };
-  }
-}
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
 
-/* =========================
-   GET DOCTOR BY ID
-========================= */
-async function getDoctorById(doctorId) {
-  try {
-    const { data, error } = await supabase
-      .from("doctors")
-      .select("*")
-      .eq("id", doctorId)
-      .single();
+    async getAvailableTests() {
+        try {
+            const { data, error } = await window.supabase
+                .from("tests")
+                .select("*")
+                .eq("is_active", true)
+                .order("name");
 
-    if (error) throw error;
-    return { success: true, data };
-  } catch (error) {
-    console.error("Error fetching doctor:", error);
-    return { success: false, error: error.message };
-  }
-}
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
 
-/* =========================
-   GET NEXT SERIAL NUMBER
-========================= */
-async function getNextSerialNumber(doctorId, appointmentDate) {
-  try {
-    const { data, error } = await supabase
-      .from("appointments")
-      .select("serial_number")
-      .eq("doctor_id", doctorId)
-      .eq("appointment_date", appointmentDate)
-      .order("serial_number", { ascending: false })
-      .limit(1);
+    async getDoctorById(id) {
+        try {
+            const { data, error } = await window.supabase
+                .from("doctors")
+                .select("*")
+                .eq("id", id)
+                .single();
 
-    if (error) throw error;
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
 
-    const nextSerial = data.length ? data[0].serial_number + 1 : 1;
-    return { success: true, serial: nextSerial };
-  } catch (error) {
-    console.error("Error getting serial:", error);
-    return { success: false, error: error.message };
-  }
-}
+    async getTestById(id) {
+        try {
+            const { data, error } = await window.supabase
+                .from("tests")
+                .select("*")
+                .eq("id", id)
+                .single();
+                
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
 
-/* =========================
-   CALCULATE ESTIMATED TIME
-========================= */
-function calculateEstimatedTime(startTime, serialNumber, avgTime = 15) {
-  const [h, m] = startTime.split(":").map(Number);
-  const date = new Date();
-  date.setHours(h, m, 0);
+    // --- 3. QUEUE LOGIC ---
 
-  date.setMinutes(date.getMinutes() + (serialNumber - 1) * avgTime);
+    async getNextSerialNumber(resourceId, date, isTest = false) {
+        const column = isTest ? "test_id" : "doctor_id";
+        
+        try {
+            const { data, error } = await window.supabase
+                .from("appointments")
+                .select("serial_number")
+                .eq(column, resourceId)
+                .eq("appointment_date", date)
+                .order("serial_number", { ascending: false })
+                .limit(1);
 
-  return date.toTimeString().slice(0, 5);
-}
+            if (error) throw error;
 
-/* =========================
-   CREATE APPOINTMENT
-========================= */
-async function createAppointment(appointmentData) {
-  try {
-    const user = await getCurrentUser();
+            const nextSerial = (data && data.length > 0) ? data[0].serial_number + 1 : 1;
+            return { success: true, serial: nextSerial };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
 
-    if (!appointmentData.doctor_id || !appointmentData.appointment_date) {
-      throw new Error("Missing required appointment details");
+    // --- 4. CORE: CREATE APPOINTMENT ---
+
+    async createAppointment(formData) {
+        try {
+            // A. Validate Inputs
+            if (!formData.appointment_date) throw new Error("Date is required.");
+            if (!formData.doctor_id && !formData.test_id) throw new Error("Select a Doctor or a Test.");
+
+            // B. Check Auth (or Guest)
+            // Use the AUTH module we created earlier
+            const user = await window.auth.getCurrentUser();
+            
+            if (!user && !formData.guest_name) {
+                throw new Error("Please log in or provide guest details.");
+            }
+
+            // C. Determine Type (Doctor vs Test)
+            const isTest = !!formData.test_id;
+            const resourceId = isTest ? formData.test_id : formData.doctor_id;
+
+            // D. Get Queue Position
+            const queueRes = await this.getNextSerialNumber(resourceId, formData.appointment_date, isTest);
+            if (!queueRes.success) throw new Error("Queue Error: " + queueRes.error);
+
+            // E. Calculate Timing
+            let estimatedTime = "09:00"; // Default for tests
+            if (!isTest) {
+                const docRes = await this.getDoctorById(formData.doctor_id);
+                if (docRes.success) {
+                    estimatedTime = this.calculateEstimatedTime(docRes.data.start_time, queueRes.serial);
+                }
+            }
+
+            // F. Build Payload
+            const payload = {
+                booking_id: this.generateBookingID(),
+                appointment_date: formData.appointment_date,
+                serial_number: queueRes.serial,
+                estimated_time: estimatedTime,
+                status: window.APP_CONSTANTS.APPOINTMENT_STATUS.BOOKED,
+                patient_notes: formData.notes || "",
+                coupon_code: formData.coupon_code || null,
+                
+                // Foreign Keys
+                doctor_id: formData.doctor_id || null,
+                test_id: formData.test_id || null,
+                
+                // User vs Guest
+                patient_id: user ? user.id : null,
+                guest_name: user ? null : formData.guest_name,
+                guest_phone: user ? null : formData.guest_phone,
+                guest_email: user ? null : formData.guest_email
+            };
+
+            // G. Insert to Supabase
+            const { data, error } = await window.supabase
+                .from("appointments")
+                .insert([payload])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            return { success: true, data: data };
+
+        } catch (error) {
+            console.error("Create Appointment Error:", error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // --- 5. HISTORY & MANAGEMENT ---
+
+    async getAppointmentByBookingId(bookingId) {
+        try {
+            // We fetch doctor AND test details to handle both types
+            const { data, error } = await window.supabase
+                .from("appointments")
+                .select(`
+                    *,
+                    doctor:doctors(name, specialization, image_url),
+                    test:tests(name, duration_minutes)
+                `)
+                .eq("booking_id", bookingId)
+                .single();
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
+    async getUserAppointments(userId) {
+        try {
+            const { data, error } = await window.supabase
+                .from("appointments")
+                .select(`
+                    *,
+                    doctor:doctors(name, specialization),
+                    test:tests(name)
+                `)
+                .eq("patient_id", userId)
+                .order("appointment_date", { ascending: false });
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
+    async cancelAppointment(id, reason) {
+        try {
+            const { data, error } = await window.supabase
+                .from("appointments")
+                .update({ 
+                    status: window.APP_CONSTANTS.APPOINTMENT_STATUS.CANCELLED,
+                    cancellation_reason: reason 
+                })
+                .eq("id", id)
+                .select()
+                .single();
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
-
-    if (!user && !appointmentData.guest_name) {
-      throw new Error("Login required or guest details missing");
-    }
-
-    const serialResult = await getNextSerialNumber(
-      appointmentData.doctor_id,
-      appointmentData.appointment_date
-    );
-
-    if (!serialResult.success) throw new Error(serialResult.error);
-
-    const bookingId = generateBookingID();
-
-    const doctorResult = await getDoctorById(appointmentData.doctor_id);
-    if (!doctorResult.success) throw new Error(doctorResult.error);
-
-    const estimatedTime = calculateEstimatedTime(
-      doctorResult.data.start_time,
-      serialResult.serial
-    );
-
-    const appointment = {
-      booking_id: bookingId,
-      doctor_id: appointmentData.doctor_id,
-      appointment_date: appointmentData.appointment_date,
-      serial_number: serialResult.serial,
-      estimated_time: estimatedTime,
-      status: APP_CONSTANTS.APPOINTMENT_STATUS.BOOKED,
-      patient_notes: appointmentData.notes || null,
-      coupon_code: appointmentData.coupon_code || null,
-    };
-
-    if (user) {
-      appointment.patient_id = user.id;
-    } else {
-      appointment.guest_name = appointmentData.guest_name;
-      appointment.guest_phone = appointmentData.guest_phone;
-      appointment.guest_email = appointmentData.guest_email || null;
-    }
-
-    const { data, error } = await supabase
-      .from("appointments")
-      .insert([appointment])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return {
-      success: true,
-      data: { ...data, doctor: doctorResult.data },
-    };
-  } catch (error) {
-    console.error("Error creating appointment:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-/* =========================
-   GET APPOINTMENT BY BOOKING ID
-========================= */
-async function getAppointmentByBookingId(bookingId) {
-  try {
-    const { data, error } = await supabase
-      .from("appointments")
-      .select(
-        `*, doctor:doctors(name, specialization, consultation_fee)`
-      )
-      .eq("booking_id", bookingId.toUpperCase())
-      .single();
-
-    if (error) throw error;
-    return { success: true, data };
-  } catch (error) {
-    console.error("Error fetching appointment:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-/* =========================
-   CANCEL APPOINTMENT
-========================= */
-async function cancelAppointment(appointmentId, reason) {
-  try {
-    const { data, error } = await supabase
-      .from("appointments")
-      .update({
-        status: APP_CONSTANTS.APPOINTMENT_STATUS.CANCELLED,
-        cancellation_reason: reason,
-      })
-      .eq("id", appointmentId)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return { success: true, data };
-  } catch (error) {
-    console.error("Error cancelling appointment:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-/* =========================
-   GET USER APPOINTMENTS
-========================= */
-async function getUserAppointments(userId, status = null) {
-  try {
-    let query = supabase
-      .from("appointments")
-      .select(
-        `*, doctor:doctors(name, specialization, image_url)`
-      )
-      .eq("patient_id", userId)
-      .order("appointment_date", { ascending: false });
-
-    if (status) {
-      query = query.eq("status", status);
-    }
-
-    const { data, error } = await query;
-    if (error) throw error;
-
-    return { success: true, data };
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-/* =========================
-   EXPORT
-========================= */
-window.booking = {
-  getAvailableDoctors,
-  getAvailableTests,
-  getDoctorById,
-  getNextSerialNumber,
-  createAppointment,
-  getAppointmentByBookingId,
-  cancelAppointment,
-  getUserAppointments,
-  calculateEstimatedTime,
 };
+
+// --- INITIALIZATION ---
+// This allows main.js to call booking.initBookingForm() if you add UI logic later
+// For now, we export the data layer.
+window.booking = Booking;
+console.log("✅ Booking module loaded");

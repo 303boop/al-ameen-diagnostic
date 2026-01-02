@@ -1,154 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Test - Admin Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Test - Admin Dashboard</title>
 
-  <link rel="icon" href="../../assets/images/logo/favicon.png">
+    <link rel="icon" href="../../assets/images/logo/logo.ico">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <link rel="stylesheet" href="../../css/reset.css">
-  <link rel="stylesheet" href="../../css/variables.css">
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/components.css">
-  <link rel="stylesheet" href="../../css/layout.css">
-  <link rel="stylesheet" href="../../css/dashboards.css">
-  <link rel="stylesheet" href="../../css/themes.css">
-  <link rel="stylesheet" href="../../css/responsive.css">
-  <link rel="stylesheet" href="../../css/utilities.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/dashboards.css">
+    <link rel="stylesheet" href="../../css/themes.css">
+    <link rel="stylesheet" href="../../css/utilities.css">
 </head>
 
 <body>
-  <div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <aside class="dashboard-sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="../../assets/images/logo/logo.png" alt="Logo">
-          <span>Admin Panel</span>
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a href="./index.html" class="sidebar-nav-item">
-          <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
-        </a>
-        <a href="./tests.html" class="sidebar-nav-item active">
-          <i class="fas fa-flask"></i><span>Tests</span>
-        </a>
-      </nav>
-    </aside>
-
-    <main class="dashboard-main">
-      <header class="dashboard-header">
-        <h1 class="dashboard-title">Add Test</h1>
-        <div class="dashboard-actions">
-          <a href="./tests.html" class="btn btn-secondary">Back</a>
-        </div>
-      </header>
-
-      <div class="dashboard-content">
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
-            <div class="card">
-              <div class="card-body">
-
-                <form id="testForm">
-                  <div class="form-group">
-                    <label class="form-label">Test Name *</label>
-                    <input type="text" class="form-control" id="testName" required>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control" id="description" rows="3"></textarea>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label class="form-label">Original Price *</label>
-                        <input type="number" class="form-control" id="originalPrice" required>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label class="form-label">Discount Price</label>
-                        <input type="number" class="form-control" id="discountPrice">
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Duration (minutes) *</label>
-                    <input type="number" class="form-control" id="duration" required>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Prerequisites</label>
-                    <textarea class="form-control" id="prerequisites" rows="2"></textarea>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Instructions</label>
-                    <textarea class="form-control" id="instructions" rows="2"></textarea>
-                  </div>
-
-                  <div class="form-check mb-2">
-                    <input type="checkbox" class="form-check-input" id="isDiscountActive">
-                    <label class="form-check-label" for="isDiscountActive">Discount Active</label>
-                  </div>
-
-                  <div class="form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="isActive" checked>
-                    <label class="form-check-label" for="isActive">Active</label>
-                  </div>
-
-                  <button type="submit" class="btn btn-primary" id="saveTestBtn">
-                    Save Test
-                  </button>
-                </form>
-
-              </div>
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="../../index.html" class="sidebar-logo text-decoration-none">
+                    <img src="../../assets/images/logo/logo.png" alt="Logo">
+                    <span class="text-white ms-2">Admin Panel</span>
+                </a>
             </div>
-          </div>
-        </div>
-      </div>
-    </main>
 
-  </div>
+            <nav class="sidebar-nav">
+                <div class="nav-label">Overview</div>
+                <a href="./index.html" class="sidebar-nav-item">
+                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                </a>
+                <a href="./analytics.html" class="sidebar-nav-item">
+                    <i class="fas fa-chart-line"></i><span>Analytics</span>
+                </a>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+                <div class="nav-label">Management</div>
+                <a href="./appointments.html" class="sidebar-nav-item">
+                    <i class="fas fa-calendar-check"></i><span>Appointments</span>
+                </a>
+                <a href="./doctors.html" class="sidebar-nav-item">
+                    <i class="fas fa-user-md"></i><span>Doctors</span>
+                </a>
+                <a href="./tests.html" class="sidebar-nav-item active">
+                    <i class="fas fa-microscope"></i><span>Lab Tests</span>
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <i class="fas fa-users"></i><span>Patients</span>
+                </a>
 
-  <script src="../../js/config/supabase.js"></script>
-  <script src="../../js/utils/helpers.js"></script>
-  <script src="../../js/utils/toast.js"></script>
-  <script src="../../js/core/auth.js"></script>
-  <script src="../../js/components/loader.js"></script>
-  <script src="../../js/dashboards/admin.js"></script>
+                <div class="nav-label">Finance</div>
+                <a href="./reports.html" class="sidebar-nav-item">
+                    <i class="fas fa-file-invoice"></i><span>Reports</span>
+                </a>
+                <a href="./coupons.html" class="sidebar-nav-item">
+                    <i class="fas fa-tags"></i><span>Coupons</span>
+                </a>
 
-  <script>
-    document.getElementById("testForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+                <div class="nav-label">System</div>
+                <a href="./audit-logs.html" class="sidebar-nav-item">
+                    <i class="fas fa-history"></i><span>Audit Logs</span>
+                </a>
+                <a href="./settings.html" class="sidebar-nav-item">
+                    <i class="fas fa-cog"></i><span>Settings</span>
+                </a>
 
-      const testData = {
-        name: document.getElementById("testName").value,
-        description: document.getElementById("description").value,
-        original_price: document.getElementById("originalPrice").value,
-        discount_price: document.getElementById("discountPrice").value || null,
-        duration_minutes: document.getElementById("duration").value,
-        prerequisites: document.getElementById("prerequisites").value,
-        instructions: document.getElementById("instructions").value,
-        is_discount_active: document.getElementById("isDiscountActive").checked,
-        is_active: document.getElementById("isActive").checked
-      };
+                <div class="mt-auto">
+                    <button id="logoutBtn" class="sidebar-nav-item text-danger border-0 bg-transparent w-100 text-start">
+                        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
 
-      await window.adminDashboard.saveTest(testData);
-    });
-  </script>
+        <main class="dashboard-main">
+            
+            <header class="dashboard-header d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">Add New Lab Test</h1>
+                <div class="dashboard-actions d-flex gap-2">
+                    <button class="btn btn-light rounded-circle" id="themeToggle" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <a href="./tests.html" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4">
+
+                                <form id="testForm">
+                                    
+                                    <h5 class="mb-3 text-primary">Test Details</h5>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-12">
+                                            <label class="form-label">Test Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="testName" placeholder="e.g. Complete Blood Count (CBC)" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" id="description" rows="2" placeholder="Brief details about the test..."></textarea>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3 text-primary">Pricing & Logistics</h5>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Original Price (₹) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="originalPrice" min="0" placeholder="0.00" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Duration (Minutes) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="duration" min="5" placeholder="e.g. 15" required>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <div class="card bg-light border-0 p-3">
+                                                <div class="form-check form-switch mb-2">
+                                                    <input class="form-check-input" type="checkbox" id="isDiscountActive">
+                                                    <label class="form-check-label fw-medium" for="isDiscountActive">Enable Discount Price</label>
+                                                </div>
+                                                <div class="mt-2" id="discountInputGroup" style="opacity: 0.5; pointer-events: none;">
+                                                    <label class="form-label small">Discounted Price (₹)</label>
+                                                    <input type="number" class="form-control form-control-sm" id="discountPrice" min="0">
+                                                    <div class="form-text">Must be lower than Original Price</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3 text-primary">Patient Guide</h5>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Prerequisites</label>
+                                            <input type="text" class="form-control" id="prerequisites" placeholder="e.g. Fasting required">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Instructions</label>
+                                            <input type="text" class="form-control" id="instructions" placeholder="e.g. Wear loose clothing">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Cover Image URL</label>
+                                            <input type="url" class="form-control" id="imageUrl" placeholder="https://...">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-4">
+                                        <input class="form-check-input" type="checkbox" id="isActive" checked>
+                                        <label class="form-check-label" for="isActive">Active (Visible to Patients)</label>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg" id="saveTestBtn">
+                                            <i class="fas fa-save me-2"></i> Save Test
+                                        </button>
+                                    </div>
+
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../../js/config/supabase.js"></script>
+    <script src="../../js/config/constants.js"></script>
+
+    <script src="../../js/core/auth.js"></script>
+    <script src="../../js/core/theme.js"></script>
+
+    <script src="../../js/utils/helpers.js"></script>
+    <script src="../../js/utils/toast.js"></script>
+    <script src="../../js/utils/validator.js"></script>
+
+    <script src="../../js/components/loader.js"></script>
+    
+    <script src="../../js/dashboards/admin.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme & Logout
+            document.getElementById('themeToggle')?.addEventListener('click', () => window.theme.toggleTheme());
+            document.getElementById('logoutBtn')?.addEventListener('click', () => window.auth.signOut());
+
+            // Handle Discount Toggle Interaction
+            const discountToggle = document.getElementById('isDiscountActive');
+            const discountGroup = document.getElementById('discountInputGroup');
+            
+            discountToggle.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    discountGroup.style.opacity = '1';
+                    discountGroup.style.pointerEvents = 'auto';
+                    document.getElementById('discountPrice').required = true;
+                } else {
+                    discountGroup.style.opacity = '0.5';
+                    discountGroup.style.pointerEvents = 'none';
+                    document.getElementById('discountPrice').required = false;
+                    document.getElementById('discountPrice').value = '';
+                }
+            });
+
+            // Handle Form Submit
+            const form = document.getElementById("testForm");
+            
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                
+                const btn = document.getElementById("saveTestBtn");
+                const originalText = btn.innerHTML;
+
+                // 1. Logic Check: Pricing
+                const original = parseFloat(document.getElementById("originalPrice").value);
+                const discount = parseFloat(document.getElementById("discountPrice").value) || 0;
+                const isDiscount = document.getElementById("isDiscountActive").checked;
+
+                if (isDiscount && discount >= original) {
+                    window.toast.error("Discount price must be less than original price");
+                    return;
+                }
+
+                // 2. Prepare Data
+                const testData = {
+                    name: document.getElementById("testName").value,
+                    description: document.getElementById("description").value,
+                    original_price: original,
+                    discount_price: isDiscount ? discount : null,
+                    is_discount_active: isDiscount,
+                    duration_minutes: parseInt(document.getElementById("duration").value) || 15,
+                    prerequisites: document.getElementById("prerequisites").value,
+                    instructions: document.getElementById("instructions").value,
+                    image_url: document.getElementById("imageUrl").value,
+                    is_active: document.getElementById("isActive").checked
+                };
+
+                // 3. UI Loading State
+                btn.disabled = true;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
+
+                // 4. Send to Backend
+                await window.adminDashboard.saveTest(testData);
+
+                // 5. Reset (If not redirected)
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+        });
+    </script>
 </body>
 </html>

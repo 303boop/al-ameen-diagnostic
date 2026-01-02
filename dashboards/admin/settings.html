@@ -1,106 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings - Admin Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - Admin Dashboard</title>
 
-  <link rel="icon" href="../../assets/images/logo/favicon.png">
+    <link rel="icon" href="../../assets/images/logo/logo.ico">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <link rel="stylesheet" href="../../css/reset.css">
-  <link rel="stylesheet" href="../../css/variables.css">
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/components.css">
-  <link rel="stylesheet" href="../../css/layout.css">
-  <link rel="stylesheet" href="../../css/dashboards.css">
-  <link rel="stylesheet" href="../../css/themes.css">
-  <link rel="stylesheet" href="../../css/responsive.css">
-  <link rel="stylesheet" href="../../css/utilities.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/dashboards.css">
+    <link rel="stylesheet" href="../../css/themes.css">
+    <link rel="stylesheet" href="../../css/utilities.css">
 </head>
 
 <body>
-  <div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <aside class="dashboard-sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="../../assets/images/logo/logo.png" alt="Logo">
-          <span>Admin Panel</span>
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a href="./index.html" class="sidebar-nav-item">
-          <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
-        </a>
-        <a href="./settings.html" class="sidebar-nav-item active">
-          <i class="fas fa-cog"></i><span>Settings</span>
-        </a>
-      </nav>
-    </aside>
-
-    <main class="dashboard-main">
-      <header class="dashboard-header">
-        <h1 class="dashboard-title">Settings</h1>
-      </header>
-
-      <div class="dashboard-content">
-
-        <div class="dashboard-card mb-4">
-          <div class="dashboard-card-header">
-            <h3>General Settings</h3>
-          </div>
-          <div class="dashboard-card-body">
-            <form id="generalSettingsForm">
-              <div class="form-group mb-3">
-                <label class="form-label">Site Name</label>
-                <input type="text" class="form-control" id="siteName">
-              </div>
-              <div class="form-group mb-3">
-                <label class="form-label">Support Email</label>
-                <input type="email" class="form-control" id="supportEmail">
-              </div>
-              <button type="submit" class="btn btn-primary">Save Settings</button>
-            </form>
-          </div>
-        </div>
-
-        <div class="dashboard-card">
-          <div class="dashboard-card-header">
-            <h3>Theme & Preferences</h3>
-          </div>
-          <div class="dashboard-card-body">
-            <div class="form-check mb-2">
-              <input type="checkbox" class="form-check-input" id="darkMode">
-              <label class="form-check-label" for="darkMode">Enable Dark Mode</label>
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="../../index.html" class="sidebar-logo text-decoration-none">
+                    <img src="../../assets/images/logo/logo.png" alt="Logo">
+                    <span class="text-white ms-2">Admin Panel</span>
+                </a>
             </div>
-            <button class="btn btn-primary" onclick="window.theme.toggleTheme()">
-              Toggle Theme
-            </button>
-          </div>
-        </div>
 
-      </div>
-    </main>
+            <nav class="sidebar-nav">
+                <div class="nav-label">Overview</div>
+                <a href="./index.html" class="sidebar-nav-item">
+                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                </a>
+                <a href="./analytics.html" class="sidebar-nav-item">
+                    <i class="fas fa-chart-line"></i><span>Analytics</span>
+                </a>
 
-  </div>
+                <div class="nav-label">Management</div>
+                <a href="./appointments.html" class="sidebar-nav-item">
+                    <i class="fas fa-calendar-check"></i><span>Appointments</span>
+                </a>
+                <a href="./doctors.html" class="sidebar-nav-item">
+                    <i class="fas fa-user-md"></i><span>Doctors</span>
+                </a>
+                <a href="./tests.html" class="sidebar-nav-item">
+                    <i class="fas fa-microscope"></i><span>Lab Tests</span>
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <i class="fas fa-users"></i><span>Patients</span>
+                </a>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+                <div class="nav-label">Finance</div>
+                <a href="./reports.html" class="sidebar-nav-item">
+                    <i class="fas fa-file-invoice"></i><span>Reports</span>
+                </a>
+                <a href="./coupons.html" class="sidebar-nav-item">
+                    <i class="fas fa-tags"></i><span>Coupons</span>
+                </a>
 
-  <script src="../../js/config/supabase.js"></script>
-  <script src="../../js/utils/helpers.js"></script>
-  <script src="../../js/utils/toast.js"></script>
-  <script src="../../js/core/auth.js"></script>
-  <script src="../../js/core/theme.js"></script>
-  <script src="../../js/components/loader.js"></script>
-  <script src="../../js/dashboards/admin.js"></script>
+                <div class="nav-label">System</div>
+                <a href="./audit-logs.html" class="sidebar-nav-item">
+                    <i class="fas fa-history"></i><span>Audit Logs</span>
+                </a>
+                <a href="./settings.html" class="sidebar-nav-item active">
+                    <i class="fas fa-cog"></i><span>Settings</span>
+                </a>
 
-  <script>
-    window.adminDashboard.loadSettings?.();
-  </script>
+                <div class="mt-auto">
+                    <button id="logoutBtn" class="sidebar-nav-item text-danger border-0 bg-transparent w-100 text-start">
+                        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="dashboard-main">
+            
+            <header class="dashboard-header d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">System Settings</h1>
+                <div class="dashboard-actions d-flex gap-2">
+                    <button class="btn btn-light rounded-circle" id="themeToggle" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="card-title mb-0 text-primary">Clinic Information</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <form id="settingsForm">
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Clinic Name</label>
+                                        <input type="text" class="form-control" id="clinicName" required>
+                                    </div>
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Contact Phone</label>
+                                            <input type="tel" class="form-control" id="clinicPhone" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Contact Email</label>
+                                            <input type="email" class="form-control" id="clinicEmail" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Address</label>
+                                        <textarea class="form-control" id="clinicAddress" rows="2" required></textarea>
+                                    </div>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Opening Time</label>
+                                            <input type="time" class="form-control" id="openTime">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Closing Time</label>
+                                            <input type="time" class="form-control" id="closeTime">
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary" id="saveSettingsBtn">
+                                        <i class="fas fa-save me-2"></i> Save Changes
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm border-danger">
+                            <div class="card-body p-4">
+                                <h5 class="text-danger mb-3">Danger Zone</h5>
+                                <p class="text-muted small">Irreversible actions for system maintenance.</p>
+                                <button class="btn btn-outline-danger btn-sm" onclick="alert('This feature (Clear Cache / Reset Data) is disabled in production for safety.')">
+                                    <i class="fas fa-trash me-2"></i> Clear Application Cache
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../../js/config/supabase.js"></script>
+    <script src="../../js/config/constants.js"></script>
+
+    <script src="../../js/core/auth.js"></script>
+    <script src="../../js/core/theme.js"></script>
+
+    <script src="../../js/utils/helpers.js"></script>
+    <script src="../../js/utils/toast.js"></script>
+
+    <script src="../../js/components/loader.js"></script>
+    
+    <script src="../../js/dashboards/admin.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme & Logout
+            document.getElementById('themeToggle')?.addEventListener('click', () => window.theme.toggleTheme());
+            document.getElementById('logoutBtn')?.addEventListener('click', () => window.auth.signOut());
+
+            // 1. Load Current Settings
+            loadSettings();
+
+            // 2. Handle Save
+            document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveSettings();
+            });
+        });
+
+        async function loadSettings() {
+            try {
+                const { data, error } = await window.supabase
+                    .from('clinic_settings')
+                    .select('*')
+                    .single();
+
+                if (error && error.code !== 'PGRST116') { // Ignore 'row not found' initially
+                    console.error("Load Error:", error);
+                    return;
+                }
+
+                if (data) {
+                    document.getElementById('clinicName').value = data.clinic_name || '';
+                    document.getElementById('clinicPhone').value = data.phone || '';
+                    document.getElementById('clinicEmail').value = data.email || '';
+                    document.getElementById('clinicAddress').value = data.address || '';
+                    document.getElementById('openTime').value = data.opening_time || '';
+                    document.getElementById('closeTime').value = data.closing_time || '';
+                }
+            } catch (error) {
+                console.error("Settings Load Error:", error);
+            }
+        }
+
+        async function saveSettings() {
+            const btn = document.getElementById('saveSettingsBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
+
+            const payload = {
+                clinic_name: document.getElementById('clinicName').value,
+                phone: document.getElementById('clinicPhone').value,
+                email: document.getElementById('clinicEmail').value,
+                address: document.getElementById('clinicAddress').value,
+                opening_time: document.getElementById('openTime').value || null,
+                closing_time: document.getElementById('closeTime').value || null,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                // Check if row exists first (to decide Insert vs Update)
+                // Actually, since we usually have 1 row, we can try Update, if 0 rows affected -> Insert.
+                // Or simpler: Upsert logic if ID is known. Assuming we just upsert.
+                
+                // Fetch ID first to be safe, or assume strict single row logic
+                const { data: existing } = await window.supabase.from('clinic_settings').select('id').single();
+
+                let error;
+                if (existing) {
+                    const res = await window.supabase.from('clinic_settings').update(payload).eq('id', existing.id);
+                    error = res.error;
+                } else {
+                    const res = await window.supabase.from('clinic_settings').insert([payload]);
+                    error = res.error;
+                }
+
+                if (error) throw error;
+
+                window.toast.success("Settings updated successfully!");
+
+            } catch (error) {
+                console.error("Save Error:", error);
+                window.toast.error("Failed to save settings.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+    </script>
 </body>
 </html>

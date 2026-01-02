@@ -1,82 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Appointment - Al-Ameen Diagnostic Center</title>
-  
-  <link rel="icon" type="image/x-icon" href="./assets/images/logo/logo.ico">
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="./css/reset.css">
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/layout.css">
-  <link rel="stylesheet" href="./css/themes.css">
-  <link rel="stylesheet" href="./css/responsive.css">
-  <link rel="stylesheet" href="./css/utilities.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - Al-Ameen Diagnostic Center</title>
+    <link rel="icon" type="image/x-icon" href="./assets/images/logo/logo.ico">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/variables.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/themes.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <link rel="stylesheet" href="./css/utilities.css">
 </head>
 
 <body>
 
-  <!-- Navbar -->
   <div id="navbar"></div>
 
-  <!-- Booking Form -->
   <section class="container py-5">
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="mb-0" data-i18n="booking.title">Book Your Appointment</h2>
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-primary text-white">
+            <h2 class="mb-0 h4">Book Your Appointment</h2>
           </div>
-          <div class="card-body">
+          <div class="card-body p-4">
+            
             <form id="bookingForm">
+              
+              <div class="mb-4">
+                  <label class="form-label fw-bold">I want to book a:</label>
+                  <div class="btn-group w-100" role="group">
+                      <input type="radio" class="btn-check" name="bookingType" id="typeDoctor" value="doctor" checked>
+                      <label class="btn btn-outline-primary" for="typeDoctor"><i class="fas fa-user-md me-2"></i>Doctor</label>
 
-              <div class="form-group mb-3">
-                <label class="form-label" data-i18n="booking.select_doctor">Select Doctor</label>
-                <select class="form-control" id="doctorSelect" required>
-                  <option value="">Choose a doctor...</option>
+                      <input type="radio" class="btn-check" name="bookingType" id="typeTest" value="test">
+                      <label class="btn btn-outline-primary" for="typeTest"><i class="fas fa-microscope me-2"></i>Lab Test</label>
+                  </div>
+              </div>
+
+              <div class="form-group mb-3" id="doctorInputGroup">
+                <label class="form-label">Select Doctor</label>
+                <select class="form-select" id="doctorSelect">
+                  <option value="">Loading doctors...</option>
+                </select>
+              </div>
+
+              <div class="form-group mb-3 d-none" id="testInputGroup">
+                <label class="form-label">Select Test</label>
+                <select class="form-select" id="testSelect">
+                  <option value="">Loading tests...</option>
                 </select>
               </div>
 
               <div class="form-group mb-3">
-                <label class="form-label" data-i18n="booking.select_date">Select Date</label>
+                <label class="form-label">Select Date</label>
                 <input type="date" class="form-control" id="appointmentDate" required>
               </div>
 
+              <hr class="my-4">
+
+              <h5 class="mb-3">Patient Details</h5>
+              
               <div class="form-group mb-3">
-                <label class="form-label" data-i18n="booking.full_name">Full Name</label>
+                <label class="form-label">Full Name</label>
                 <input type="text" class="form-control" id="patientName" required>
               </div>
 
-              <div class="form-group mb-3">
-                <label class="form-label" data-i18n="booking.phone">Phone Number</label>
-                <input type="tel" class="form-control" id="patientPhone" required>
+              <div class="row">
+                  <div class="col-md-6 form-group mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="patientPhone" required>
+                  </div>
+                  <div class="col-md-6 form-group mb-3">
+                    <label class="form-label">Email Address (Optional)</label>
+                    <input type="email" class="form-control" id="patientEmail">
+                  </div>
               </div>
 
               <div class="form-group mb-3">
-                <label class="form-label" data-i18n="booking.email">Email Address</label>
-                <input type="email" class="form-control" id="patientEmail">
-              </div>
-
-              <div class="form-group mb-3">
-                <label class="form-label" data-i18n="booking.notes">Additional Notes</label>
-                <textarea class="form-control" id="patientNotes" rows="3"></textarea>
+                <label class="form-label">Additional Notes</label>
+                <textarea class="form-control" id="patientNotes" rows="2"></textarea>
               </div>
 
               <div class="form-group mb-4">
-                <label class="form-label" data-i18n="booking.coupon_code">Coupon Code (Optional)</label>
-                <div class="d-flex gap-2">
-                  <input type="text" class="form-control" id="couponCode">
-                  <button type="button" class="btn btn-secondary" id="applyCoupon">Apply</button>
+                <label class="form-label">Coupon Code</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="couponCode" placeholder="Enter code">
+                  <button type="button" class="btn btn-outline-secondary" id="applyCoupon">Apply</button>
                 </div>
+                <small id="couponMessage" class="form-text text-success"></small>
               </div>
 
-              <button type="submit" class="btn btn-primary w-100" id="submitBooking" data-i18n="booking.submit">
+              <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="submitBooking">
                 Confirm Booking
               </button>
 
@@ -87,85 +109,27 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <div id="footer"></div>
 
-  <!-- Vendor JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Core Config -->
-  <script src="./js/config/supabase.js" defer></script>
-  <script src="./js/config/constants.js" defer></script>
+  <script src="./js/config/supabase.js"></script>
+  <script src="./js/config/constants.js"></script>
+  <script src="./js/core/auth.js"></script>
+  
+  <script src="./js/utils/helpers.js"></script>
+  <script src="./js/utils/date-utils.js"></script>
+  <script src="./js/utils/validator.js"></script>
+  <script src="./js/utils/toast.js"></script>
 
-  <!-- Core (must load before components) -->
-  <script src="./js/core/auth.js" defer></script>
-  <script src="./js/core/language.js" defer></script>
-  <script src="./js/core/theme.js" defer></script>
+  <script src="./js/features/booking.js"></script>
+  
+  <script src="./js/features/booking-ui.js"></script>
 
-  <!-- Utilities -->
-  <script src="./js/utils/helpers.js" defer></script>
-  <script src="./js/utils/validator.js" defer></script>
-  <script src="./js/utils/date-utils.js" defer></script>
-  <script src="./js/utils/toast.js" defer></script>
-
-  <!-- Features -->
-  <script src="./js/features/booking.js" defer></script>
-  <script src="./js/features/coupon.js" defer></script>
-
-  <!-- Components -->
-  <script src="./js/components/navbar.js" defer></script>
-  <script src="./js/components/footer.js" defer></script>
-  <script src="./js/components/modal.js" defer></script>
-  <script src="./js/components/loader.js" defer></script>
-
-  <!-- App -->
-  <script src="./js/main.js" defer></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-
-      document.getElementById('appointmentDate').min = dateUtils.getTodayDate();
-
-      document.getElementById('bookingForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!validator.validateForm(e.target)) return;
-
-        loader.showPageLoader('Booking appointment...');
-
-        const bookingData = {
-          doctor_id: document.getElementById('doctorSelect').value,
-          appointment_date: document.getElementById('appointmentDate').value,
-          guest_name: document.getElementById('patientName').value,
-          guest_phone: document.getElementById('patientPhone').value,
-          guest_email: document.getElementById('patientEmail').value,
-          notes: document.getElementById('patientNotes').value,
-          coupon_code: document.getElementById('couponCode').value
-        };
-
-        const result = await booking.createAppointment(bookingData);
-        loader.hidePageLoader();
-
-        if (result.success) {
-          modal.showBookingConfirmation(result.data);
-        } else {
-          toast.error(result.error);
-        }
-      });
-
-      const doctorsResult = await booking.getAvailableDoctors();
-      if (doctorsResult.success) {
-        const select = document.getElementById('doctorSelect');
-        doctorsResult.data.forEach(doctor => {
-          const option = document.createElement('option');
-          option.value = doctor.id;
-          option.textContent = `${doctor.name} - ${doctor.specialization}`;
-          select.appendChild(option);
-        });
-      }
-
-    });
-  </script>
+  <script src="./js/main.js"></script>
+  <script src="./js/components/navbar.js"></script>
+  <script src="./js/components/footer.js"></script>
 
 </body>
 </html>

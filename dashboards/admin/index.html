@@ -1,142 +1,195 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Al-Ameen Diagnostic</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Al-Ameen Diagnostic</title>
+    
+    <link rel="icon" href="../../assets/images/logo/logo.ico">
 
-  <link rel="icon" href="../../assets/images/logo/favicon.png">
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css" rel="stylesheet">
-
-  <link rel="stylesheet" href="../../css/reset.css">
-  <link rel="stylesheet" href="../../css/variables.css">
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/components.css">
-  <link rel="stylesheet" href="../../css/layout.css">
-  <link rel="stylesheet" href="../../css/dashboards.css">
-  <link rel="stylesheet" href="../../css/themes.css">
-  <link rel="stylesheet" href="../../css/responsive.css">
-  <link rel="stylesheet" href="../../css/utilities.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/dashboards.css">
+    <link rel="stylesheet" href="../../css/themes.css">
+    <link rel="stylesheet" href="../../css/utilities.css">
 </head>
 
 <body>
-  <div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <aside class="dashboard-sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="../../assets/images/logo/logo.png" alt="Logo">
-          <span>Admin Panel</span>
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a href="./index.html" class="sidebar-nav-item active">
-          <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
-        </a>
-        <a href="./doctors.html" class="sidebar-nav-item">
-          <i class="fas fa-user-md"></i><span>Doctors</span>
-        </a>
-        <a href="./tests.html" class="sidebar-nav-item">
-          <i class="fas fa-flask"></i><span>Tests</span>
-        </a>
-        <a href="./appointments.html" class="sidebar-nav-item">
-          <i class="fas fa-calendar"></i><span>Appointments</span>
-        </a>
-        <a href="./reports.html" class="sidebar-nav-item">
-          <i class="fas fa-file-medical"></i><span>Reports</span>
-        </a>
-        <a href="./coupons.html" class="sidebar-nav-item">
-          <i class="fas fa-ticket-alt"></i><span>Coupons</span>
-        </a>
-        <a href="./users.html" class="sidebar-nav-item">
-          <i class="fas fa-users"></i><span>Users</span>
-        </a>
-        <a href="./audit-logs.html" class="sidebar-nav-item">
-          <i class="fas fa-history"></i><span>Audit Logs</span>
-        </a>
-        <a href="./settings.html" class="sidebar-nav-item">
-          <i class="fas fa-cog"></i><span>Settings</span>
-        </a>
-        <a href="../../index.html" class="sidebar-nav-item">
-          <i class="fas fa-home"></i><span>Back to Site</span>
-        </a>
-      </nav>
-    </aside>
-
-    <main class="dashboard-main">
-      <header class="dashboard-header">
-        <h1 class="dashboard-title">Admin Dashboard</h1>
-        <div class="dashboard-actions">
-          <button class="nav-icon-btn" onclick="window.theme.toggleTheme()">
-            <i class="fas fa-moon"></i>
-          </button>
-          <button class="nav-icon-btn" onclick="window.language.toggleLanguage()">EN</button>
-          <button class="btn btn-sm btn-danger" onclick="window.auth.signOut()">Logout</button>
-        </div>
-      </header>
-
-      <div class="dashboard-content">
-
-        <div id="adminStats" class="mb-4"></div>
-
-        <div class="row mb-4">
-          <div class="col-lg-6">
-            <div class="chart-wrapper">
-              <h3 class="chart-title">Appointment Status</h3>
-              <canvas id="statusChart"></canvas>
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="../../index.html" class="sidebar-logo text-decoration-none">
+                    <img src="../../assets/images/logo/logo.png" alt="Logo">
+                    <span class="text-white ms-2">Admin Panel</span>
+                </a>
             </div>
-          </div>
 
-          <div class="col-lg-6">
-            <div class="chart-wrapper">
-              <h3 class="chart-title">Monthly Revenue</h3>
-              <canvas id="revenueChart"></canvas>
+            <nav class="sidebar-nav">
+                <div class="nav-label">Overview</div>
+                <a href="./index.html" class="sidebar-nav-item active">
+                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                </a>
+                <a href="./analytics.html" class="sidebar-nav-item">
+                    <i class="fas fa-chart-line"></i><span>Analytics</span>
+                </a>
+
+                <div class="nav-label">Management</div>
+                <a href="./appointments.html" class="sidebar-nav-item">
+                    <i class="fas fa-calendar-check"></i><span>Appointments</span>
+                </a>
+                <a href="./doctors.html" class="sidebar-nav-item">
+                    <i class="fas fa-user-md"></i><span>Doctors</span>
+                </a>
+                <a href="./tests.html" class="sidebar-nav-item">
+                    <i class="fas fa-microscope"></i><span>Lab Tests</span>
+                </a>
+                <a href="./users.html" class="sidebar-nav-item">
+                    <i class="fas fa-users"></i><span>Patients</span>
+                </a>
+
+                <div class="nav-label">Finance</div>
+                <a href="./reports.html" class="sidebar-nav-item">
+                    <i class="fas fa-file-invoice"></i><span>Reports</span>
+                </a>
+                <a href="./coupons.html" class="sidebar-nav-item">
+                    <i class="fas fa-tags"></i><span>Coupons</span>
+                </a>
+
+                <div class="nav-label">System</div>
+                <a href="./audit-logs.html" class="sidebar-nav-item">
+                    <i class="fas fa-history"></i><span>Audit Logs</span>
+                </a>
+                <a href="./settings.html" class="sidebar-nav-item">
+                    <i class="fas fa-cog"></i><span>Settings</span>
+                </a>
+                
+                <div class="mt-auto">
+                    <button id="logoutBtn" class="sidebar-nav-item text-danger border-0 bg-transparent w-100 text-start">
+                        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="dashboard-main">
+            
+            <header class="dashboard-header d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">Dashboard Overview</h1>
+                
+                <div class="dashboard-actions d-flex gap-2">
+                    <button class="btn btn-light rounded-circle" id="themeToggle" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-light rounded-circle position-relative" id="notifBell" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none notification-badge">
+                                0
+                            </span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-0 notification-dropdown" id="notifDropdown" style="width: 300px;">
+                            </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+
+                <div id="adminStats" class="mb-4">
+                    <div class="row g-4">
+                        <div class="col-md-3"><div class="skeleton-box" style="height: 100px;"></div></div>
+                        <div class="col-md-3"><div class="skeleton-box" style="height: 100px;"></div></div>
+                        <div class="col-md-3"><div class="skeleton-box" style="height: 100px;"></div></div>
+                        <div class="col-md-3"><div class="skeleton-box" style="height: 100px;"></div></div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-8 mb-4 mb-lg-0">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Revenue Overview</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="revenueChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">Appointment Status</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="statusChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Recent Appointments</h5>
+                        <a href="./appointments.html" class="btn btn-sm btn-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0" id="recentAppointments">
+                        <div class="p-4 text-center text-muted">Loading data...</div>
+                    </div>
+                </div>
+
             </div>
-          </div>
-        </div>
+        </main>
+    </div>
 
-        <div class="dashboard-card">
-          <div class="dashboard-card-header">
-            <h3>Recent Appointments</h3>
-            <a href="./appointments.html" class="btn btn-sm btn-primary">View All</a>
-          </div>
-          <div class="dashboard-card-body">
-            <div id="recentAppointments"></div>
-          </div>
-        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-      </div>
-    </main>
-  </div>
+    <script src="../../js/config/supabase.js"></script>
+    <script src="../../js/config/constants.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/core/auth.js"></script>
+    <script src="../../js/core/theme.js"></script>
+    <script src="../../js/core/language.js"></script>
 
-  <script src="../../js/config/constants.js"></script>
-  <script src="../../js/config/supabase.js"></script>
-  <script src="../../js/utils/helpers.js"></script>
-  <script src="../../js/utils/date-utils.js"></script>
-  <script src="../../js/utils/toast.js"></script>
-  <script src="../../js/core/auth.js"></script>
-  <script src="../../js/core/language.js"></script>
-  <script src="../../js/core/theme.js"></script>
-  <script src="../../js/components/loader.js"></script>
-  <script src="../../js/components/modal.js"></script>
-  <script src="../../js/components/analytics.js"></script>
-  <script src="../../js/dashboards/admin.js"></script>
-  <script src="../../js/main.js"></script>
+    <script src="../../js/utils/helpers.js"></script>
+    <script src="../../js/utils/date-utils.js"></script>
+    <script src="../../js/utils/toast.js"></script>
 
-  <script>
-    window.auth.requireAuth(["admin"]);
-    document.addEventListener("DOMContentLoaded", () => {
-      window.adminDashboard.initAdminDashboard();
-    });
-  </script>
+    <script src="../../js/components/loader.js"></script>
+    <script src="../../js/components/modal.js"></script>
+    <script src="../../js/components/analytics.js"></script>
+
+    <script src="../../js/features/notifications.js"></script>
+
+    <script src="../../js/dashboards/admin.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Init Theme Toggle
+            document.getElementById('themeToggle')?.addEventListener('click', () => window.theme.toggleTheme());
+            
+            // 2. Init Logout
+            document.getElementById('logoutBtn')?.addEventListener('click', () => window.auth.signOut());
+
+            // 3. Init Notifications
+            if(window.notifications) {
+                window.notifications.init('notifBell', 'notifDropdown');
+            }
+
+            // 4. Admin Dashboard is auto-initialized by admin.js
+            // But if you removed auto-init from admin.js, uncomment below:
+            // if(window.adminDashboard) window.adminDashboard.init();
+        });
+    </script>
+
 </body>
 </html>

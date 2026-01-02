@@ -1,55 +1,73 @@
-// Application Constants (Read-only & Safe)
+// js/config/constants.js
 
-window.BASE_PATH = "/al-ameen-diagnostic";
+// =====================================================
+// Application Constants
+// =====================================================
+// NOTE: window.BASE_PATH is handled in supabase.js
 
-// Booking ID prefix
-const BOOKING_PREFIX = "ALM";
+// 1. Business Logic
+const BOOKING_PREFIX = "ALM"; // e.g., ALM-10234
 
-// Status values
+// 2. Database Enums (Must match Supabase "CHECK" constraints)
 const APPOINTMENT_STATUS = Object.freeze({
-  BOOKED: "booked",
-  CHECKED_IN: "checked_in",
-  COMPLETED: "completed",
-  CANCELLED: "cancelled",
+    BOOKED: "booked",
+    CHECKED_IN: "checked_in",
+    COMPLETED: "completed",
+    CANCELLED: "cancelled"
 });
 
 const REPORT_TYPES = Object.freeze({
-  DIAGNOSTIC: "diagnostic_test",
-  PRESCRIPTION: "prescription",
-  SCAN: "scan",
-  OTHER: "other",
+    DIAGNOSTIC: "diagnostic_test",
+    PRESCRIPTION: "prescription",
+    SCAN: "scan",
+    OTHER: "other"
 });
 
 const USER_ROLES = Object.freeze({
-  ADMIN: "admin",
-  LAB: "lab",
-  PATIENT: "patient",
+    ADMIN: "admin",
+    LAB: "lab",
+    PATIENT: "patient"
 });
 
-// Date & time formats
-const DATE_FORMAT = "DD/MM/YYYY";
-const TIME_FORMAT = "hh:mm A";
+const NOTIFICATION_TYPES = Object.freeze({
+    BOOKING_CONFIRMED: "booking_confirmed",
+    REPORT_READY: "report_ready",
+    REMINDER: "reminder"
+});
 
-// Pagination
+// 3. UI Helpers
 const ITEMS_PER_PAGE = 12;
+const CURRENCY = "₹"; 
 
-// Storage buckets
+// 4. Supabase Storage Bucket Names
 const STORAGE_BUCKETS = Object.freeze({
-  REPORTS: "reports",
-  DOCTORS: "doctors",
-  TESTS: "tests",
+    REPORTS: "reports",
+    DOCTORS: "doctors",
+    TESTS: "tests" // Ensure you created this bucket in Supabase
 });
 
-// Export once (protect from overwrite)
+// 5. Date Formats (for formatting libraries if used later)
+const DATE_FORMAT = {
+    DISPLAY: 'DD MMM YYYY', // 01 Jan 2024
+    DB: 'YYYY-MM-DD'       // 2024-01-01
+};
+
+// =========================
+// EXPORT
+// =========================
+// Prevent overwriting if loaded twice
 if (!window.APP_CONSTANTS) {
-  window.APP_CONSTANTS = Object.freeze({
-    BOOKING_PREFIX,
-    APPOINTMENT_STATUS,
-    REPORT_TYPES,
-    USER_ROLES,
-    DATE_FORMAT,
-    TIME_FORMAT,
-    ITEMS_PER_PAGE,
-    STORAGE_BUCKETS,
-  });
+    window.APP_CONSTANTS = Object.freeze({
+        BOOKING_PREFIX,
+        APPOINTMENT_STATUS,
+        REPORT_TYPES,
+        USER_ROLES,
+        NOTIFICATION_TYPES,
+        ITEMS_PER_PAGE,
+        CURRENCY,
+        STORAGE_BUCKETS,
+        DATE_FORMAT
+    });
 }
+
+console.log("✅ Constants loaded");

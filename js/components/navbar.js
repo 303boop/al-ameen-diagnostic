@@ -1,164 +1,140 @@
-// ===============================
-// Dynamic Navbar Component (FIXED)
-// ===============================
+// js/components/navbar.js
 
-// Render navbar
-async function renderNavbar() {
-  const navbar = document.getElementById('navbar');
-  if (!navbar) return;
+// =====================================================
+// Dynamic Navbar Component
+// =====================================================
 
-  // Safe guards (prevent JS crash)
-  const user = window.auth?.getCurrentUser
-    ? await window.auth.getCurrentUser()
-    : null;
+const Navbar = {
+    async renderNavbar() {
+        const navbar = document.getElementById('navbar');
+        if (!navbar) return;
 
-  const profile = user && window.auth?.getUserRole
-    ? await window.auth.getUserRole()
-    : null;
+        // 1. Get Base Path (Fixes navigation from subfolders)
+        const BP = window.BASE_PATH || '';
 
-  const currentLang = window.language?.getCurrentLanguage
-    ? window.language.getCurrentLanguage()
-    : 'en';
+        // 2. Get User State
+        const user = window.auth && window.auth.getCurrentUser 
+            ? await window.auth.getCurrentUser() 
+            : null;
 
-  const navHTML = `
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
-      <div class="container">
+        const profile = user && window.auth.getUserRole 
+            ? await window.auth.getUserRole() 
+            : null;
 
-        <!-- Logo -->
-        <a class="navbar-brand" href="./index.html">
-          <img src="./assets/images/logo/logo.png" alt="Al-Ameen Diagnostic" class="logo">
-        </a>
+        const currentLang = window.language && window.language.getCurrentLanguage 
+            ? window.language.getCurrentLanguage() 
+            : 'en';
 
-        <!-- Mobile Toggle -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        // 3. Build HTML
+        const navHTML = `
+            <nav class="navbar navbar-expand-lg navbar-light sticky-top bg-white shadow-sm">
+            <div class="container">
 
-        <!-- Nav Items -->
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav mx-auto">
-            <li class="nav-item"><a class="nav-link" href="./index.html">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="./about.html">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="./doctors.html">Doctors</a></li>
-            <li class="nav-item"><a class="nav-link" href="./tests.html">Tests</a></li>
-            <li class="nav-item"><a class="nav-link" href="./departments.html">Departments</a></li>
-            <li class="nav-item"><a class="nav-link" href="./contact.html">Contact</a></li>
-          </ul>
+                <a class="navbar-brand" href="${BP}/index.html">
+                    <img src="${BP}/assets/images/logo/logo.png" alt="Al-Ameen" class="logo" style="height: 40px;">
+                </a>
 
-          <!-- Right Actions -->
-          <div class="navbar-actions d-flex align-items-center gap-2">
-
-            <!-- Language -->
-            <button class="nav-icon-btn" id="langToggle">
-              ${currentLang === 'en' ? 'বাংলা' : 'English'}
-            </button>
-
-            <!-- Theme -->
-            <button class="nav-icon-btn" id="themeToggle">
-              <i class="fas fa-moon"></i>
-            </button>
-
-            ${
-              user
-                ? `
-              <div class="user-dropdown">
-                <button class="user-avatar" id="userMenuToggle">
-                  <i class="fas fa-user-circle"></i>
-                  <span class="user-name">${profile?.full_name || 'User'}</span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="user-menu" id="userMenu">
-                  <a href="${getDashboardURL(profile?.role)}" class="user-menu-item">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                  </a>
-                  <hr>
-                  <button class="user-menu-item" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                  </button>
+
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link" href="${BP}/index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="${BP}/about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="${BP}/doctors.html">Doctors</a></li>
+                        <li class="nav-item"><a class="nav-link" href="${BP}/tests.html">Tests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="${BP}/contact.html">Contact</a></li>
+                    </ul>
+
+                    <div class="navbar-actions d-flex align-items-center gap-2">
+
+                        <button class="btn btn-sm btn-outline-secondary rounded-circle" id="langToggle" title="Switch Language">
+                            <i class="fas fa-globe"></i>
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-secondary rounded-circle" id="themeToggle" title="Toggle Theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+
+                        ${user ? this.renderUserMenu(profile, BP) : `<a href="${BP}/login.html" class="btn btn-primary btn-sm">Login</a>`}
+
+                        <a href="${BP}/booking.html" class="btn btn-accent btn-sm text-white" style="background-color: var(--primary-color);">
+                            <i class="fas fa-calendar-plus"></i> Book Now
+                        </a>
+                    </div>
                 </div>
-              </div>
-            `
-                : `<a href="./login.html" class="btn btn-primary btn-sm">Login</a>`
+            </div>
+            </nav>
+        `;
+
+        navbar.innerHTML = navHTML;
+        this.initEvents();
+        this.highlightActivePage(BP);
+    },
+
+    renderUserMenu(profile, BP) {
+        const role = profile?.role || 'patient';
+        const name = profile?.full_name || 'User';
+        
+        // Determine Dashboard Link
+        let dashboardLink = `${BP}/dashboards/patient/index.html`;
+        if (role === 'admin') dashboardLink = `${BP}/dashboards/admin/index.html`;
+        if (role === 'lab') dashboardLink = `${BP}/dashboards/lab/index.html`;
+
+        return `
+            <div class="dropdown">
+                <button class="btn btn-outline-primary btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="d-none d-md-inline">${name}</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuBtn">
+                    <li><a class="dropdown-item" href="${dashboardLink}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item text-danger" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</button></li>
+                </ul>
+            </div>
+        `;
+    },
+
+    initEvents() {
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (window.auth) window.auth.signOut();
+            });
+        }
+
+        // Theme Toggle
+        const themeBtn = document.getElementById('themeToggle');
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                // Simple toggle logic (requires css variables)
+                const html = document.documentElement;
+                const current = html.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+        }
+    },
+
+    highlightActivePage(BP) {
+        const path = window.location.pathname;
+        const links = document.querySelectorAll('.nav-link');
+        
+        links.forEach(link => {
+            const href = link.getAttribute('href');
+            // Check if current path ends with the link href (handling base path)
+            if (href && href !== '#' && path.endsWith(href.replace(BP, ''))) {
+                link.classList.add('active');
+                link.classList.add('fw-bold');
+                link.classList.add('text-primary');
             }
-
-            <a href="./booking.html" class="btn btn-accent btn-sm">
-              <i class="fas fa-calendar-plus"></i> Book Now
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
-  `;
-
-  navbar.innerHTML = navHTML;
-
-  initNavbarEvents(user);
-}
-
-// Dashboard routing
-function getDashboardURL(role) {
-  if (role === 'admin') return './dashboards/admin/index.html';
-  if (role === 'lab') return './dashboards/lab/index.html';
-  return './dashboards/patient/index.html';
-}
-
-// Navbar events
-function initNavbarEvents(user) {
-  // Language toggle
-  document.getElementById('langToggle')?.addEventListener('click', () => {
-    window.language?.toggleLanguage?.();
-  });
-
-  // Theme toggle
-  document.getElementById('themeToggle')?.addEventListener('click', () => {
-    window.theme?.toggleTheme?.();
-  });
-
-  // User menu
-  const toggle = document.getElementById('userMenuToggle');
-  const menu = document.getElementById('userMenu');
-
-  if (toggle && menu) {
-    toggle.addEventListener('click', e => {
-      e.stopPropagation();
-      menu.classList.toggle('show');
-    });
-
-    document.addEventListener('click', () => {
-      menu.classList.remove('show');
-    });
-  }
-
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', () => {
-    window.auth?.signOut?.();
-  });
-
-  highlightActivePage();
-  initScrollBehavior();
-}
-
-// Active link
-function highlightActivePage() {
-  const path = window.location.pathname;
-  document.querySelectorAll('.nav-link').forEach(link => {
-    if (path.endsWith(link.getAttribute('href'))) {
-      link.classList.add('active');
+        });
     }
-  });
-}
+};
 
-// Scroll behavior
-function initScrollBehavior() {
-  const navbar = document.querySelector('.navbar');
-  if (!navbar) return;
-
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
-  });
-}
-
-// Init
-document.addEventListener('DOMContentLoaded', renderNavbar);
-
-// Global export
-window.navbar = { renderNavbar };
+// Global Export
+window.navbar = Navbar;

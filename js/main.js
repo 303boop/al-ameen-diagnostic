@@ -1,455 +1,303 @@
+// js/main.js
+
 // =====================================================
-// main.js — Application Initialization (PART 1)
-// Al-Ameen Diagnostic Center
+// Application Initialization & Routing
 // =====================================================
 
-/* =====================================================
-   DOM READY
-===================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("🚀 Al-Ameen Diagnostic - Application Starting...");
+    console.log("🚀 Al-Ameen Diagnostic - Application Starting...");
 
-  try {
-    // Supabase check (FIXED)
-    if (!window.supabase) {
-      console.error("❌ Supabase not initialized");
-      return;
+    try {
+        // 1. Safety Check for Dependencies
+        if (!window.supabase || !window.auth || !window.APP_CONSTANTS) {
+            console.error("❌ Critical dependencies missing. Check script order in HTML.");
+            return;
+        }
+
+        // 2. Initialize Core Components
+        await initializeGlobalComponents();
+
+        // 3. Initialize Page-Specific Logic
+        initializePageRouting();
+
+        // 4. Initialize Animations (AOS)
+        if (typeof AOS !== "undefined") {
+            AOS.init({
+                duration: 800,
+                easing: "ease-in-out",
+                once: true,
+                offset: 50,
+            });
+        }
+
+        console.log("✅ Application initialized successfully");
+
+    } catch (error) {
+        console.error("❌ Init Error:", error);
     }
-
-    // Core init
-    await initializeApp();
-
-    // Page routing
-    initializePageFeatures();
-
-    // AOS
-    if (typeof AOS !== "undefined") {
-      AOS.init({
-        duration: 800,
-        easing: "ease-in-out",
-        once: true,
-        offset: 100,
-      });
-    }
-
-    console.log("✅ Application initialized successfully");
-  } catch (error) {
-    console.error("❌ Application initialization failed:", error);
-  }
 });
 
-/* =====================================================
-   CORE INITIALIZATION
-===================================================== */
-async function initializeApp() {
-  /* ---------- Language ---------- */
-  if (window.language?.loadTranslations) {
-    const savedLanguage = localStorage.getItem("language") || "en";
-    await window.language.loadTranslations(savedLanguage);
-  }
-
-  /* ---------- Theme ---------- */
-  if (window.theme?.applyTheme) {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    window.theme.applyTheme(savedTheme);
-  }
-
-  /* ---------- Navbar ---------- */
-  if (window.navbar?.renderNavbar) {
-    await window.navbar.renderNavbar();
-  }
-
-  /* ---------- Footer ---------- */
-  if (window.footer?.renderFooter) {
-    await window.footer.renderFooter();
-  }
-
-  /* ---------- Lazy images ---------- */
-  window.gallery?.initLazyLoad?.();
-
-  /* ---------- Auth state ---------- */
-  supabase.auth.onAuthStateChange(async (event) => {
-    console.log("🔐 Auth event:", event);
-    if (window.navbar?.renderNavbar) {
-      await window.navbar.renderNavbar();
+// =====================================================
+// Core Component Initialization
+// =====================================================
+async function initializeGlobalComponents() {
+    // A. Load Navbar
+    if (window.navbar && window.navbar.renderNavbar) {
+        await window.navbar.renderNavbar();
     }
-  });
-}
 
-/* =====================================================
-   PAGE ROUTER
-===================================================== */
-function initializePageFeatures() {
-  const path = window.location.pathname;
+    // B. Load Footer
+    if (window.footer && window.footer.renderFooter) {
+        window.footer.renderFooter();
+    }
 
-  // Homepage
-  if (
-    path === BASE_PATH + "/" ||
-    path.endsWith("/index.html") ||
-    path.endsWith("/al-ameen-diagnostic/")
-  ) {
-    initHomepage();
-  }
+    // C. Theme & Language (Future Proofing)
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute('data-theme', savedTheme);
 
-  if (path.includes("doctors.html")) initDoctorsPage();
-  if (path.includes("doctor-detail.html")) initDoctorDetailPage();
-  if (path.includes("tests.html")) initTestsPage();
-  if (path.includes("test-detail.html")) initTestDetailPage();
-  if (path.includes("booking.html")) initBookingPage();
-  if (path.includes("track-booking.html")) initTrackBookingPage();
-  if (path.includes("login.html")) initLoginPage();
-
-  // Dashboards
-  if (path.includes("/dashboards/patient/"))
-    window.patientDashboard?.initPatientDashboard?.();
-
-  if (path.includes("/dashboards/lab/"))
-    window.labDashboard?.initLabDashboard?.();
-
-  if (path.includes("/dashboards/admin/"))
-    window.adminDashboard?.initAdminDashboard?.();
-}
-
-// =====================================================
-// main.js — Homepage & Doctors (PART 2)
-// =====================================================
-
-/* =====================================================
-   HOMEPAGE
-===================================================== */
-function initHomepage() {
-  console.log("📄 Initializing homepage...");
-  loadFeaturedDoctors();
-  loadFeaturedTests();
-
-  const heroSwiper = document.querySelector(".hero-swiper");
-  if (heroSwiper && window.gallery) {
-    window.gallery.initCarousel(heroSwiper, {
-      slidesPerView: 1,
-      autoplay: { delay: 5000 },
+    // D. Global Auth Listener
+    // If user logs in/out in a different tab, this updates the UI
+    window.supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            if (window.navbar) await window.navbar.renderNavbar();
+            
+            // Redirect logic if they log out while on a dashboard
+            if (event === 'SIGNED_OUT' && window.location.pathname.includes('/dashboards/')) {
+                window.location.href = `${window.BASE_PATH}/login.html`;
+            }
+        }
     });
-  }
 }
 
-/* =====================================================
-   FEATURED DOCTORS
-===================================================== */
+// =====================================================
+// Page Routing Logic
+// =====================================================
+function initializePageRouting() {
+    const path = window.location.pathname;
+    const basePath = window.BASE_PATH || "";
+
+    // Helper to check path
+    const isPage = (name) => path.includes(name) || path === basePath + name;
+
+    // --- Public Pages ---
+    if (path === basePath + "/" || path.endsWith("/index.html") || path === basePath) {
+        initHomepage();
+    } 
+    else if (isPage("/doctors.html")) {
+        initDoctorsPage();
+    }
+    else if (isPage("/doctor-detail.html")) {
+        initDoctorDetailPage();
+    }
+    else if (isPage("/tests.html")) {
+        initTestsPage();
+    }
+    else if (isPage("/test-detail.html")) {
+        initTestDetailPage();
+    }
+    else if (isPage("/login.html")) {
+        // Login logic is handled directly in login.html script usually, 
+        // but we can add global listeners here if needed.
+    }
+    else if (isPage("/booking.html")) {
+        // We will build this next
+        if (window.booking) window.booking.initBookingForm();
+    }
+
+    // --- Dashboards ---
+    // We check if the specific dashboard module is loaded before calling init
+    if (path.includes("/dashboards/patient/") && window.patientDashboard) {
+        window.patientDashboard.init();
+    }
+    else if (path.includes("/dashboards/admin/") && window.adminDashboard) {
+        window.adminDashboard.init();
+    }
+    else if (path.includes("/dashboards/lab/") && window.labDashboard) {
+        window.labDashboard.init();
+    }
+}
+
+// =====================================================
+// Public Page Functions
+// =====================================================
+
+// --- Homepage ---
+function initHomepage() {
+    console.log("🏠 Loading Homepage...");
+    loadFeaturedDoctors();
+    loadFeaturedTests(); 
+}
+
+// --- Doctors ---
 async function loadFeaturedDoctors() {
-  const container = document.getElementById("featuredDoctors");
-  if (!container) return;
+    const container = document.getElementById("featuredDoctors");
+    if (!container) return;
 
-  try {
-    const { data, error } = await supabase
-      .from("doctors")
-      .select("*")
-      .eq("is_active", true)
-      .limit(6);
+    const { data, error } = await window.supabase
+        .from("doctors")
+        .select("*")
+        .eq("is_active", true)
+        .limit(4);
 
-    if (error) throw error;
-    if (!data?.length) return;
+    if (error) {
+        console.error("Error loading doctors:", error);
+        return;
+    }
 
-    container.innerHTML = gallery.createItemCarousel(data, "doctor");
-
-    gallery.initCarousel(
-      container.querySelector(".item-carousel"),
-      {
-        slidesPerView: 1,
-        spaceBetween: 20,
-        breakpoints: {
-          640: { slidesPerView: 2 },
-          768: { slidesPerView: 3 },
-          1024: { slidesPerView: 4 },
-        },
-      }
-    );
-  } catch (e) {
-    console.error("Error loading featured doctors:", e);
-  }
+    if (data && window.gallery) {
+        container.innerHTML = window.gallery.createItemCarousel(data, "doctor");
+        // Initialize Swiper if needed here
+    }
 }
 
-/* =====================================================
-   DOCTORS PAGE
-===================================================== */
+async function loadFeaturedTests() {
+    const container = document.getElementById("featuredTests");
+    if (!container) return;
+
+    const { data, error } = await window.supabase
+        .from("tests")
+        .select("*")
+        .eq("is_active", true)
+        .limit(4);
+
+    if (error) {
+        console.error("Error loading tests:", error);
+        return;
+    }
+
+    // Basic Grid Render (Replace with your card component)
+    container.innerHTML = data.map(test => `
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">${test.name}</h5>
+                    <p class="text-primary fw-bold">₹${test.discount_price || test.original_price}</p>
+                    <a href="${window.BASE_PATH}/booking.html?test_id=${test.id}" class="btn btn-sm btn-outline-primary w-100">Book Now</a>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// --- Doctors Page ---
 function initDoctorsPage() {
-  console.log("📄 Initializing doctors page...");
-  loadAllDoctors();
+    loadAllDoctors();
 }
 
 async function loadAllDoctors() {
-  const container = document.getElementById("doctorsGrid");
-  if (!container) return;
+    const container = document.getElementById("doctorsGrid");
+    if (!container) return;
 
-  window.loader?.showSectionLoader?.(container);
+    const { data, error } = await window.supabase
+        .from("doctors")
+        .select("*")
+        .eq("is_active", true);
 
-  try {
-    const { data, error } = await supabase
-      .from("doctors")
-      .select("*")
-      .eq("is_active", true)
-      .order("name");
+    if (error) {
+        container.innerHTML = `<p class="text-danger">Failed to load doctors.</p>`;
+        return;
+    }
 
-    if (error) throw error;
-    displayDoctorsGrid(data, container);
-  } catch (err) {
-    container.innerHTML =
-      '<p class="text-danger">Failed to load doctors</p>';
-  } finally {
-    window.loader?.hideSectionLoader?.(container);
-  }
-}
-
-function displayDoctorsGrid(doctors, container) {
-  if (!doctors?.length) {
-    container.innerHTML =
-      '<div class="empty-state"><p>No doctors available</p></div>';
-    return;
-  }
-
-  let html = '<div class="row g-4">';
-
-  doctors.forEach((doctor) => {
-    html += `
-      <div class="col-md-4 col-lg-3">
-        <div class="doctor-card">
-          <img src="${
-            doctor.image_url ||
-            BASE_PATH + "/assets/images/doctors/placeholder.jpg"
-          }" alt="${helpers.sanitizeHTML(doctor.name)}">
-          <h3>${helpers.sanitizeHTML(doctor.name)}</h3>
-          <p>${helpers.sanitizeHTML(doctor.specialization || "")}</p>
-          <p class="fee">${helpers.formatCurrency(
-            doctor.consultation_fee
-          )}</p>
-          <a href="${BASE_PATH}/doctor-detail.html?id=${
-      doctor.id
-    }" class="btn btn-primary btn-sm">View Profile</a>
+    container.innerHTML = data.map(doc => `
+        <div class="col-md-4 mb-4">
+            <div class="doctor-card p-3 border rounded">
+                <h5>${doc.name}</h5>
+                <p class="text-muted">${doc.specialization}</p>
+                <a href="${window.BASE_PATH}/doctor-detail.html?id=${doc.id}" class="btn btn-primary btn-sm">View Profile</a>
+            </div>
         </div>
-      </div>
-    `;
-  });
-
-  html += "</div>";
-  container.innerHTML = html;
+    `).join('');
 }
 
-/* =====================================================
-   DOCTOR DETAIL
-===================================================== */
+// --- Doctor Detail ---
 function initDoctorDetailPage() {
-  const id = new URLSearchParams(window.location.search).get("id");
-  if (id) loadDoctorDetails(id);
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if(id) loadDoctorDetails(id);
 }
 
-async function loadDoctorDetails(doctorId) {
-  const container = document.getElementById("doctorDetails");
-  if (!container) return;
+async function loadDoctorDetails(id) {
+    const container = document.getElementById("doctorDetails");
+    if (!container) return;
 
-  window.loader?.showPageLoader?.("Loading doctor details...");
+    const { data, error } = await window.supabase
+        .from("doctors")
+        .select("*")
+        .eq("id", id)
+        .single();
+    
+    if(error || !data) {
+        container.innerHTML = "Doctor not found.";
+        return;
+    }
 
-  try {
-    const result = await booking.getDoctorById(doctorId);
-    if (!result.success) throw new Error(result.error);
-    displayDoctorDetails(result.data, container);
-  } catch (e) {
-    container.innerHTML =
-      '<p class="text-danger">Failed to load doctor details</p>';
-  } finally {
-    window.loader?.hidePageLoader?.();
-  }
+    // Update UI
+    container.innerHTML = `
+        <h1>${data.name}</h1>
+        <p>${data.specialization}</p>
+        <p>${data.description || 'No description available.'}</p>
+        <a href="${window.BASE_PATH}/booking.html?doctor_id=${data.id}" class="btn btn-success">Book Appointment</a>
+    `;
 }
 
-function displayDoctorDetails(doctor, container) {
-  container.innerHTML = `
-    <div class="doctor-detail">
-      <img src="${
-        doctor.image_url ||
-        BASE_PATH + "/assets/images/doctors/placeholder.jpg"
-      }">
-      <h1>${helpers.sanitizeHTML(doctor.name)}</h1>
-      <p class="specialization">${helpers.sanitizeHTML(
-        doctor.specialization
-      )}</p>
-      <p class="description">${helpers.sanitizeHTML(
-        doctor.description || ""
-      )}</p>
-      <p class="fee">Consultation Fee: ${helpers.formatCurrency(
-        doctor.consultation_fee
-      )}</p>
-      <a href="${BASE_PATH}/booking.html?doctor=${
-    doctor.id
-  }" class="btn btn-primary">Book Appointment</a>
-    </div>
-  `;
-}
-
-// =====================================================
-// main.js — Tests, Booking, Globals (PART 3)
-// =====================================================
-
-/* =====================================================
-   TESTS PAGE
-===================================================== */
+// --- Tests Page ---
 function initTestsPage() {
-  loadAllTests();
+    loadAllTests();
 }
 
 async function loadAllTests() {
-  const container = document.getElementById("testsGrid");
-  if (!container) return;
+    const container = document.getElementById("testsGrid");
+    if(!container) return;
 
-  window.loader?.showSectionLoader?.(container);
+    const { data, error } = await window.supabase
+        .from("tests")
+        .select("*")
+        .eq("is_active", true);
 
-  try {
-    const { data, error } = await supabase
-      .from("tests")
-      .select("*")
-      .eq("is_active", true)
-      .order("name");
+    if(error) {
+        container.innerHTML = "Failed to load tests.";
+        return;
+    }
 
-    if (error) throw error;
-    displayTestsGrid(data, container);
-  } catch {
-    container.innerHTML =
-      '<p class="text-danger">Failed to load tests</p>';
-  } finally {
-    window.loader?.hideSectionLoader?.(container);
-  }
-}
-
-function displayTestsGrid(tests, container) {
-  if (!tests?.length) {
-    container.innerHTML =
-      '<div class="empty-state"><p>No tests available</p></div>';
-    return;
-  }
-
-  let html = '<div class="row g-4">';
-
-  tests.forEach((test) => {
-    const price = test.is_discount_active && test.discount_price
-      ? `<span class="original-price">${helpers.formatCurrency(
-          test.original_price
-        )}</span>
-         <span class="discount-price">${helpers.formatCurrency(
-           test.discount_price
-         )}</span>`
-      : `<span class="price">${helpers.formatCurrency(
-          test.original_price
-        )}</span>`;
-
-    html += `
-      <div class="col-md-4 col-lg-3">
-        <div class="test-card">
-          <img src="${
-            test.image_url ||
-            BASE_PATH + "/assets/images/tests/placeholder.jpg"
-          }">
-          ${test.is_discount_active ? '<span class="discount-badge">Discount</span>' : ""}
-          <h3>${helpers.sanitizeHTML(test.name)}</h3>
-          <div class="price-section">${price}</div>
-          <a href="${BASE_PATH}/test-detail.html?id=${
-      test.id
-    }" class="btn btn-primary btn-sm">View Details</a>
+    container.innerHTML = data.map(test => `
+         <div class="col-md-4 mb-4">
+            <div class="test-card p-3 border rounded">
+                <h5>${test.name}</h5>
+                <p>₹${test.original_price}</p>
+                <a href="${window.BASE_PATH}/test-detail.html?id=${test.id}" class="btn btn-primary btn-sm">Details</a>
+            </div>
         </div>
-      </div>
-    `;
-  });
-
-  html += "</div>";
-  container.innerHTML = html;
+    `).join('');
 }
 
-/* =====================================================
-   TEST DETAIL
-===================================================== */
+// --- Test Detail ---
 function initTestDetailPage() {
-  const id = new URLSearchParams(window.location.search).get("id");
-  if (id) loadTestDetails(id);
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if(id) loadTestDetails(id);
 }
 
-async function loadTestDetails(testId) {
-  const container = document.getElementById("testDetails");
-  if (!container) return;
+async function loadTestDetails(id) {
+    const container = document.getElementById("testDetails");
+    if (!container) return;
 
-  window.loader?.showPageLoader?.("Loading test details...");
+    const { data, error } = await window.supabase
+        .from("tests")
+        .select("*")
+        .eq("id", id)
+        .single();
+    
+    if(error || !data) {
+        container.innerHTML = "Test not found.";
+        return;
+    }
 
-  try {
-    const { data, error } = await supabase
-      .from("tests")
-      .select("*")
-      .eq("id", testId)
-      .single();
-
-    if (error) throw error;
-    displayTestDetails(data, container);
-  } catch {
-    container.innerHTML =
-      '<p class="text-danger">Failed to load test details</p>';
-  } finally {
-    window.loader?.hidePageLoader?.();
-  }
+    container.innerHTML = `
+        <h1>${data.name}</h1>
+        <p>${data.description}</p>
+        <p class="h4">Price: ₹${data.original_price}</p>
+        <a href="${window.BASE_PATH}/booking.html?test_id=${data.id}" class="btn btn-success mt-3">Book Test</a>
+    `;
 }
-
-function displayTestDetails(test, container) {
-  const price = test.is_discount_active && test.discount_price
-    ? `<span class="original-price">${helpers.formatCurrency(
-        test.original_price
-      )}</span>
-       <span class="discount-price">${helpers.formatCurrency(
-         test.discount_price
-       )}</span>`
-    : `<span class="price">${helpers.formatCurrency(
-        test.original_price
-      )}</span>`;
-
-  container.innerHTML = `
-    <div class="test-detail">
-      <img src="${
-        test.image_url ||
-        BASE_PATH + "/assets/images/tests/placeholder.jpg"
-      }">
-      <h1>${helpers.sanitizeHTML(test.name)}</h1>
-      <div class="price-section">${price}</div>
-      <p>${helpers.sanitizeHTML(test.description || "")}</p>
-      <a href="${BASE_PATH}/booking.html" class="btn btn-primary">Book Now</a>
-    </div>
-  `;
-}
-
-/* =====================================================
-   BOOKING / TRACK / LOGIN
-===================================================== */
-function initBookingPage() {
-  booking?.initBookingForm?.();
-}
-
-function initTrackBookingPage() {
-  console.log("📄 Track booking page");
-}
-
-function initLoginPage() {
-  console.log("📄 Login page");
-}
-
-/* =====================================================
-   GLOBAL ERROR HANDLERS
-===================================================== */
-window.addEventListener("error", (e) =>
-  console.error("Global error:", e.error)
-);
-
-window.addEventListener("unhandledrejection", (e) =>
-  console.error("Unhandled promise:", e.reason)
-);
-
-/* =====================================================
-   EXPORT
-===================================================== */
-window.app = {
-  initializeApp,
-  initializePageFeatures,
-};
-
-console.log("📝 main.js loaded successfully");
 
   

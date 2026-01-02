@@ -1,769 +1,309 @@
-// Admin Dashboard Functions
+// js/dashboards/admin.js
 
-// Initialize admin dashboard
-async function initAdminDashboard() {
-  const user = await getCurrentUser();
-  if (!user) {
-    window.location.href = '/login.html';
-    return;
-  }
+// =====================================================
+// Admin Dashboard Controller
+// =====================================================
 
-  const profile = await getUserRole();
-  if (profile.role !== 'admin') {
-    window.location.href = '/index.html';
-    return;
-  }
-
-  // Load dashboard data
-  loadAdminStats();
-  loadRecentAppointments();
-  loadAnalytics();
-}
-
-// Load admin statistics
-async function loadAdminStats() {
-  const statsContainer = document.getElementById('adminStats');
-  if (!statsContainer) return;
-
-  loader.showSectionLoader(statsContainer);
-
-  try {
-    // Get all stats in parallel
-    const [todayResult, patientsResult, doctorsResult, revenueResult] = await Promise.all([
-      analytics.getTodayAppointments(),
-      analytics.getTotalPatients(),
-      analytics.getActiveDoctors(),
-      analytics.getRevenueData(dateUtils.getDateAfterDays(-30), dateUtils.getTodayDate())
-    ]);
-
-    const stats = {
-      today_appointments: todayResult.count || 0,
-      total_patients: patientsResult.count || 0,
-      active_doctors: doctorsResult.count || 0,
-      monthly_revenue: revenueResult.revenue || 0
-    };
-
-    displayAdminStats(stats, statsContainer);
-  } catch (error) {
-    console.error('Error loading stats:', error);
-    toast.error('Failed to load statistics');
-  } finally {
-    loader.hideSectionLoader(statsContainer);
-  }
-}
-
-// Display admin stats
-function displayAdminStats(stats, container) {
-  container.innerHTML = `
-    <div class="row g-4">
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-primary">
-            <i class="fas fa-calendar-check"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.today_appointments}</h3>
-            <p>Today's Appointments</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-success">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.total_patients}</h3>
-            <p>Total Patients</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-info">
-            <i class="fas fa-user-md"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.active_doctors}</h3>
-            <p>Active Doctors</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-warning">
-            <i class="fas fa-rupee-sign"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${helpers.formatCurrency(stats.monthly_revenue)}</h3>
-            <p>Monthly Revenue</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// Load recent appointments
-async function loadRecentAppointments() {
-  const container = document.getElementById('recentAppointments');
-  if (!container) return;
-
-  loader.showSectionLoader(container);
-
-  try {
-    const { data, error } = await supabaseClient
-      .from('appointments')
-      .select(`
-        *,
-        doctor:doctors(name),
-        patient:profiles(full_name)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    if (error) throw error;
-
-    displayRecentAppointments(data, container);
-  } catch (error) {
-    console.error('Error loading appointments:', error);
-    container.innerHTML = '<p class="text-danger">Failed to load appointments</p>';
-  } finally {
-    loader.hideSectionLoader(container);
-  }
-}
-
-// Display recent appointments
-function displayRecentAppointments(appointments, container) {
-  if (!appointments || appointments.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No appointments yet</p></div>';
-    return;
-  }
-
-  let html = '<div class="table-responsive"><table class="table">';
-  html += `
-    <thead>
-      <tr>
-        <th>Booking ID</th>
-        <th>Patient</th>
-        <th>Doctor</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-
-  appointments.forEach(appointment => {
-    const patientName = appointment.patient?.full_name || appointment.guest_name || 'N/A';
-    const statusClass = {
-      'booked': 'warning',
-      'checked_in': 'info',
-      'completed': 'success',
-      'cancelled': 'danger'
-    }[appointment.status] || 'secondary';
-
-    html += `
-      <tr>
-        <td><code>${appointment.booking_id}</code></td>
-        <td>${patientName}</td>
-        <td>${appointment.doctor?.name}</td>
-        <td>${dateUtils.formatDisplayDate(appointment.appointment_date)}</td>
-        <td><span class="badge bg-${statusClass}">${appointment.status}</span></td>
-        <td>
-          <button class="btn btn-sm btn-outline-primary" 
-                  onclick="window.adminDashboard.viewAppointment('${appointment.id}')">
-            <i class="fas fa-eye"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-// Load analytics charts
-async function loadAnalytics() {
-  try {
-    const startDate = dateUtils.getDateAfterDays(-30);
-    const endDate = dateUtils.getTodayDate();
-
-    // Load appointment stats
-    const statsResult = await analytics.getAppointmentStats(startDate, endDate);
-    if (statsResult.success && document.getElementById('statusChart')) {
-      analytics.createStatusChart('statusChart', statsResult.stats);
+document.addEventListener('DOMContentLoaded', () => {
+    // Auto-init if we are on the admin dashboard page
+    if (window.location.pathname.includes('/admin/')) {
+        AdminDashboard.init();
     }
+});
 
-    // Load revenue chart
-    const revenueResult = await analytics.getRevenueByDate(startDate, endDate);
-    if (revenueResult.success && document.getElementById('revenueChart')) {
-      analytics.createRevenueChart('revenueChart', revenueResult);
-    }
+const AdminDashboard = {
 
-    // Load appointments chart
-    const appointmentsResult = await analytics.getAppointmentsByDate(startDate, endDate);
-    if (appointmentsResult.success && document.getElementById('appointmentsChart')) {
-      analytics.createAppointmentsChart('appointmentsChart', appointmentsResult);
-    }
+    // --- 1. INITIALIZATION ---
+    async init() {
+        console.log("🛡️ Initializing Admin Dashboard...");
 
-    // Load top doctors
-    const doctorsResult = await analytics.getPopularDoctors(5);
-    if (doctorsResult.success && document.getElementById('topDoctorsChart')) {
-      analytics.createTopDoctorsChart('topDoctorsChart', doctorsResult.doctors);
-    }
-  } catch (error) {
-    console.error('Error loading analytics:', error);
-  }
-}
-
-// View appointment details
-async function viewAppointment(appointmentId) {
-  try {
-    const { data, error } = await supabaseClient
-      .from('appointments')
-      .select(`
-        *,
-        doctor:doctors(name, specialization, consultation_fee),
-        patient:profiles(full_name, phone, email)
-      `)
-      .eq('id', appointmentId)
-      .single();
-
-    if (error) throw error;
-
-    const patientName = data.patient?.full_name || data.guest_name || 'N/A';
-    const patientPhone = data.patient?.phone || data.guest_phone || 'N/A';
-    const patientEmail = data.patient?.email || data.guest_email || 'N/A';
-
-    const content = `
-      <div class="appointment-details">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label>Booking ID:</label>
-            <p><strong>${data.booking_id}</strong></p>
-          </div>
-          <div class="col-md-6">
-            <label>Serial Number:</label>
-            <p><strong>#${data.serial_number}</strong></p>
-          </div>
-          <div class="col-md-6">
-            <label>Patient Name:</label>
-            <p>${patientName}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Phone:</label>
-            <p>${patientPhone}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Email:</label>
-            <p>${patientEmail}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Doctor:</label>
-            <p>${data.doctor?.name} (${data.doctor?.specialization})</p>
-          </div>
-          <div class="col-md-6">
-            <label>Date:</label>
-            <p>${dateUtils.formatDisplayDate(data.appointment_date)}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Time:</label>
-            <p>${helpers.formatTime(data.estimated_time)}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Status:</label>
-            <p><span class="badge bg-primary">${data.status}</span></p>
-          </div>
-          <div class="col-md-6">
-            <label>Consultation Fee:</label>
-            <p>${helpers.formatCurrency(data.doctor?.consultation_fee || 0)}</p>
-          </div>
-          ${data.patient_notes ? `
-          <div class="col-12">
-            <label>Patient Notes:</label>
-            <p>${data.patient_notes}</p>
-          </div>
-          ` : ''}
-          ${data.coupon_code ? `
-          <div class="col-md-6">
-            <label>Coupon Used:</label>
-            <p><code>${data.coupon_code}</code></p>
-          </div>
-          ` : ''}
-        </div>
-      </div>
-    `;
-
-    modal.showModal({
-      title: 'Appointment Details',
-      content: content,
-      size: 'large',
-      buttons: [
-        {
-          id: 'closeBtn',
-          text: 'Close',
-          type: 'secondary'
+        // A. Auth Check
+        const user = await window.auth.getCurrentUser();
+        if (!user) {
+            window.location.href = `${window.BASE_PATH}/login.html`;
+            return;
         }
-      ]
-    });
-  } catch (error) {
-    console.error('Error loading appointment:', error);
-    toast.error('Failed to load appointment details');
-  }
-}
 
-// Manage doctors
-async function loadDoctors() {
-  const container = document.getElementById('doctorsTable');
-  if (!container) return;
+        // B. Role Check
+        const profile = await window.auth.getUserRole();
+        if (!profile || profile.role !== 'admin') {
+            console.warn("Unauthorized: Not an admin.");
+            window.location.href = `${window.BASE_PATH}/index.html`;
+            return;
+        }
 
-  loader.showSectionLoader(container);
+        // C. Load Data based on current page
+        const path = window.location.pathname;
 
-  try {
-    const { data, error } = await supabaseClient
-      .from('doctors')
-      .select('*')
-      .order('name');
+        if (path.endsWith('index.html') || path.endsWith('/admin/')) {
+            this.loadAdminStats();
+            this.loadRecentAppointments();
+            this.loadAnalytics();
+        } 
+        else if (path.includes('doctors.html')) this.loadDoctors();
+        else if (path.includes('tests.html')) this.loadTests();
+        else if (path.includes('coupons.html')) this.loadCoupons();
+        else if (path.includes('users.html')) this.loadUsers();
+    },
 
-    if (error) throw error;
+    // --- 2. STATISTICS & ANALYTICS ---
+    async loadAdminStats() {
+        const container = document.getElementById('adminStats');
+        if (!container) return;
 
-    displayDoctorsTable(data, container);
-  } catch (error) {
-    console.error('Error loading doctors:', error);
-    container.innerHTML = '<p class="text-danger">Failed to load doctors</p>';
-  } finally {
-    loader.hideSectionLoader(container);
-  }
-}
+        if (!window.analytics) {
+            console.warn("Analytics module missing.");
+            container.innerHTML = `<div class="alert alert-warning">Analytics module not loaded.</div>`;
+            return;
+        }
 
-// Display doctors table
-function displayDoctorsTable(doctors, container) {
-  if (!doctors || doctors.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No doctors yet</p></div>';
-    return;
-  }
+        if(window.loader) window.loader.showSectionLoader(container);
 
-  let html = '<div class="table-responsive"><table class="table">';
-  html += `
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Specialization</th>
-        <th>Fee</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
+        try {
+            // Fetch Analytics Data
+            const [today, patients, doctors, revenue] = await Promise.all([
+                window.analytics.getTodayAppointments(),
+                window.analytics.getTotalPatients(),
+                window.analytics.getActiveDoctors(),
+                window.analytics.getRevenueData(30) // Last 30 days
+            ]);
 
-  doctors.forEach(doctor => {
-    html += `
-      <tr>
-        <td>${doctor.name}</td>
-        <td>${doctor.specialization}</td>
-        <td>${helpers.formatCurrency(doctor.consultation_fee)}</td>
-        <td>
-          <span class="badge bg-${doctor.is_active ? 'success' : 'danger'}">
-            ${doctor.is_active ? 'Active' : 'Inactive'}
-          </span>
-        </td>
-        <td>
-          <a href="/dashboards/admin/add-doctor.html?id=${doctor.id}" 
-             class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-edit"></i>
-          </a>
-          <button class="btn btn-sm btn-outline-${doctor.is_active ? 'danger' : 'success'}" 
-                  onclick="window.adminDashboard.toggleDoctorStatus('${doctor.id}', ${!doctor.is_active})">
-            <i class="fas fa-${doctor.is_active ? 'ban' : 'check'}"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  });
+            const stats = {
+                today_appointments: today?.count || 0,
+                total_patients: patients?.count || 0,
+                active_doctors: doctors?.count || 0,
+                monthly_revenue: revenue?.total || 0
+            };
 
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
+            this.renderStats(stats, container);
 
-// Toggle doctor active status
-async function toggleDoctorStatus(doctorId, newStatus) {
-  try {
-    const { error } = await supabaseClient
-      .from('doctors')
-      .update({ is_active: newStatus })
-      .eq('id', doctorId);
+        } catch (error) {
+            console.error('Stats Error:', error);
+            container.innerHTML = `<p class="text-danger">Failed to load statistics.</p>`;
+        } finally {
+            if(window.loader) window.loader.hideSectionLoader(container);
+        }
+    },
 
-    if (error) throw error;
+    renderStats(stats, container) {
+        // Helper to format currency
+        const formatMoney = (amount) => `₹${amount.toLocaleString()}`;
 
-    toast.success(`Doctor ${newStatus ? 'activated' : 'deactivated'} successfully`);
-    loadDoctors();
-  } catch (error) {
-    console.error('Error updating doctor:', error);
-    toast.error('Failed to update doctor status');
-  }
-}
+        container.innerHTML = `
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <h6 class="text-uppercase small">Today's Appointments</h6>
+                            <h2 class="display-6 fw-bold">${stats.today_appointments}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <h6 class="text-uppercase small">Total Patients</h6>
+                            <h2 class="display-6 fw-bold">${stats.total_patients}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <h6 class="text-uppercase small">Active Doctors</h6>
+                            <h2 class="display-6 fw-bold">${stats.active_doctors}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body">
+                            <h6 class="text-uppercase small">Monthly Revenue</h6>
+                            <h2 class="display-6 fw-bold">${formatMoney(stats.monthly_revenue)}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
 
-// Save doctor
-async function saveDoctor(doctorData, doctorId = null) {
-  const saveBtn = document.getElementById('saveDoctorBtn');
-  if (saveBtn) loader.showButtonLoader(saveBtn);
+    async loadAnalytics() {
+        if (!window.analytics) return;
+        
+        // Ensure elements exist before trying to render charts
+        if(document.getElementById('revenueChart')) {
+            window.analytics.renderRevenueChart('revenueChart');
+        }
+    },
 
-  try {
-    if (doctorId) {
-      // Update existing
-      const { error } = await supabaseClient
-        .from('doctors')
-        .update(doctorData)
-        .eq('id', doctorId);
+    // --- 3. RECENT APPOINTMENTS ---
+    async loadRecentAppointments() {
+        const container = document.getElementById('recentAppointments');
+        if (!container) return;
 
-      if (error) throw error;
-      toast.success('Doctor updated successfully');
-    } else {
-      // Create new
-      const { error } = await supabaseClient
-        .from('doctors')
-        .insert([doctorData]);
+        try {
+            const { data, error } = await window.supabase
+                .from('appointments')
+                .select(`*, doctor:doctors(name), patient:profiles(full_name)`)
+                .order('created_at', { ascending: false })
+                .limit(10);
 
-      if (error) throw error;
-      toast.success('Doctor added successfully');
+            if (error) throw error;
+
+            this.renderAppointmentsTable(data, container);
+
+        } catch (error) {
+            container.innerHTML = `<p class="text-danger">Error loading appointments.</p>`;
+        }
+    },
+
+    renderAppointmentsTable(appointments, container) {
+        if (!appointments.length) {
+            container.innerHTML = `<p class="text-muted">No appointments found.</p>`;
+            return;
+        }
+
+        const rows = appointments.map(appt => `
+            <tr>
+                <td><small class="text-muted">${appt.booking_id}</small></td>
+                <td>${appt.patient?.full_name || appt.guest_name || 'Guest'}</td>
+                <td>${appt.doctor?.name || 'Lab Test'}</td>
+                <td>${appt.appointment_date}</td>
+                <td><span class="badge bg-${this.getStatusColor(appt.status)}">${appt.status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-light" onclick="window.adminDashboard.viewAppointment('${appt.id}')">View</button>
+                </td>
+            </tr>
+        `).join('');
+
+        container.innerHTML = `
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead><tr><th>ID</th><th>Patient</th><th>Doctor/Test</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    },
+
+    getStatusColor(status) {
+        switch(status) {
+            case 'booked': return 'primary';
+            case 'completed': return 'success';
+            case 'cancelled': return 'danger';
+            default: return 'secondary';
+        }
+    },
+
+    async viewAppointment(id) {
+        alert(`View Appointment ID: ${id} \n(Modal functionality needs js/components/modal.js)`);
+    },
+
+    // --- 4. DOCTORS MANAGEMENT ---
+    async loadDoctors() {
+        const container = document.getElementById('doctorsTable');
+        if (!container) return;
+
+        const { data, error } = await window.supabase
+            .from('doctors')
+            .select('*')
+            .order('name');
+
+        if (error) {
+            container.innerHTML = "Error loading doctors.";
+            return;
+        }
+
+        container.innerHTML = `
+            <table class="table table-hover">
+                <thead><tr><th>Name</th><th>Specialization</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    ${data.map(doc => `
+                        <tr>
+                            <td>${doc.name}</td>
+                            <td>${doc.specialization}</td>
+                            <td>${doc.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='add-doctor.html?id=${doc.id}'">Edit</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="window.adminDashboard.toggleDoctor('${doc.id}', ${!doc.is_active})">
+                                    ${doc.is_active ? 'Disable' : 'Enable'}
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    },
+
+    async toggleDoctor(id, status) {
+        await window.supabase.from('doctors').update({ is_active: status }).eq('id', id);
+        this.loadDoctors(); // Refresh
+    },
+
+    // --- 5. USERS MANAGEMENT (Fixed) ---
+    async loadUsers() {
+        const container = document.getElementById('usersTable'); // Ensure you have a <div id="usersTable"></div> in users.html
+        if (!container) return;
+
+        const { data, error } = await window.supabase
+            .from("profiles")
+            .select(`id, full_name, phone, role, created_at`)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            container.innerHTML = `<p class="text-danger">Failed to load users.</p>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(user => `
+                            <tr>
+                                <td>${user.full_name || 'N/A'}</td>
+                                <td>${user.phone || '-'}</td>
+                                <td><span class="badge bg-secondary">${user.role}</span></td>
+                                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <select class="form-select form-select-sm d-inline-block w-auto" 
+                                        onchange="window.adminDashboard.updateUserRole('${user.id}', this.value)">
+                                        <option value="patient" ${user.role === 'patient' ? 'selected' : ''}>Patient</option>
+                                        <option value="lab" ${user.role === 'lab' ? 'selected' : ''}>Lab</option>
+                                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    },
+
+    async updateUserRole(userId, newRole) {
+        if(!confirm(`Change user role to ${newRole}?`)) return;
+
+        const { error } = await window.supabase
+            .from("profiles")
+            .update({ role: newRole })
+            .eq("id", userId);
+
+        if (error) alert("Update failed: " + error.message);
+        else alert("Role updated successfully.");
     }
-
-    setTimeout(() => {
-      window.location.href = '/dashboards/admin/doctors.html';
-    }, 1500);
-  } catch (error) {
-    console.error('Error saving doctor:', error);
-    toast.error('Failed to save doctor');
-  } finally {
-    if (saveBtn) loader.hideButtonLoader(saveBtn);
-  }
-}
-
-// Manage tests
-async function loadTests() {
-  const container = document.getElementById('testsTable');
-  if (!container) return;
-
-  loader.showSectionLoader(container);
-
-  try {
-    const { data, error } = await supabaseClient
-      .from('tests')
-      .select('*')
-      .order('name');
-
-    if (error) throw error;
-
-    displayTestsTable(data, container);
-  } catch (error) {
-    console.error('Error loading tests:', error);
-    container.innerHTML = '<p class="text-danger">Failed to load tests</p>';
-  } finally {
-    loader.hideSectionLoader(container);
-  }
-}
-
-// Display tests table
-function displayTestsTable(tests, container) {
-  if (!tests || tests.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No tests yet</p></div>';
-    return;
-  }
-
-  let html = '<div class="table-responsive"><table class="table">';
-  html += `
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Original Price</th>
-        <th>Discount Price</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-
-  tests.forEach(test => {
-    html += `
-      <tr>
-        <td>${test.name}</td>
-        <td>${helpers.formatCurrency(test.original_price)}</td>
-        <td>
-          ${test.is_discount_active && test.discount_price 
-            ? helpers.formatCurrency(test.discount_price) 
-            : '-'}
-        </td>
-        <td>
-          <span class="badge bg-${test.is_active ? 'success' : 'danger'}">
-            ${test.is_active ? 'Active' : 'Inactive'}
-          </span>
-        </td>
-        <td>
-          <a href="/dashboards/admin/add-test.html?id=${test.id}" 
-             class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-edit"></i>
-          </a>
-          <button class="btn btn-sm btn-outline-${test.is_active ? 'danger' : 'success'}" 
-                  onclick="window.adminDashboard.toggleTestStatus('${test.id}', ${!test.is_active})">
-            <i class="fas fa-${test.is_active ? 'ban' : 'check'}"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-// Toggle test status
-async function toggleTestStatus(testId, newStatus) {
-  try {
-    const { error } = await supabaseClient
-      .from('tests')
-      .update({ is_active: newStatus })
-      .eq('id', testId);
-
-    if (error) throw error;
-
-    toast.success(`Test ${newStatus ? 'activated' : 'deactivated'} successfully`);
-    loadTests();
-  } catch (error) {
-    console.error('Error updating test:', error);
-    toast.error('Failed to update test status');
-  }
-}
-
-// Save test
-async function saveTest(testData, testId = null) {
-  const saveBtn = document.getElementById('saveTestBtn');
-  if (saveBtn) loader.showButtonLoader(saveBtn);
-
-  try {
-    if (testId) {
-      const { error } = await supabaseClient
-        .from('tests')
-        .update(testData)
-        .eq('id', testId);
-
-      if (error) throw error;
-      toast.success('Test updated successfully');
-    } else {
-      const { error } = await supabaseClient
-        .from('tests')
-        .insert([testData]);
-
-      if (error) throw error;
-      toast.success('Test added successfully');
-    }
-
-    setTimeout(() => {
-      window.location.href = '/dashboards/admin/tests.html';
-    }, 1500);
-  } catch (error) {
-    console.error('Error saving test:', error);
-    toast.error('Failed to save test');
-  } finally {
-    if (saveBtn) loader.hideButtonLoader(saveBtn);
-  }
-}
-
-// Manage coupons
-async function loadCoupons() {
-  const container = document.getElementById('couponsTable');
-  if (!container) return;
-
-  loader.showSectionLoader(container);
-
-  try {
-    const { data, error } = await supabaseClient
-      .from('coupons')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    displayCouponsTable(data, container);
-  } catch (error) {
-    console.error('Error loading coupons:', error);
-    container.innerHTML = '<p class="text-danger">Failed to load coupons</p>';
-  } finally {
-    loader.hideSectionLoader(container);
-  }
-}
-
-// Display coupons table
-function displayCouponsTable(coupons, container) {
-  if (!coupons || coupons.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>No coupons yet</p></div>';
-    return;
-  }
-
-  let html = '<div class="table-responsive"><table class="table">';
-  html += `
-    <thead>
-      <tr>
-        <th>Code</th>
-        <th>Discount</th>
-        <th>Expires</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-
-  coupons.forEach(coupon => {
-    const discount = coupon.discount_type === 'percent' 
-      ? `${coupon.discount_value}%` 
-      : helpers.formatCurrency(coupon.discount_value);
-
-    html += `
-      <tr>
-        <td><code>${coupon.code}</code></td>
-        <td>${discount}</td>
-        <td>${coupon.expires_at ? dateUtils.formatDisplayDate(coupon.expires_at) : 'No Expiry'}</td>
-        <td>
-          <span class="badge bg-${coupon.is_active ? 'success' : 'danger'}">
-            ${coupon.is_active ? 'Active' : 'Inactive'}
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-sm btn-outline-${coupon.is_active ? 'danger' : 'success'}" 
-                  onclick="window.adminDashboard.toggleCouponStatus('${coupon.id}', ${!coupon.is_active})">
-            <i class="fas fa-${coupon.is_active ? 'ban' : 'check'}"></i>
-          </button>
-          <button class="btn btn-sm btn-outline-danger" 
-                  onclick="window.adminDashboard.deleteCoupon('${coupon.id}')">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-// Toggle coupon status
-async function toggleCouponStatus(couponId, newStatus) {
-  try {
-    const { error } = await supabaseClient
-      .from('coupons')
-      .update({ is_active: newStatus })
-      .eq('id', couponId);
-
-    if (error) throw error;
-
-    toast.success(`Coupon ${newStatus ? 'activated' : 'deactivated'} successfully`);
-    loadCoupons();
-  } catch (error) {
-    console.error('Error updating coupon:', error);
-    toast.error('Failed to update coupon status');
-  }
-}
-
-// Delete coupon
-async function deleteCoupon(couponId) {
-  const confirmed = await new Promise((resolve) => {
-    modal.showConfirm(
-      'Delete Coupon',
-      'Are you sure you want to delete this coupon?',
-      () => resolve(true),
-      () => resolve(false)
-    );
-  });
-
-  if (!confirmed) return;
-
-  try {
-    const { error } = await supabaseClient
-      .from('coupons')
-      .delete()
-      .eq('id', couponId);
-
-    if (error) throw error;
-
-    toast.success('Coupon deleted successfully');
-    loadCoupons();
-  } catch (error) {
-    console.error('Error deleting coupon:', error);
-    toast.error('Failed to delete coupon');
-  }
-}
-
-// Save coupon
-async function saveCoupon(couponData) {
-  const saveBtn = document.getElementById('saveCouponBtn');
-  if (saveBtn) loader.showButtonLoader(saveBtn);
-
-  try {
-    const { error } = await supabaseClient
-      .from('coupons')
-      .insert([couponData]);
-
-    if (error) throw error;
-
-    toast.success('Coupon created successfully');
-    
-    setTimeout(() => {
-      window.location.href = '/dashboards/admin/coupons.html';
-    }, 1500);
-  } catch (error) {
-    console.error('Error saving coupon:', error);
-    toast.error('Failed to create coupon');
-  } finally {
-    if (saveBtn) loader.hideButtonLoader(saveBtn);
-  }
-}
-
-// Export
-window.adminDashboard = {
-  initAdminDashboard,
-  viewAppointment,
-  loadDoctors,
-  toggleDoctorStatus,
-  saveDoctor,
-  loadTests,
-  toggleTestStatus,
-  saveTest,
-  loadCoupons,
-  toggleCouponStatus,
-  deleteCoupon,
-  saveCoupon
 };
 
-async function loadUsers() {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select(`
-      id,
-      full_name,
-      phone,
-      role,
-      created_at
-    `);
-
-  if (error) {
-    toast.error("Failed to load users");
-    return;
-  }
-
-  console.log(data); // render table here
-}
-
-async function updateUserRole(userId, role) {
-  const { error } = await supabase
-    .from("profiles")
-    .update({ role })
-    .eq("id", userId);
-
-  if (error) toast.error("Role update failed");
-  else toast.success("Role updated");
-}
+// Export
+window.adminDashboard = AdminDashboard;
+console.log("✅ Admin Dashboard loaded");

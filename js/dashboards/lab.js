@@ -1,412 +1,309 @@
-// Lab Dashboard Functions
+// js/dashboards/lab.js
 
-// Initialize lab dashboard
-async function initLabDashboard() {
-  const user = await getCurrentUser();
-  if (!user) {
-    window.location.href = '/login.html';
-    return;
-  }
+// =====================================================
+// Lab Dashboard Controller
+// =====================================================
 
-  const profile = await getUserRole();
-  if (profile.role !== 'lab') {
-    window.location.href = '/index.html';
-    return;
-  }
-
-  // Load dashboard data
-  loadLabStats();
-  loadTodayAppointments();
-}
-
-// Load lab statistics
-async function loadLabStats() {
-  const statsContainer = document.getElementById('labStats');
-  if (!statsContainer) return;
-
-  loader.showSectionLoader(statsContainer);
-
-  try {
-    const today = dateUtils.getTodayDate();
-    
-    // Today's appointments
-    const { data: todayAppointments } = await supabaseClient
-      .from('appointments')
-      .select('*')
-      .eq('appointment_date', today);
-
-    // Pending reports (appointments completed but no report uploaded)
-    const { data: completedNoReport } = await supabaseClient
-      .from('appointments')
-      .select(`
-        id,
-        reports(id)
-      `)
-      .eq('status', 'completed')
-      .is('reports.id', null);
-
-    const stats = {
-      today_total: todayAppointments?.length || 0,
-      today_pending: todayAppointments?.filter(a => a.status === 'booked').length || 0,
-      today_completed: todayAppointments?.filter(a => a.status === 'completed').length || 0,
-      pending_reports: completedNoReport?.length || 0
-    };
-
-    displayLabStats(stats, statsContainer);
-  } catch (error) {
-    console.error('Error loading stats:', error);
-    toast.error('Failed to load statistics');
-  } finally {
-    loader.hideSectionLoader(statsContainer);
-  }
-}
-
-// Display lab stats
-function displayLabStats(stats, container) {
-  container.innerHTML = `
-    <div class="row g-4">
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-primary">
-            <i class="fas fa-calendar-day"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.today_total}</h3>
-            <p>Today's Total</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-warning">
-            <i class="fas fa-hourglass-half"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.today_pending}</h3>
-            <p>Pending</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-success">
-            <i class="fas fa-check-double"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.today_completed}</h3>
-            <p>Completed</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat-card">
-          <div class="stat-icon bg-danger">
-            <i class="fas fa-file-upload"></i>
-          </div>
-          <div class="stat-content">
-            <h3>${stats.pending_reports}</h3>
-            <p>Pending Reports</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// Load today's appointments
-async function loadTodayAppointments() {
-  const container = document.getElementById('todayAppointments');
-  if (!container) return;
-
-  loader.showSectionLoader(container);
-
-  try {
-    const today = dateUtils.getTodayDate();
-    
-    const { data, error } = await supabaseClient
-      .from('appointments')
-      .select(`
-        *,
-        doctor:doctors(name, specialization),
-        patient:profiles(full_name, phone)
-      `)
-      .eq('appointment_date', today)
-      .order('serial_number');
-
-    if (error) throw error;
-
-    displayTodayAppointments(data, container);
-  } catch (error) {
-    console.error('Error loading appointments:', error);
-    container.innerHTML = '<p class="text-danger">Failed to load appointments</p>';
-  } finally {
-    loader.hideSectionLoader(container);
-  }
-}
-
-// Display today's appointments
-function displayTodayAppointments(appointments, container) {
-  if (!appointments || appointments.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-calendar-check"></i>
-        <p>No appointments for today</p>
-      </div>
-    `;
-    return;
-  }
-
-  let html = '<div class="table-responsive"><table class="table">';
-  html += `
-    <thead>
-      <tr>
-        <th>Serial</th>
-        <th>Booking ID</th>
-        <th>Patient</th>
-        <th>Doctor</th>
-        <th>Time</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-
-  appointments.forEach(appointment => {
-    const patientName = appointment.patient?.full_name || appointment.guest_name || 'N/A';
-    const statusClass = {
-      'booked': 'warning',
-      'checked_in': 'info',
-      'completed': 'success',
-      'cancelled': 'danger'
-    }[appointment.status] || 'secondary';
-
-    html += `
-      <tr>
-        <td><strong>#${appointment.serial_number}</strong></td>
-        <td><code>${appointment.booking_id}</code></td>
-        <td>${patientName}</td>
-        <td>${appointment.doctor?.name}</td>
-        <td>${helpers.formatTime(appointment.estimated_time)}</td>
-        <td><span class="badge bg-${statusClass}">${appointment.status}</span></td>
-        <td>
-          ${appointment.status === 'booked' ? `
-            <button class="btn btn-sm btn-success" 
-                    onclick="window.labDashboard.updateStatus('${appointment.id}', 'checked_in')">
-              Check In
-            </button>
-          ` : ''}
-          ${appointment.status === 'checked_in' ? `
-            <button class="btn btn-sm btn-primary" 
-                    onclick="window.labDashboard.updateStatus('${appointment.id}', 'completed')">
-              Complete
-            </button>
-          ` : ''}
-          ${appointment.status === 'completed' ? `
-            <a href="/dashboards/lab/upload-report.html?appointment=${appointment.id}" 
-               class="btn btn-sm btn-info">
-              Upload Report
-            </a>
-          ` : ''}
-        </td>
-      </tr>
-    `;
-  });
-
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-// Search appointment by booking ID
-async function searchByBookingId(bookingId) {
-  if (!bookingId || bookingId.trim().length === 0) {
-    toast.error('Please enter a booking ID');
-    return;
-  }
-
-  loader.showPageLoader('Searching...');
-
-  try {
-    const result = await booking.getAppointmentByBookingId(bookingId.trim());
-
-    if (!result.success) {
-      toast.error('Booking not found');
-      return;
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname.includes('/lab/')) {
+        LabDashboard.init();
     }
+});
 
-    displaySearchResult(result.data);
-  } catch (error) {
-    console.error('Error searching:', error);
-    toast.error('Search failed');
-  } finally {
-    loader.hidePageLoader();
-  }
-}
-
-// Display search result
-function displaySearchResult(appointment) {
-  const resultContainer = document.getElementById('searchResult');
-  if (!resultContainer) return;
-
-  const patientName = appointment.patient?.full_name || appointment.guest_name || 'N/A';
-  const patientPhone = appointment.patient?.phone || appointment.guest_phone || 'N/A';
-
-  resultContainer.innerHTML = `
-    <div class="search-result-card">
-      <div class="result-header">
-        <h4>Appointment Found</h4>
-        <span class="badge bg-${appointment.status === 'booked' ? 'warning' : 'success'}">
-          ${appointment.status}
-        </span>
-      </div>
-      <div class="result-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label>Booking ID:</label>
-            <p><strong>${appointment.booking_id}</strong></p>
-          </div>
-          <div class="col-md-6">
-            <label>Serial Number:</label>
-            <p><strong>#${appointment.serial_number}</strong></p>
-          </div>
-          <div class="col-md-6">
-            <label>Patient Name:</label>
-            <p>${patientName}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Phone:</label>
-            <p>${patientPhone}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Doctor:</label>
-            <p>${appointment.doctor?.name}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Date:</label>
-            <p>${dateUtils.formatDisplayDate(appointment.appointment_date)}</p>
-          </div>
-          <div class="col-md-6">
-            <label>Estimated Time:</label>
-            <p>${helpers.formatTime(appointment.estimated_time)}</p>
-          </div>
-        </div>
-      </div>
-      <div class="result-actions">
-        ${appointment.status === 'booked' ? `
-          <button class="btn btn-success" 
-                  onclick="window.labDashboard.updateStatus('${appointment.id}', 'checked_in')">
-            Check In
-          </button>
-        ` : ''}
-        ${appointment.status === 'checked_in' ? `
-          <button class="btn btn-primary" 
-                  onclick="window.labDashboard.updateStatus('${appointment.id}', 'completed')">
-            Mark Complete
-          </button>
-        ` : ''}
-      </div>
-    </div>
-  `;
-}
-
-// Update appointment status
-async function updateStatus(appointmentId, newStatus) {
-  loader.showPageLoader('Updating status...');
-
-  try {
-    const { data, error } = await supabaseClient
-      .from('appointments')
-      .update({ status: newStatus })
-      .eq('id', appointmentId)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    toast.success(`Status updated to ${newStatus}`);
+const LabDashboard = {
     
-    // Reload data
-    loadLabStats();
-    loadTodayAppointments();
-  } catch (error) {
-    console.error('Error updating status:', error);
-    toast.error('Failed to update status');
-  } finally {
-    loader.hidePageLoader();
-  }
-}
+    // --- 1. INITIALIZATION ---
+    async init() {
+        console.log("🧪 Initializing Lab Dashboard...");
 
-// Upload report
-async function uploadReport(appointmentId, file, reportType, testId) {
-  if (!file) {
-    toast.error('Please select a file');
-    return;
-  }
+        // A. Auth Check
+        const user = await window.auth.getCurrentUser();
+        if (!user) {
+            window.location.href = `${window.BASE_PATH}/login.html`;
+            return;
+        }
 
-  const user = await getCurrentUser();
-  const uploadBtn = document.getElementById('uploadBtn');
-  
-  if (uploadBtn) loader.showButtonLoader(uploadBtn);
+        // B. Role Check
+        const profile = await window.auth.getUserRole();
+        if (!profile || profile.role !== 'lab') {
+            console.warn("Unauthorized: Not a lab tech.");
+            window.location.href = `${window.BASE_PATH}/index.html`;
+            return;
+        }
 
-  try {
-    // Upload file to storage
-    const fileName = `${Date.now()}_${file.name}`;
-    const { data: uploadData, error: uploadError } = await supabaseClient
-      .storage
-      .from('reports')
-      .upload(fileName, file);
+        // C. Load Data
+        this.loadStats();
+        this.loadTodayAppointments();
+        
+        // D. Setup Search Listener (if on index page)
+        const searchInput = document.getElementById('bookingIdSearch');
+        const searchBtn = document.getElementById('searchBtn');
+        if(searchBtn && searchInput) {
+            searchBtn.addEventListener('click', () => this.searchByBookingId(searchInput.value));
+        }
+    },
 
-    if (uploadError) throw uploadError;
+    // --- 2. STATISTICS ---
+    async loadStats() {
+        const container = document.getElementById('labStats');
+        if (!container) return;
 
-    // Get public URL
-    const { data: urlData } = supabaseClient
-      .storage
-      .from('reports')
-      .getPublicUrl(fileName);
+        if(window.loader) window.loader.showSectionLoader(container);
 
-    // Get appointment details for patient_id
-    const { data: appointment } = await supabaseClient
-      .from('appointments')
-      .select('patient_id')
-      .eq('id', appointmentId)
-      .single();
+        try {
+            const today = new Date().toISOString().split('T')[0];
 
-    // Create report record
-    const { data: reportData, error: reportError } = await supabaseClient
-      .from('reports')
-      .insert([{
-        appointment_id: appointmentId,
-        patient_id: appointment?.patient_id,
-        file_url: urlData.publicUrl,
-        file_type: file.type,
-        report_type: reportType,
-        test_id: testId || null,
-        uploaded_by: user.id
-      }])
-      .select()
-      .single();
+            // 1. Get Today's Work
+            const { data: todayApps, error: todayError } = await window.supabase
+                .from('appointments')
+                .select('*')
+                .eq('appointment_date', today);
+            
+            if (todayError) throw todayError;
 
-    if (reportError) throw reportError;
+            // 2. Get Pending Reports (Completed appointments with NO report)
+            // Note: This is a simplified check. For production, use a more specific RPC or filter.
+            const { data: completedApps } = await window.supabase
+                .from('appointments')
+                .select('id, reports(id)')
+                .eq('status', 'completed');
 
-    toast.success('Report uploaded successfully');
-    
-    // Redirect back
-    setTimeout(() => {
-      window.location.href = '/dashboards/lab/index.html';
-    }, 1500);
+            // Count how many have empty reports array
+            const pendingReportsCount = completedApps 
+                ? completedApps.filter(app => !app.reports || app.reports.length === 0).length 
+                : 0;
 
-  } catch (error) {
-    console.error('Error uploading report:', error);
-    toast.error('Failed to upload report');
-  } finally {
-    if (uploadBtn) loader.hideButtonLoader(uploadBtn);
-  }
-}
+            const stats = {
+                today_total: todayApps.length,
+                today_pending: todayApps.filter(a => a.status === 'booked').length,
+                today_completed: todayApps.filter(a => a.status === 'completed').length,
+                pending_reports: pendingReportsCount
+            };
 
-// Export
-window.labDashboard = {
-  initLabDashboard,
-  searchByBookingId,
-  updateStatus,
-  uploadReport
+            this.renderStats(stats, container);
+
+        } catch (error) {
+            console.error("Stats Error:", error);
+            container.innerHTML = `<p class="text-danger">Failed to load statistics.</p>`;
+        } finally {
+            if(window.loader) window.loader.hideSectionLoader(container);
+        }
+    },
+
+    renderStats(stats, container) {
+        container.innerHTML = `
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calendar-day fa-2x mb-2"></i>
+                            <h5>Today's Total</h5>
+                            <h3>${stats.today_total}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-hourglass-half fa-2x mb-2"></i>
+                            <h5>Pending</h5>
+                            <h3>${stats.today_pending}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-check-double fa-2x mb-2"></i>
+                            <h5>Completed</h5>
+                            <h3>${stats.today_completed}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-upload fa-2x mb-2"></i>
+                            <h5>Reports Due</h5>
+                            <h3>${stats.pending_reports}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // --- 3. APPOINTMENTS ---
+    async loadTodayAppointments() {
+        const container = document.getElementById('todayAppointments');
+        if (!container) return;
+
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            
+            const { data, error } = await window.supabase
+                .from('appointments')
+                .select(`*, doctor:doctors(name), patient:profiles(full_name), test:tests(name)`)
+                .eq('appointment_date', today)
+                .order('serial_number');
+
+            if (error) throw error;
+
+            this.renderAppointments(data, container);
+
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = `<p class="text-danger">Error loading appointments.</p>`;
+        }
+    },
+
+    renderAppointments(appointments, container) {
+        if (!appointments.length) {
+            container.innerHTML = `<div class="alert alert-info">No appointments scheduled for today.</div>`;
+            return;
+        }
+
+        const rows = appointments.map(appt => {
+            const patientName = appt.patient?.full_name || appt.guest_name || 'Guest';
+            const serviceName = appt.doctor ? `Dr. ${appt.doctor.name}` : (appt.test ? appt.test.name : 'Unknown');
+            
+            // Action Buttons Logic
+            let actions = '';
+            if (appt.status === 'booked') {
+                actions = `<button class="btn btn-sm btn-info text-white" onclick="window.labDashboard.updateStatus('${appt.id}', 'checked_in')">Check In</button>`;
+            } else if (appt.status === 'checked_in') {
+                actions = `<button class="btn btn-sm btn-success" onclick="window.labDashboard.updateStatus('${appt.id}', 'completed')">Complete</button>`;
+            } else if (appt.status === 'completed') {
+                actions = `<a href="upload-report.html?id=${appt.id}" class="btn btn-sm btn-outline-primary">Upload Report</a>`;
+            }
+
+            return `
+                <tr>
+                    <td><strong>#${appt.serial_number}</strong></td>
+                    <td>${appt.booking_id}</td>
+                    <td>${patientName}</td>
+                    <td>${serviceName}</td>
+                    <td>${appt.estimated_time}</td>
+                    <td><span class="badge bg-${this.getStatusColor(appt.status)}">${appt.status}</span></td>
+                    <td>${actions}</td>
+                </tr>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead><tr><th>Serial</th><th>ID</th><th>Patient</th><th>Service</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    },
+
+    getStatusColor(status) {
+        return status === 'booked' ? 'warning' : status === 'checked_in' ? 'info' : status === 'completed' ? 'success' : 'secondary';
+    },
+
+    async updateStatus(id, status) {
+        if (!confirm(`Mark this appointment as ${status}?`)) return;
+
+        const { error } = await window.supabase
+            .from('appointments')
+            .update({ status: status })
+            .eq('id', id);
+
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            // Refresh
+            this.loadStats();
+            this.loadTodayAppointments();
+        }
+    },
+
+    // --- 4. SEARCH ---
+    async searchByBookingId(bookingId) {
+        if (!bookingId) return alert("Enter a Booking ID");
+
+        // Simple redirect to search result page or filter current view
+        // For now, let's filter the current view or show a modal
+        const { data, error } = await window.supabase
+            .from('appointments')
+            .select(`*, doctor:doctors(name), patient:profiles(full_name)`)
+            .eq('booking_id', bookingId)
+            .single();
+
+        if (error || !data) {
+            alert("Booking not found!");
+        } else {
+            alert(`Found: ${data.guest_name || data.patient?.full_name} - Status: ${data.status}`);
+            // In a real app, you'd render this into a 'SearchResult' div
+        }
+    },
+
+    // --- 5. REPORT UPLOAD (For upload-report.html) ---
+    async handleUpload(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('uploadBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Uploading...";
+
+        const fileInput = document.getElementById('reportFile');
+        const appointmentId = new URLSearchParams(window.location.search).get('id');
+        const file = fileInput.files[0];
+
+        if (!file || !appointmentId) {
+            alert("Missing file or appointment ID");
+            submitBtn.disabled = false;
+            return;
+        }
+
+        try {
+            const user = await window.auth.getCurrentUser();
+            
+            // 1. Upload to Supabase Storage
+            const fileName = `${appointmentId}_${Date.now()}.pdf`;
+            const bucketName = window.APP_CONSTANTS.STORAGE_BUCKETS.REPORTS || 'reports';
+            
+            const { data: fileData, error: uploadError } = await window.supabase.storage
+                .from(bucketName)
+                .upload(fileName, file);
+
+            if (uploadError) throw uploadError;
+
+            // 2. Get Public URL
+            const { data: { publicUrl } } = window.supabase.storage
+                .from(bucketName)
+                .getPublicUrl(fileName);
+
+            // 3. Save Record in Database
+            const { error: dbError } = await window.supabase
+                .from('reports')
+                .insert([{
+                    appointment_id: appointmentId,
+                    file_url: publicUrl,
+                    uploaded_by: user.id,
+                    report_type: 'diagnostic_test'
+                }]);
+
+            if (dbError) throw dbError;
+
+            alert("Report Uploaded Successfully!");
+            window.location.href = 'index.html'; // Go back to dashboard
+
+        } catch (error) {
+            console.error("Upload Error:", error);
+            alert("Upload Failed: " + error.message);
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Upload";
+        }
+    }
 };
+
+// Expose globally
+window.labDashboard = LabDashboard;
+
+// Auto-attach upload listener if we are on upload page
+if (document.getElementById('uploadReportForm')) {
+    document.getElementById('uploadReportForm').addEventListener('submit', (e) => LabDashboard.handleUpload(e));
+}
