@@ -456,20 +456,23 @@ window.app = {
 
 console.log("📝 main.js loaded successfully");
 
-async function redirectByRole() {
+async function redirectAfterLogin() {
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) return; // not logged in
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (!profile) return;
+  if (error || !profile) return;
+
+  // 🚫 STOP infinite redirect
+  if (location.pathname.includes(`/dashboards/${profile.role}`)) return;
 
   if (profile.role === "admin")
     location.href = "/dashboards/admin/index.html";
@@ -479,5 +482,5 @@ async function redirectByRole() {
     location.href = "/dashboards/patient/index.html";
 }
 
-redirectByRole();
+redirectAfterLogin();
 

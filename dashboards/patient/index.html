@@ -120,6 +120,7 @@
   <script src="../../js/dashboards/patient.js"></script>
 
   <script>
+    window.auth.requireAuth(["patient"]);
     document.addEventListener("DOMContentLoaded", () => {
       window.patientDashboard.initPatientDashboard();
     });

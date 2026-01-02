@@ -114,6 +114,7 @@
   <script src="../../js/dashboards/lab.js"></script>
 
   <script>
+    window.auth.requireAuth(["lab"]);
     document.addEventListener("DOMContentLoaded", () => {
       window.labDashboard.initLabDashboard();
     });
