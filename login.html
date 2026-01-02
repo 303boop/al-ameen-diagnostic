@@ -144,75 +144,80 @@
   <!-- App -->
   <script src="./js/main.js" defer></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
+ <script>
+  document.addEventListener("DOMContentLoaded", () => {
 
-      document.getElementById('showSignup').addEventListener('click', () => {
-        const card = document.getElementById('signupCard');
-        card.style.display = 'block';
-        card.scrollIntoView({ behavior: 'smooth' });
-      });
-
-      document.getElementById('showLogin').addEventListener('click', () => {
-        document.getElementById('signupCard').style.display = 'none';
-      });
-
-      document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        loader.showButtonLoader(document.getElementById('loginBtn'));
-
-        const result = await auth.signIn(
-          document.getElementById('loginEmail').value,
-          document.getElementById('loginPassword').value
-        );
-
-        loader.hideButtonLoader(document.getElementById('loginBtn'));
-
-        if (result.success) {
-          toast.success('Login successful!');
-          setTimeout(() => {
-            window.location.href = './dashboards/patient/index.html';
-          }, 800);
-        } else {
-          toast.error(result.error);
-        }
-      });
-
-      document.getElementById('signupForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const password = document.getElementById('signupPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-
-        if (password !== confirmPassword) {
-          toast.error('Passwords do not match');
-          return;
-        }
-
-        loader.showButtonLoader(document.getElementById('signupBtn'));
-
-        const result = await auth.signUp(
-          document.getElementById('signupEmail').value,
-          password,
-          document.getElementById('signupName').value,
-          document.getElementById('signupPhone').value
-        );
-
-        loader.hideButtonLoader(document.getElementById('signupBtn'));
-
-        if (result.success) {
-          toast.success('Account created successfully!');
-          setTimeout(() => {
-            window.location.href = './dashboards/patient/index.html';
-          }, 800);
-        } else {
-          toast.error(result.error);
-        }
-      });
-
+    document.getElementById("showSignup").addEventListener("click", () => {
+      const card = document.getElementById("signupCard");
+      card.style.display = "block";
+      card.scrollIntoView({ behavior: "smooth" });
     });
-  </script>
+
+    document.getElementById("showLogin").addEventListener("click", () => {
+      document.getElementById("signupCard").style.display = "none";
+    });
+
+    /* =========================
+       LOGIN
+    ========================= */
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById("loginBtn");
+      loader.showButtonLoader(btn);
+
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      const result = await window.auth.signIn(email, password);
+
+      loader.hideButtonLoader(btn);
+
+      if (!result.success) {
+        toast.error(result.error);
+      }
+      // ✅ NO REDIRECT HERE
+    });
+
+    /* =========================
+       SIGN UP
+    ========================= */
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const password = document.getElementById("signupPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+
+      const btn = document.getElementById("signupBtn");
+      loader.showButtonLoader(btn);
+
+      const result = await window.auth.signUp({
+        email: document.getElementById("signupEmail").value,
+        password,
+        full_name: document.getElementById("signupName").value,
+        phone: document.getElementById("signupPhone").value,
+      });
+
+      loader.hideButtonLoader(btn);
+
+      if (result.success) {
+        toast.success(
+          result.requiresVerification
+            ? "Verification email sent. Please check your inbox."
+            : "Account created successfully!"
+        );
+      } else {
+        toast.error(result.error);
+      }
+    });
+
+  });
+</script>
 
 </body>
 </html>

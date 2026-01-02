@@ -1,5 +1,5 @@
 // =====================================================
-// Authentication Module (HARDENED & FIXED)
+// Authentication Module (FINAL FIXED)
 // =====================================================
 
 /* =========================
@@ -58,36 +58,30 @@ async function signUp({ email, password, full_name, phone }) {
 
     if (error) throw error;
 
-    // Email confirmation ON → user may be null
+    // email verification ON
     if (!data.user) {
       return {
         success: true,
         requiresVerification: true,
-        message: "Verification email sent. Please check your inbox.",
+        message: "Verification email sent",
       };
     }
 
-    // CREATE PROFILE (ONLY ON FIRST CONFIRMED USER)
-    const { error: profileError } = await supabase.from("profiles").insert({
+    await supabase.from("profiles").insert({
       id: data.user.id,
       full_name,
       phone,
       role: "patient",
     });
 
-    if (profileError) {
-      console.warn("Profile insert failed:", profileError);
-    }
-
-    return { success: true, data };
+    return { success: true };
   } catch (error) {
-    console.error("Sign up error:", error);
     return { success: false, error: error.message };
   }
 }
 
 /* =========================
-   SIGN IN
+   SIGN IN  (✅ REDIRECT HERE)
 ========================= */
 async function signIn(email, password) {
   try {
@@ -97,9 +91,22 @@ async function signIn(email, password) {
     });
 
     if (error) throw error;
-    return { success: true, data };
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+    if (profile.role === "admin")
+      location.href = "/dashboards/admin/index.html";
+    else if (profile.role === "lab")
+      location.href = "/dashboards/lab/index.html";
+    else
+      location.href = "/dashboards/patient/index.html";
+
+    return { success: true };
   } catch (error) {
-    console.error("Sign in error:", error);
     return { success: false, error: error.message };
   }
 }
@@ -108,67 +115,40 @@ async function signIn(email, password) {
    SIGN OUT
 ========================= */
 async function signOut() {
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-
-    window.location.href = `${BASE_PATH}/index.html`;
-    return { success: true };
-  } catch (error) {
-    console.error("Sign out error:", error);
-    return { success: false, error: error.message };
-  }
+  await supabase.auth.signOut();
+  location.href = "/index.html";
 }
 
 /* =========================
    PASSWORD RESET
 ========================= */
 async function resetPassword(email) {
-  try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}${BASE_PATH}/reset-password.html`,
-    });
-
-    if (error) throw error;
-    return { success: true };
-  } catch (error) {
-    console.error("Reset password error:", error);
-    return { success: false, error: error.message };
-  }
+  return supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${location.origin}/reset-password.html`,
+  });
 }
 
 /* =========================
    UPDATE PASSWORD
 ========================= */
 async function updatePassword(newPassword) {
-  try {
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
-
-    if (error) throw error;
-    return { success: true };
-  } catch (error) {
-    console.error("Update password error:", error);
-    return { success: false, error: error.message };
-  }
+  return supabase.auth.updateUser({ password: newPassword });
 }
 
 /* =========================
-   AUTH GUARD
+   AUTH GUARD (NO REDIRECT LOOPS)
 ========================= */
 async function requireAuth(allowedRoles = []) {
   const user = await getCurrentUser();
-
   if (!user) {
-    window.location.href = `${BASE_PATH}/login.html`;
+    location.href = "/login.html";
     return false;
   }
 
-  if (allowedRoles.length > 0) {
+  if (allowedRoles.length) {
     const profile = await getUserRole();
     if (!profile || !allowedRoles.includes(profile.role)) {
-      window.location.href = `${BASE_PATH}/index.html`;
+      location.href = "/index.html";
       return false;
     }
   }
@@ -177,7 +157,7 @@ async function requireAuth(allowedRoles = []) {
 }
 
 /* =========================
-   EXPORT (GUARANTEED)
+   EXPORT
 ========================= */
 window.auth = {
   signUp,
@@ -193,25 +173,3 @@ window.auth = {
 
 authReadyResolve();
 console.log("✅ Auth module ready");
-
-const { data, error } = await supabase.auth.signInWithPassword({
-  email,
-  password,
-});
-
-if (error) throw error;
-
-// 🔁 REDIRECT ONLY HERE
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("role")
-  .eq("id", data.user.id)
-  .single();
-
-if (profile.role === "admin")
-  location.href = "/dashboards/admin/index.html";
-else if (profile.role === "lab")
-  location.href = "/dashboards/lab/index.html";
-else
-  location.href = "/dashboards/patient/index.html";
-
