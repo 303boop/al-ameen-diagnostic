@@ -116,7 +116,7 @@ async function signIn(email, password) {
 ========================= */
 async function signOut() {
   await supabase.auth.signOut();
-  location.href = "`${BASE_PATH}/index.html`";
+  location.href = `${BASE_PATH}/index.html`;
 }
 
 /* =========================
@@ -141,14 +141,14 @@ async function updatePassword(newPassword) {
 async function requireAuth(allowedRoles = []) {
   const user = await getCurrentUser();
   if (!user) {
-    location.href = "`${BASE_PATH}/login.html`";
+    location.href = `${BASE_PATH}/login.html`;
     return false;
   }
 
   if (allowedRoles.length) {
     const profile = await getUserRole();
     if (!profile || !allowedRoles.includes(profile.role)) {
-      location.href = "`${BASE_PATH}/index.html`";
+      location.href = `${BASE_PATH}/index.html`;
       return false;
     }
   }
