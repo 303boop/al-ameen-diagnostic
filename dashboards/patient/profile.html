@@ -1,137 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile - Patient Dashboard</title>
-
-  <link rel="icon" href="../../assets/images/logo/favicon.png">
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <link rel="stylesheet" href="../../css/reset.css">
-  <link rel="stylesheet" href="../../css/variables.css">
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/components.css">
-  <link rel="stylesheet" href="../../css/layout.css">
-  <link rel="stylesheet" href="../../css/dashboards.css">
-  <link rel="stylesheet" href="../../css/themes.css">
-  <link rel="stylesheet" href="../../css/responsive.css">
-  <link rel="stylesheet" href="../../css/utilities.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Patient Dashboard</title>
+    <link rel="icon" href="../../assets/images/logo/logo.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/dashboards.css">
+    <link rel="stylesheet" href="../../css/themes.css">
+    <link rel="stylesheet" href="../../css/utilities.css">
 </head>
 
 <body>
-  <div class="dashboard-container">
-
-    <aside class="dashboard-sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="../../assets/images/logo/logo.png" alt="Logo">
-          <span>Patient Panel</span>
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a href="./index.html" class="sidebar-nav-item">
-          <i class="fas fa-home"></i><span>Dashboard</span>
-        </a>
-        <a href="./appointments.html" class="sidebar-nav-item">
-          <i class="fas fa-calendar-check"></i><span>Appointments</span>
-        </a>
-        <a href="./reports.html" class="sidebar-nav-item">
-          <i class="fas fa-file-medical"></i><span>Reports</span>
-        </a>
-        <a href="./notifications.html" class="sidebar-nav-item">
-          <i class="fas fa-bell"></i><span>Notifications</span>
-        </a>
-        <a href="./profile.html" class="sidebar-nav-item active">
-          <i class="fas fa-user"></i><span>Profile</span>
-        </a>
-        <a href="../../index.html" class="sidebar-nav-item">
-          <i class="fas fa-home"></i><span>Back to Site</span>
-        </a>
-      </nav>
-    </aside>
-
-    <main class="dashboard-main">
-      <header class="dashboard-header">
-        <h1 class="dashboard-title">My Profile</h1>
-      </header>
-
-      <div class="dashboard-content">
-
-        <div class="row">
-          <div class="col-lg-6">
-            <div class="dashboard-card">
-              <div class="dashboard-card-header">
-                <h3>Personal Information</h3>
-              </div>
-              <div class="dashboard-card-body">
-                <form id="profileForm">
-                  <div class="form-group mb-3">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="fullName">
-                  </div>
-
-                  <div class="form-group mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" disabled>
-                  </div>
-
-                  <div class="form-group mb-3">
-                    <label class="form-label">Phone</label>
-                    <input type="text" class="form-control" id="phone">
-                  </div>
-
-                  <button type="submit" class="btn btn-primary">
-                    Update Profile
-                  </button>
-                </form>
-              </div>
+    <div class="dashboard-container">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="../../index.html" class="sidebar-logo text-decoration-none">
+                    <img src="../../assets/images/logo/logo.png" alt="Logo">
+                    <span class="text-white ms-2">Patient Portal</span>
+                </a>
             </div>
-          </div>
+            <nav class="sidebar-nav">
+                <div class="nav-label">Menu</div>
+                <a href="./index.html" class="sidebar-nav-item">
+                    <i class="fas fa-home"></i><span>Overview</span>
+                </a>
+                <a href="./appointments.html" class="sidebar-nav-item">
+                    <i class="fas fa-calendar-check"></i><span>My Appointments</span>
+                </a>
+                <a href="./reports.html" class="sidebar-nav-item">
+                    <i class="fas fa-file-medical-alt"></i><span>Medical Reports</span>
+                </a>
+                <a href="./notifications.html" class="sidebar-nav-item">
+                    <i class="fas fa-bell"></i><span>Notifications</span>
+                </a>
+                <a href="./profile.html" class="sidebar-nav-item active">
+                    <i class="fas fa-user-circle"></i><span>My Profile</span>
+                </a>
+                <div class="mt-auto">
+                    <button id="logoutBtn" class="sidebar-nav-item text-danger border-0 bg-transparent w-100 text-start">
+                        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
 
-          <div class="col-lg-6">
-            <div class="dashboard-card">
-              <div class="dashboard-card-header">
-                <h3>Security</h3>
-              </div>
-              <div class="dashboard-card-body">
-                <button class="btn btn-warning mb-2" onclick="window.patientDashboard.resetPassword()">
-                  Reset Password
-                </button>
-                <br>
-                <button class="btn btn-danger" onclick="window.auth.signOut()">
-                  Logout
-                </button>
-              </div>
+        <main class="dashboard-main">
+            <header class="dashboard-header d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">My Profile</h1>
+                <div class="dashboard-actions">
+                    <button class="btn btn-light rounded-circle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="card-title mb-0">Account Details</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <form id="profileForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email Address</label>
+                                        <input type="email" id="email" class="form-control" disabled>
+                                        <div class="form-text">Email cannot be changed directly.</div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Full Name</label>
+                                            <input type="text" id="fullName" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="tel" id="phone" class="form-control" required>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                                        Update Profile
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="card-title mb-0">Security</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <button class="btn btn-outline-secondary" onclick="sendPasswordReset()">
+                                    <i class="fas fa-key me-2"></i> Send Password Reset Email
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
+        </main>
+    </div>
 
-      </div>
-    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/config/supabase.js"></script>
+    <script src="../../js/config/constants.js"></script>
+    <script src="../../js/core/auth.js"></script>
+    <script src="../../js/core/theme.js"></script>
+    <script src="../../js/utils/toast.js"></script>
+    <script src="../../js/utils/helpers.js"></script>
+    <script src="../../js/components/loader.js"></script>
 
-  </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Theme & Logout
+            document.getElementById('themeToggle')?.addEventListener('click', () => window.theme.toggleTheme());
+            document.getElementById('logoutBtn')?.addEventListener('click', () => window.auth.signOut());
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            // Load Profile Data
+            loadProfile();
 
-  <script src="../../js/config/supabase.js"></script>
-  <script src="../../js/utils/helpers.js"></script>
-  <script src="../../js/utils/toast.js"></script>
-  <script src="../../js/core/auth.js"></script>
-  <script src="../../js/components/loader.js"></script>
-  <script src="../../js/dashboards/patient.js"></script>
+            // Save Profile
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await updateProfile();
+            });
+        });
 
-  <script>
-    document.getElementById("profileForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      await window.patientDashboard.updateProfile();
-    });
+        async function loadProfile() {
+            const user = await window.auth.getCurrentUser();
+            if(!user) return;
 
-    window.patientDashboard.loadProfile();
-  </script>
+            document.getElementById('email').value = user.email;
+
+            // Fetch from profiles table
+            const { data } = await window.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if(data) {
+                document.getElementById('fullName').value = data.full_name || '';
+                document.getElementById('phone').value = data.phone || '';
+            }
+        }
+
+        async function updateProfile() {
+            const btn = document.getElementById('saveProfileBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Saving...';
+
+            try {
+                const user = await window.auth.getCurrentUser();
+                const updates = {
+                    full_name: document.getElementById('fullName').value,
+                    phone: document.getElementById('phone').value,
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error } = await window.supabase
+                    .from('profiles')
+                    .update(updates)
+                    .eq('id', user.id);
+
+                if(error) throw error;
+                window.toast.success('Profile updated successfully');
+
+            } catch(e) {
+                console.error(e);
+                window.toast.error('Failed to update profile');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function sendPasswordReset() {
+            const user = await window.auth.getCurrentUser();
+            if(!user) return;
+
+            if(!confirm("Send a password reset link to " + user.email + "?")) return;
+
+            try {
+                const { error } = await window.supabase.auth.resetPasswordForEmail(user.email, {
+                    redirectTo: window.location.origin + '/al-ameen-diagnostics/reset-password.html',
+                });
+                if(error) throw error;
+                window.toast.success('Check your email for the reset link.');
+            } catch(e) {
+                window.toast.error(e.message);
+            }
+        }
+    </script>
 </body>
 </html>
