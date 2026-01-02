@@ -1,7 +1,8 @@
 // Supabase Configuration
-const SUPABASE_URL = "https://hdlwflzgpphkdhhojldt.supabase.co";
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkbHdmbHpncHBoa2RoaG9qbGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0Njc0ODAsImV4cCI6MjA1MTA0MzQ4MH0.sb_publishable_v9un03jyjabk-HSWoyvZWQ_LD1g9E_B";
+import { createClient } from '@supabase/supabase-js'
+const supabaseUrl = 'https://hdlwflzgpphkdhhojldt.supabase.co'
+const supabaseKey = process.env.sb_publishable_v9un03jyjabk-HSWoyvZWQ_LD1g9E_B
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 🚨 SAFETY CHECK (THIS WAS MISSING)
 if (!window.supabase) {
