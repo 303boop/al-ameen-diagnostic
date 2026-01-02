@@ -162,7 +162,7 @@
 
         loader.showButtonLoader(document.getElementById('loginBtn'));
 
-        const result = await auth.signIn(
+        const result = await window.auth.signIn(
           document.getElementById('loginEmail').value,
           document.getElementById('loginPassword').value
         );
@@ -192,7 +192,7 @@
 
         loader.showButtonLoader(document.getElementById('signupBtn'));
 
-        const result = await auth.signUp(
+        const result = await window.auth.signUp(
           document.getElementById('signupEmail').value,
           password,
           document.getElementById('signupName').value,
