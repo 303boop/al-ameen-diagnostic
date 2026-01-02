@@ -1,7 +1,7 @@
 // Supabase Configuration
 import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://hdlwflzgpphkdhhojldt.supabase.co'
-const supabaseKey = process.env.sb_publishable_v9un03jyjabk-HSWoyvZWQ_LD1g9E_B
+const supabaseKey = process.env.sb_secret_uNd_r6dUsgdVa9MY6ea0Pw_Tyg3tlm2
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 🚨 SAFETY CHECK (THIS WAS MISSING)
