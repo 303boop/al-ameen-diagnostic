@@ -59,3 +59,13 @@ h1, h2, h3, h4, h5, h6 {
 p {
   margin: 0;
 }
+
+/* Improve tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent font zoom on iOS */
+html {
+  -webkit-text-size-adjust: 100%;
+}

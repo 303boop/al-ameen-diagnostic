@@ -240,3 +240,124 @@ img.loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* =========================================================
+   BASE ENHANCEMENTS (APPEND ONLY)
+   Light / Dark / Mobile / Accessibility
+========================================================= */
+
+/* ---------- Global Color Safety ---------- */
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+}
+
+/* ---------- Headings Dark/Light Fix ---------- */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+}
+
+/* ---------- Paragraph Readability ---------- */
+p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ---------- Section Spacing (Mobile Friendly) ---------- */
+@media (max-width: 768px) {
+  section {
+    padding: var(--spacing-2xl) 0;
+  }
+
+  h1 { font-size: clamp(2rem, 6vw, 3rem); }
+  h2 { font-size: clamp(1.75rem, 5vw, 2.5rem); }
+  h3 { font-size: clamp(1.4rem, 4vw, 2rem); }
+}
+
+/* ---------- Links Accessibility ---------- */
+a {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+a:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* ---------- Buttons UX Polish ---------- */
+.btn {
+  min-height: 44px; /* touch target */
+  letter-spacing: 0.2px;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--cta-primary-text, #ffffff);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Form Dark Safety ---------- */
+.form-label {
+  color: var(--text-primary);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.form-control::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.25);
+}
+
+/* ---------- Invalid State ---------- */
+.form-control.is-invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+/* ---------- Select Arrow Dark Fix ---------- */
+select.form-control {
+  background-color: var(--surface);
+}
+
+/* ---------- Scrollbar Dark/Light ---------- */
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* ---------- Image Loading Dark Safe ---------- */
+img.loading {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--surface) 50%,
+    var(--border) 75%
+  );
+}
+
+/* ---------- Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

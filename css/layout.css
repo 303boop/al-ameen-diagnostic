@@ -411,3 +411,166 @@ transform: translateY(0);
 transform: translateY(-4px);
 box-shadow: var(--shadow-xl);
 }
+
+/* =========================================================
+   ENHANCEMENTS — Mobile First + Dark/Light Safe
+   (APPEND ONLY — original file remains untouched)
+========================================================= */
+
+/* ---------- Global Background Safety ---------- */
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+}
+
+/* ---------- Navbar Color Normalization ---------- */
+.navbar {
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-brand,
+.navbar-brand span {
+  color: var(--primary);
+}
+
+.nav-link {
+  color: var(--text-primary);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--primary);
+}
+
+/* ---------- Action Buttons (Book / Login) ---------- */
+.navbar-actions .btn {
+  min-height: 44px;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.2px;
+  border-radius: var(--radius-md);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.navbar-actions .btn:active {
+  transform: scale(0.97);
+}
+
+/* Primary CTA */
+.navbar-actions .btn-primary {
+  background: var(--cta-primary);
+  color: var(--cta-primary-text);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+/* Secondary CTA */
+.navbar-actions .btn-outline {
+  background: transparent;
+  border: 2px solid var(--cta-primary);
+  color: var(--cta-primary);
+}
+
+/* ---------- Mobile First Rules ---------- */
+@media (max-width: 768px) {
+
+  /* Hide navigation links */
+  .navbar-nav {
+    display: none !important;
+  }
+
+  /* Always show actions */
+  .navbar-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .navbar-actions .btn {
+    padding: 0 14px;
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
+  /* Make navbar more compact */
+  .navbar .container {
+    padding: 10px 14px;
+  }
+
+  .navbar-brand .logo {
+    height: 34px;
+  }
+}
+
+/* ---------- User Dropdown Dark Safety ---------- */
+.user-menu {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+}
+
+.user-menu-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.user-menu-name {
+  color: var(--text-primary);
+}
+
+.user-menu-role {
+  color: var(--text-secondary);
+}
+
+/* ---------- Search Modal Dark Fix ---------- */
+.search-modal-content {
+  background-color: var(--card);
+  color: var(--text-primary);
+}
+
+.search-input {
+  color: var(--text-primary);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* ---------- Footer Contrast Fix ---------- */
+.footer {
+  background-color: var(--surface);
+  color: var(--text-secondary);
+}
+
+.footer-title,
+.footer-widget-title {
+  color: var(--text-primary);
+}
+
+.footer-links a,
+.footer-legal a {
+  color: var(--text-secondary);
+}
+
+.footer-links a:hover,
+.footer-legal a:hover {
+  color: var(--primary);
+}
+
+/* ---------- Back To Top Button ---------- */
+.back-to-top {
+  background: var(--gradient-primary);
+  color: #fff;
+}
+
+/* ---------- Accessibility Improvements ---------- */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Motion Preference ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

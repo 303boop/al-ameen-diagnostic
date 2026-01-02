@@ -294,3 +294,15 @@
     border: 1px solid #ddd;
   }
 }
+
+@media (max-width: 768px) {
+  .navbar-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+
+  /* Ensure CTAs never hide inside collapse */
+  .navbar-collapse .navbar-actions {
+    display: none;
+  }
+}
