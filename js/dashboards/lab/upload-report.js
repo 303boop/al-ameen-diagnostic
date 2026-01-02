@@ -47,13 +47,26 @@ async function uploadReport(e) {
 
   loader.showButtonLoader(uploadBtn);
 
-  const filePath =
-    `${appointmentId}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+  /* 🔹 Get appointment to fetch patient user_id */
+  const { data: appointment } = await supabaseClient
+    .from('appointments')
+    .select('user_id')
+    .eq('id', appointmentId)
+    .single();
 
-  // Upload to private bucket
+  if (!appointment) {
+    loader.hideButtonLoader(uploadBtn);
+    toast.error('Invalid appointment');
+    return;
+  }
+
+  const safeName = file.name.replace(/\s+/g, '_');
+  const filePath = `${appointmentId}/${Date.now()}_${safeName}`;
+
+  /* Upload to private bucket */
   const { error: uploadError } = await supabaseClient
     .storage
-    .from('reports')
+    .from(APP_CONSTANTS.STORAGE_BUCKETS.REPORTS)
     .upload(filePath, file);
 
   if (uploadError) {
@@ -62,11 +75,13 @@ async function uploadReport(e) {
     return;
   }
 
-  // Save report record
+  /* Save report record */
   const { error: dbError } = await supabaseClient
     .from('reports')
     .insert({
       appointment_id: appointmentId,
+      user_id: appointment.user_id,
+      file_name: safeName,
       file_path: filePath,
       report_type: reportType.value
     });
@@ -77,7 +92,7 @@ async function uploadReport(e) {
     return;
   }
 
-  // Optional: mark appointment completed
+  /* Mark appointment completed */
   await supabaseClient
     .from('appointments')
     .update({ status: 'completed' })

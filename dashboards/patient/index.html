@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" href="/assets/images/logo/favicon.png">
+
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/dashboards.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  <aside class="dashboard-sidebar" id="patientSidebar"></aside>
+
+  <main class="dashboard-main">
+
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">My Dashboard</h1>
+    </header>
+
+    <section class="dashboard-content">
+
+      <div class="dashboard-grid grid-3">
+        <div class="stat-card">
+          <h4>Total Appointments</h4>
+          <p id="totalAppointments">—</p>
+        </div>
+        <div class="stat-card">
+          <h4>Completed</h4>
+          <p id="completedAppointments">—</p>
+        </div>
+        <div class="stat-card">
+          <h4>Reports</h4>
+          <p id="totalReports">—</p>
+        </div>
+      </div>
+
+      <div class="dashboard-card mt-4">
+        <div class="dashboard-card-body">
+          <h3>Quick Actions</h3>
+
+          <div class="mt-3">
+            <a href="/dashboards/patient/appointments.html"
+               class="btn btn-primary me-2">
+              <i class="fas fa-calendar-check"></i> My Appointments
+            </a>
+
+            <a href="/dashboards/patient/reports.html"
+               class="btn btn-outline-primary">
+              <i class="fas fa-file-medical"></i> My Reports
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="/js/config/supabase.js"></script>
+<script src="/js/utils/toast.js"></script>
+<script src="/js/core/auth.js"></script>
+
+<script src="/js/dashboards/patient/index.js"></script>
+
+</body>
+</html>

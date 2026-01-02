@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Test - Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" href="/assets/images/logo/favicon.png" />
+
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/dashboards.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  <aside class="dashboard-sidebar" id="adminSidebar"></aside>
+
+  <main class="dashboard-main">
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">Add Test</h1>
+    </header>
+
+    <section class="dashboard-content">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+
+          <form id="testForm">
+
+            <div class="form-group">
+              <label class="form-label">Test Name</label>
+              <input type="text" class="form-control" id="name" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Original Price</label>
+              <input type="number" class="form-control" id="price" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Discount Price</label>
+              <input type="number" class="form-control" id="discountPrice">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Discount Active</label>
+              <select class="form-control" id="discountActive">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Active</label>
+              <select class="form-control" id="isActive">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Save Test
+            </button>
+
+            <a href="/dashboards/admin/tests.html" class="btn btn-outline-secondary ms-2">
+              Cancel
+            </a>
+
+          </form>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="/js/config/supabase.js"></script>
+<script src="/js/utils/toast.js"></script>
+<script src="/js/core/auth.js"></script>
+<script src="/js/components/loader.js"></script>
+
+<script>
+(async function () {
+  const allowed = await auth.requireAuth(['admin']);
+  if (!allowed) return;
+
+  document.getElementById('testForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const payload = {
+      name: name.value.trim(),
+      original_price: Number(price.value),
+      discount_price: discountPrice.value ? Number(discountPrice.value) : null,
+      is_discount_active: discountActive.value === 'true',
+      is_active: isActive.value === 'true'
+    };
+
+    loader.showPageLoader('Saving test...');
+
+    const { error } = await supabaseClient.from('tests').insert(payload);
+
+    loader.hidePageLoader();
+
+    if (error) {
+      toast.error('Failed to add test');
+      return;
+    }
+
+    toast.success('Test added');
+    window.location.href = '/dashboards/admin/tests.html';
+  });
+})();
+</script>
+
+</body>
+</html>

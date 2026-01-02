@@ -102,4 +102,12 @@ async function downloadReport(path, filename) {
     if (error) throw error;
 
     const url = URL.createObjectURL(data);
-    const a = doc
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    toast.error('Download failed');
+  }
+}

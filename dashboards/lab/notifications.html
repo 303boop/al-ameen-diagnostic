@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notifications - Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" href="/assets/images/logo/favicon.png">
+
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/dashboards.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  <aside class="dashboard-sidebar" id="labSidebar"></aside>
+
+  <main class="dashboard-main">
+
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">Notifications</h1>
+    </header>
+
+    <section class="dashboard-content">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <p class="text-muted">
+            No notifications yet.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="/js/core/auth.js"></script>
+
+<script>
+(async () => {
+  await auth.requireAuth(['lab']);
+})();
+</script>
+
+</body>
+</html>
