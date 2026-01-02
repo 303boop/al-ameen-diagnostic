@@ -27,8 +27,10 @@
 
 <body>
 
+  <!-- Navbar -->
   <div id="navbar"></div>
 
+  <!-- Hero -->
   <section class="hero" style="min-height: 40vh;">
     <div class="container">
       <div class="text-center text-white">
@@ -40,10 +42,12 @@
     </div>
   </section>
 
+  <!-- Tests Grid -->
   <section class="container py-5">
     <div id="testsGrid"></div>
   </section>
 
+  <!-- Footer -->
   <div id="footer"></div>
 
   <!-- Vendor JS -->
@@ -55,14 +59,14 @@
   <script src="./js/config/supabase.js" defer></script>
   <script src="./js/config/constants.js" defer></script>
 
-  <!-- Utilities -->
-  <script src="./js/utils/helpers.js" defer></script>
-  <script src="./js/utils/toast.js" defer></script>
-
-  <!-- Core -->
+  <!-- Core (must load before components) -->
   <script src="./js/core/auth.js" defer></script>
   <script src="./js/core/language.js" defer></script>
   <script src="./js/core/theme.js" defer></script>
+
+  <!-- Utilities -->
+  <script src="./js/utils/helpers.js" defer></script>
+  <script src="./js/utils/toast.js" defer></script>
 
   <!-- Components -->
   <script src="./js/components/navbar.js" defer></script>
@@ -72,6 +76,7 @@
   <!-- App -->
   <script src="./js/main.js" defer></script>
 
+  <!-- Page Init -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       AOS.init({
