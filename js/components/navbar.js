@@ -27,7 +27,6 @@ async function renderNavbar() {
         <!-- Logo -->
         <a class="navbar-brand" href="./index.html">
           <img src="./assets/images/logo/logo.png" alt="Al-Ameen Diagnostic" class="logo">
-          <span class="brand-name">Al-Ameen Diagnostic</span>
         </a>
 
         <!-- Mobile Toggle -->
