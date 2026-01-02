@@ -11,7 +11,7 @@
 // CONFIG (PUBLIC ONLY)
 // =========================
 const SUPABASE_URL = "https://hdlwflzgpphkdhhojldt.supabase.co";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_PUBLIC_ANON_KEY_HERE";
+const SUPABASE_ANON_KEY = "sb_secret_uNd_r6dUsgdVa9MY6ea0Pw_Tyg3tlm2";
 
 // =========================
 // SAFETY CHECK
