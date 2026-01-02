@@ -1,87 +1,52 @@
-(async function () {
-  const ok = await auth.requireAuth(['patient']);
-  if (!ok) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Reports</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  loadSidebar();
-  loadAppointments();
-})();
+  <link rel="icon" href="/assets/images/logo/favicon.png">
 
-function loadSidebar() {
-  document.getElementById('patientSidebar').innerHTML = `
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <i class="fas fa-user"></i> Patient
-      </div>
-    </div>
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/dashboards.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/utilities.css">
 
-    <nav class="sidebar-nav">
-      <a class="sidebar-nav-item" href="/dashboards/patient/index.html">
-        <i class="fas fa-home"></i> Dashboard
-      </a>
-      <a class="sidebar-nav-item active" href="/dashboards/patient/appointments.html">
-        <i class="fas fa-calendar-check"></i> Appointments
-      </a>
-      <a class="sidebar-nav-item" href="/dashboards/patient/reports.html">
-        <i class="fas fa-file-medical"></i> Reports
-      </a>
-      <a class="sidebar-nav-item" href="/dashboards/patient/profile.html">
-        <i class="fas fa-user-cog"></i> Profile
-      </a>
-    </nav>
-  `;
-}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
 
-async function loadAppointments() {
-  const user = await getCurrentUser();
-  if (!user) return;
+<div class="dashboard-container">
 
-  const list = document.getElementById('appointmentsList');
-  list.innerHTML = loader.createSkeletonLoader('card', 3);
+  <aside class="dashboard-sidebar" id="patientSidebar"></aside>
 
-  const { data, error } = await supabaseClient
-    .from('appointments')
-    .select(`
-      id,
-      booking_id,
-      appointment_date,
-      estimated_time,
-      status,
-      doctors ( name, specialization )
-    `)
-    .eq('user_id', user.id)
-    .order('appointment_date', { ascending: false });
+  <main class="dashboard-main">
 
-  if (error) {
-    toast.error('Failed to load appointments');
-    list.innerHTML = '';
-    return;
-  }
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">My Reports</h1>
+    </header>
 
-  if (!data || data.length === 0) {
-    list.innerHTML = `<p class="text-muted">No appointments found.</p>`;
-    return;
-  }
+    <section class="dashboard-content">
+      <div id="reportsList"></div>
+    </section>
 
-  list.innerHTML = data.map(renderAppointment).join('');
-}
+  </main>
+</div>
 
-function renderAppointment(a) {
-  const statusClass = `status-${a.status}`;
-  return `
-    <div class="appointment-card">
-      <div class="appointment-header">
-        <strong>${a.doctors?.name || 'Doctor'}</strong>
-        <span class="status-badge ${statusClass}">
-          ${a.status.replace('_', ' ').toUpperCase()}
-        </span>
-      </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-      <div class="appointment-body">
-        <p><i class="fas fa-id-card"></i> ${a.booking_id}</p>
-        <p><i class="fas fa-calendar"></i> ${helpers.formatDate(a.appointment_date)}</p>
-        <p><i class="fas fa-clock"></i> ${helpers.formatTime(a.estimated_time)}</p>
-        <p><i class="fas fa-stethoscope"></i> ${a.doctors?.specialization || ''}</p>
-      </div>
-    </div>
-  `;
-}
+<script src="/js/config/supabase.js"></script>
+<script src="/js/utils/helpers.js"></script>
+<script src="/js/utils/toast.js"></script>
+<script src="/js/core/auth.js"></script>
+<script src="/js/components/loader.js"></script>
+
+<script src="/js/dashboards/patient/reports.js"></script>
+
+</body>
+</html>
