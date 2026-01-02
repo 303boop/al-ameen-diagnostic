@@ -1,4 +1,8 @@
-// Authentication Module (Fixed)
+// =====================================================
+// Authentication Module (HARDENED & FIXED)
+// =====================================================
+
+const BASE_PATH = "/al-ameen-diagnostic";
 
 /* =========================
    SAFETY CHECK
@@ -6,6 +10,14 @@
 if (!window.supabase) {
   console.error("❌ Supabase client not available");
 }
+
+/* =========================
+   INTERNAL READY PROMISE
+========================= */
+let authReadyResolve;
+const authReady = new Promise(resolve => {
+  authReadyResolve = resolve;
+});
 
 /* =========================
    SIGN UP
@@ -25,10 +37,11 @@ async function signUp(email, password, fullName, phone) {
 
     if (error) throw error;
 
-    // If email confirmation is ON, user may be null
+    // Email confirmation ON → user may be null
     if (!data.user) {
       return {
         success: true,
+        requiresVerification: true,
         message: "Verification email sent. Please check your inbox.",
       };
     }
@@ -64,7 +77,6 @@ async function signIn(email, password) {
     });
 
     if (error) throw error;
-
     return { success: true, data };
   } catch (error) {
     console.error("Sign in error:", error);
@@ -80,7 +92,7 @@ async function signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
 
-    window.location.href = "/index.html";
+    window.location.href = `${BASE_PATH}/index.html`;
     return { success: true };
   } catch (error) {
     console.error("Sign out error:", error);
@@ -94,11 +106,10 @@ async function signOut() {
 async function resetPassword(email) {
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password.html`,
+      redirectTo: `${window.location.origin}${BASE_PATH}/reset-password.html`,
     });
 
     if (error) throw error;
-
     return { success: true };
   } catch (error) {
     console.error("Reset password error:", error);
@@ -116,7 +127,6 @@ async function updatePassword(newPassword) {
     });
 
     if (error) throw error;
-
     return { success: true };
   } catch (error) {
     console.error("Update password error:", error);
@@ -131,15 +141,14 @@ async function requireAuth(allowedRoles = []) {
   const user = await getCurrentUser();
 
   if (!user) {
-    window.location.href = "/login.html";
+    window.location.href = `${BASE_PATH}/login.html`;
     return false;
   }
 
   if (allowedRoles.length > 0) {
     const profile = await getUserRole();
-
     if (!profile || !allowedRoles.includes(profile.role)) {
-      window.location.href = "/index.html";
+      window.location.href = `${BASE_PATH}/index.html`;
       return false;
     }
   }
@@ -148,7 +157,7 @@ async function requireAuth(allowedRoles = []) {
 }
 
 /* =========================
-   EXPORT
+   EXPORT (GUARANTEED)
 ========================= */
 window.auth = {
   signUp,
@@ -157,4 +166,8 @@ window.auth = {
   resetPassword,
   updatePassword,
   requireAuth,
+  ready: authReady,
 };
+
+authReadyResolve();
+console.log("✅ Auth module ready");
