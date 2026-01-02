@@ -1,41 +1,41 @@
-// Modal Component
+// ===============================
+// Modal Component (FIXED & SAFE)
+// ===============================
 
 // Create and show modal
 function showModal(options = {}) {
   const {
-    title = 'Modal Title',
+    title = '',
     content = '',
-    size = 'medium', // small, medium, large
+    size = 'md', // sm | md | lg
     showClose = true,
     buttons = [],
     onClose = null
   } = options;
 
   // Remove existing modal
-  const existingModal = document.getElementById('dynamicModal');
-  if (existingModal) existingModal.remove();
+  document.getElementById('dynamicModal')?.remove();
 
-  // Create modal HTML
   const modalHTML = `
-    <div class="modal fade" id="dynamicModal" tabindex="-1">
+    <div class="modal fade" id="dynamicModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-${size}">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">${title}</h5>
-            ${showClose ? `
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            ` : ''}
-          </div>
+          ${title || showClose ? `
+            <div class="modal-header">
+              ${title ? `<h5 class="modal-title">${title}</h5>` : ''}
+              ${showClose ? `<button type="button" class="btn-close" data-bs-dismiss="modal"></button>` : ''}
+            </div>
+          ` : ''}
           <div class="modal-body">
             ${content}
           </div>
-          ${buttons.length > 0 ? `
+          ${buttons.length ? `
             <div class="modal-footer">
               ${buttons.map(btn => `
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="btn btn-${btn.type || 'secondary'}"
-                  id="${btn.id || ''}"
+                  id="${btn.id}"
                 >
                   ${btn.text}
                 </button>
@@ -47,38 +47,30 @@ function showModal(options = {}) {
     </div>
   `;
 
-  // Add to body
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-  // Get modal element
-  const modalElement = document.getElementById('dynamicModal');
-  const modal = new bootstrap.Modal(modalElement);
+  const modalEl = document.getElementById('dynamicModal');
+  const modal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
 
-  // Attach button handlers
+  // Button handlers
   buttons.forEach(btn => {
-    if (btn.id && btn.onClick) {
-      document.getElementById(btn.id).addEventListener('click', () => {
-        btn.onClick();
-        if (btn.closeOnClick !== false) {
-          modal.hide();
-        }
-      });
-    }
+    if (!btn.id) return;
+    const el = document.getElementById(btn.id);
+    if (!el) return;
+
+    el.addEventListener('click', () => {
+      btn.onClick?.();
+      if (btn.closeOnClick !== false) modal.hide();
+    });
   });
 
-  // Handle close event
   if (onClose) {
-    modalElement.addEventListener('hidden.bs.modal', onClose);
+    modalEl.addEventListener('hidden.bs.modal', onClose, { once: true });
   }
 
-  // Remove from DOM after close
-  modalElement.addEventListener('hidden.bs.modal', () => {
-    modalElement.remove();
-  });
+  modalEl.addEventListener('hidden.bs.modal', () => modalEl.remove(), { once: true });
 
-  // Show modal
   modal.show();
-
   return modal;
 }
 
@@ -86,24 +78,20 @@ function showModal(options = {}) {
 function showConfirm(title, message, onConfirm, onCancel) {
   return showModal({
     title,
-    content: `<p>${message}</p>`,
-    size: 'small',
+    content: `<p class="mb-0">${message}</p>`,
+    size: 'sm',
     buttons: [
       {
-        id: 'cancelBtn',
+        id: 'confirmCancel',
         text: 'Cancel',
         type: 'secondary',
-        onClick: () => {
-          if (onCancel) onCancel();
-        }
+        onClick: onCancel
       },
       {
-        id: 'confirmBtn',
+        id: 'confirmOk',
         text: 'Confirm',
         type: 'primary',
-        onClick: () => {
-          if (onConfirm) onConfirm();
-        }
+        onClick: onConfirm
       }
     ]
   });
@@ -112,27 +100,26 @@ function showConfirm(title, message, onConfirm, onCancel) {
 // Alert dialog
 function showAlert(title, message, type = 'info') {
   const icons = {
-    success: '<i class="fas fa-check-circle text-success fa-3x mb-3"></i>',
-    error: '<i class="fas fa-times-circle text-danger fa-3x mb-3"></i>',
-    warning: '<i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>',
-    info: '<i class="fas fa-info-circle text-info fa-3x mb-3"></i>'
+    success: 'fa-check-circle text-success',
+    error: 'fa-times-circle text-danger',
+    warning: 'fa-exclamation-triangle text-warning',
+    info: 'fa-info-circle text-info'
   };
 
   return showModal({
     title,
     content: `
       <div class="text-center">
-        ${icons[type]}
-        <p>${message}</p>
+        <i class="fas ${icons[type]} fa-3x mb-3"></i>
+        <p class="mb-0">${message}</p>
       </div>
     `,
-    size: 'small',
+    size: 'sm',
     buttons: [
       {
-        id: 'okBtn',
+        id: 'alertOk',
         text: 'OK',
-        type: 'primary',
-        onClick: () => {}
+        type: 'primary'
       }
     ]
   });
@@ -141,57 +128,37 @@ function showAlert(title, message, type = 'info') {
 // Loading modal
 function showLoading(message = 'Loading...') {
   return showModal({
-    title: '',
     content: `
       <div class="text-center py-4">
-        <div class="spinner-border text-primary mb-3" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
+        <div class="spinner-border text-primary mb-3"></div>
         <p class="mb-0">${message}</p>
       </div>
     `,
-    size: 'small',
+    size: 'sm',
     showClose: false,
     buttons: []
   });
 }
 
 // Booking confirmation modal
-function showBookingConfirmation(bookingData) {
+function showBookingConfirmation(data) {
+  if (!data) return;
+
   const content = `
-    <div class="booking-confirmation">
-      <div class="confirmation-icon">
-        <i class="fas fa-check-circle text-success"></i>
+    <div class="booking-confirmation text-center">
+      <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+      <h4 class="mb-3">Booking Confirmed</h4>
+
+      <div class="booking-details text-start">
+        <div class="detail-row"><strong>ID:</strong> ${data.booking_id}</div>
+        <div class="detail-row"><strong>Serial:</strong> ${data.serial_number}</div>
+        <div class="detail-row"><strong>Date:</strong> ${helpers?.formatDate?.(data.appointment_date) || '-'}</div>
+        <div class="detail-row"><strong>Time:</strong> ${helpers?.formatTime?.(data.estimated_time) || '-'}</div>
+        <div class="detail-row"><strong>Doctor:</strong> ${data.doctor?.name || '-'}</div>
       </div>
-      <h3>Booking Confirmed!</h3>
-      <div class="booking-details">
-        <div class="detail-row">
-          <span class="detail-label">Booking ID:</span>
-          <span class="detail-value booking-id">${bookingData.booking_id}</span>
-          <button class="btn-icon" onclick="window.helpers.copyToClipboard('${bookingData.booking_id}')" title="Copy">
-            <i class="fas fa-copy"></i>
-          </button>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Serial Number:</span>
-          <span class="detail-value">${bookingData.serial_number}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Date:</span>
-          <span class="detail-value">${helpers.formatDate(bookingData.appointment_date)}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Estimated Time:</span>
-          <span class="detail-value">${helpers.formatTime(bookingData.estimated_time)}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Doctor:</span>
-          <span class="detail-value">${bookingData.doctor.name}</span>
-        </div>
-      </div>
-      <p class="confirmation-note">
-        <i class="fas fa-info-circle"></i>
-        Please take a screenshot of this confirmation for your visit.
+
+      <p class="mt-3 text-muted">
+        Please keep a screenshot of this confirmation.
       </p>
     </div>
   `;
@@ -199,38 +166,28 @@ function showBookingConfirmation(bookingData) {
   return showModal({
     title: 'Appointment Confirmation',
     content,
-    size: 'medium',
+    size: 'md',
     buttons: [
       {
-        id: 'printBtn',
-        text: 'Print Receipt',
+        id: 'printReceipt',
+        text: 'Print',
         type: 'secondary',
         closeOnClick: false,
         onClick: () => window.print()
       },
       {
-        id: 'whatsappBtn',
-        text: 'Share on WhatsApp',
-        type: 'success',
-        closeOnClick: false,
-        onClick: () => {
-          const message = `Booking Confirmed!\nID: ${bookingData.booking_id}\nSerial: ${bookingData.serial_number}\nDate: ${helpers.formatDate(bookingData.appointment_date)}\nTime: ${helpers.formatTime(bookingData.estimated_time)}`;
-          window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
-        }
-      },
-      {
-        id: 'doneBtn',
+        id: 'doneBooking',
         text: 'Done',
         type: 'primary',
         onClick: () => {
-          window.location.href = '/index.html';
+          window.location.href = './index.html';
         }
       }
     ]
   });
 }
 
-// Export
+// Global export
 window.modal = {
   showModal,
   showConfirm,
