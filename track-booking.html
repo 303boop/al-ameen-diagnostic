@@ -1,141 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Track Booking - Al-Ameen Diagnostic Center</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Booking - Al-Ameen Diagnostic Center</title>
+    <meta name="description" content="Check the status of your appointment or lab test.">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="./assets/images/logo/favicon.png">
+    <link rel="icon" href="assets/images/logo/logo.ico">
 
-  <!-- Vendor CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Project CSS -->
-  <link rel="stylesheet" href="./css/reset.css">
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/layout.css">
-  <link rel="stylesheet" href="./css/themes.css">
-  <link rel="stylesheet" href="./css/responsive.css">
-  <link rel="stylesheet" href="./css/utilities.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/utilities.css">
 </head>
 
 <body>
 
-  <!-- Navbar -->
-  <div id="navbar"></div>
+    <div id="navbar"></div>
 
-  <!-- Content -->
-  <section class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-6">
-
-        <div class="card">
-          <div class="card-header">
-            <h2 class="mb-0" data-i18n="track.title">Track Your Appointment</h2>
-          </div>
-
-          <div class="card-body">
-            <div class="form-group mb-3">
-              <label class="form-label" data-i18n="track.enter_booking_id">
-                Enter Booking ID
-              </label>
-              <input
-                type="text"
-                class="form-control"
-                id="bookingIdInput"
-                placeholder="ALM-DDMMYY-XXX"
-              >
-            </div>
-
-            <button class="btn btn-primary w-100" id="searchBtn" data-i18n="track.search">
-              Search
-            </button>
-          </div>
-        </div>
-
-        <div id="searchResult" class="mt-4"></div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <div id="footer"></div>
-
-  <!-- Vendor JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
-  <!-- Core Config -->
-  <script src="./js/config/supabase.js" defer></script>
-
-  <!-- Core (⚠️ REQUIRED before navbar) -->
-  <script src="./js/core/auth.js" defer></script>
-  <script src="./js/core/language.js" defer></script>
-  <script src="./js/core/theme.js" defer></script>
-
-  <!-- Utilities -->
-  <script src="./js/utils/helpers.js" defer></script>
-  <script src="./js/utils/date-utils.js" defer></script>
-  <script src="./js/utils/toast.js" defer></script>
-
-  <!-- Features -->
-  <script src="./js/features/booking.js" defer></script>
-
-  <!-- Components -->
-  <script src="./js/components/navbar.js" defer></script>
-  <script src="./js/components/footer.js" defer></script>
-  <script src="./js/components/loader.js" defer></script>
-
-  <!-- App -->
-  <script src="./js/main.js" defer></script>
-
-  <!-- Page Logic (UNCHANGED) -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('searchBtn').addEventListener('click', async () => {
-        const bookingId = document.getElementById('bookingIdInput').value.trim();
-
-        if (!bookingId) {
-          toast.error('Please enter a booking ID');
-          return;
-        }
-
-        loader.showPageLoader('Searching...');
-        const result = await booking.getAppointmentByBookingId(bookingId);
-        loader.hidePageLoader();
-
-        if (result.success) {
-          displayResult(result.data);
-        } else {
-          toast.error('Booking not found');
-        }
-      });
-    });
-
-    function displayResult(data) {
-      document.getElementById('searchResult').innerHTML = `
-        <div class="card">
-          <div class="card-body">
-            <h4>Appointment Found</h4>
-            <p><strong>Booking ID:</strong> ${data.booking_id}</p>
-            <p><strong>Serial:</strong> #${data.serial_number}</p>
-            <p><strong>Date:</strong> ${helpers.formatDate(data.appointment_date)}</p>
-            <p><strong>Time:</strong> ${helpers.formatTime(data.estimated_time)}</p>
-            <p>
-              <strong>Status:</strong>
-              <span class="badge bg-primary">${data.status}</span>
+    <section class="bg-primary text-white py-5">
+        <div class="container text-center py-4">
+            <h1 class="display-4 fw-bold" data-i18n="track.title">Track Your Status</h1>
+            <p class="lead text-white-50 mx-auto" style="max-width: 600px;">
+                Enter your unique Booking ID to check your appointment status or download reports.
             </p>
-            <p><strong>Doctor:</strong> ${data.doctor?.name || '-'}</p>
-          </div>
         </div>
-      `;
-    }
-  </script>
+    </section>
+
+    <section class="section-padding py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8">
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold" data-i18n="track.enter_booking_id">
+                                    Enter Booking ID <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" class="form-control" id="bookingIdInput" placeholder="e.g. ALM-2024-..." required>
+                                </div>
+                                <div class="form-text mt-2">You can find this on your confirmation receipt.</div>
+                            </div>
+
+                            <button class="btn btn-primary btn-lg w-100 shadow-sm" id="searchBtn" data-i18n="track.search">
+                                Check Status
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="searchResult" class="d-none">
+                        </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="js/config/supabase.js"></script>
+    <script src="js/config/constants.js"></script>
+
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/language.js"></script>
+
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/utils/toast.js"></script>
+
+    <script src="js/features/booking.js"></script>
+
+    <script src="js/components/loader.js"></script>
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/footer.js"></script>
+
+    <script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Check URL param for auto-fill (e.g. from email link)
+            const params = new URLSearchParams(window.location.search);
+            const refId = params.get('ref');
+            if(refId) {
+                document.getElementById('bookingIdInput').value = refId;
+                document.getElementById('searchBtn').click();
+            }
+
+            document.getElementById('searchBtn').addEventListener('click', async () => {
+                const bookingId = document.getElementById('bookingIdInput').value.trim();
+                const container = document.getElementById('searchResult');
+
+                if (!bookingId) {
+                    window.toast.error('Please enter a valid Booking ID');
+                    return;
+                }
+
+                // UI Loading
+                window.loader.showPageLoader('Searching records...');
+                container.classList.add('d-none'); // Hide previous result
+
+                // Fetch Data
+                const result = await window.booking.getAppointmentByBookingId(bookingId);
+                
+                window.loader.hidePageLoader();
+
+                if (result.success && result.data) {
+                    displayResult(result.data);
+                } else {
+                    window.toast.error('Booking not found. Please check the ID.');
+                    container.innerHTML = `
+                        <div class="alert alert-danger shadow-sm text-center">
+                            <i class="fas fa-exclamation-circle me-2"></i> No records found for "<strong>${bookingId}</strong>"
+                        </div>
+                    `;
+                    container.classList.remove('d-none');
+                }
+            });
+        });
+
+        function displayResult(data) {
+            const container = document.getElementById('searchResult');
+            
+            // Color coding for status
+            let badgeClass = 'bg-secondary';
+            if (data.status === 'booked') badgeClass = 'bg-warning text-dark';
+            if (data.status === 'checked_in') badgeClass = 'bg-info text-white';
+            if (data.status === 'completed') badgeClass = 'bg-success';
+            if (data.status === 'cancelled') badgeClass = 'bg-danger';
+
+            const serviceName = data.doctor ? `Dr. ${data.doctor.name}` : (data.test ? data.test.name : 'Unknown Service');
+            const patientName = data.patient ? data.patient.full_name : (data.guest_name || 'Guest');
+
+            container.innerHTML = `
+                <div class="card border-0 shadow-sm border-top border-5 border-primary">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Booking Details</h5>
+                            <span class="badge ${badgeClass} text-uppercase px-3 py-2">${data.status.replace('_', ' ')}</span>
+                        </div>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Booking ID</small>
+                                <span class="fw-bold text-primary">${data.booking_id}</span>
+                            </div>
+                            <div class="col-6 text-end">
+                                <small class="text-muted d-block">Serial No.</small>
+                                <span class="fw-bold">#${data.serial_number}</span>
+                            </div>
+                            <div class="col-12 border-top pt-2"></div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Patient Name</small>
+                                <strong>${patientName}</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <small class="text-muted d-block">Service</small>
+                                <strong>${serviceName}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Date</small>
+                                <strong>${window.dateUtils.formatDisplayDate(data.appointment_date)}</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <small class="text-muted d-block">Time</small>
+                                <strong>${window.helpers.formatTime(data.estimated_time)}</strong>
+                            </div>
+                        </div>
+
+                        ${data.status === 'completed' ? `
+                            <div class="alert alert-success d-flex align-items-center">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <div>
+                                    Report is ready. 
+                                    <a href="login.html" class="alert-link">Login to download</a>.
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div class="d-grid mt-3">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i> Print Status
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.classList.remove('d-none');
+        }
+    </script>
 
 </body>
 </html>

@@ -4,132 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment - Al-Ameen Diagnostic Center</title>
-    <link rel="icon" type="image/x-icon" href="./assets/images/logo/logo.ico">
-    
+    <meta name="description" content="Schedule your doctor visit or lab test online easily.">
+
+    <link rel="icon" href="assets/images/logo/logo.ico">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link rel="stylesheet" href="./css/reset.css">
-    <link rel="stylesheet" href="./css/variables.css">
-    <link rel="stylesheet" href="./css/base.css">
-    <link rel="stylesheet" href="./css/components.css">
-    <link rel="stylesheet" href="./css/layout.css">
-    <link rel="stylesheet" href="./css/themes.css">
-    <link rel="stylesheet" href="./css/responsive.css">
-    <link rel="stylesheet" href="./css/utilities.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 
-<body>
+<body class="bg-light">
 
-  <div id="navbar"></div>
+    <div id="navbar"></div>
 
-  <section class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
-          <div class="card-header bg-primary text-white">
-            <h2 class="mb-0 h4">Book Your Appointment</h2>
-          </div>
-          <div class="card-body p-4">
-            
-            <form id="bookingForm">
-              
-              <div class="mb-4">
-                  <label class="form-label fw-bold">I want to book a:</label>
-                  <div class="btn-group w-100" role="group">
-                      <input type="radio" class="btn-check" name="bookingType" id="typeDoctor" value="doctor" checked>
-                      <label class="btn btn-outline-primary" for="typeDoctor"><i class="fas fa-user-md me-2"></i>Doctor</label>
+    <section class="section-padding py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold" data-i18n="booking.title">Schedule Your Visit</h2>
+                        <p class="text-muted">Book appointments with top doctors or schedule diagnostic tests.</p>
+                    </div>
 
-                      <input type="radio" class="btn-check" name="bookingType" id="typeTest" value="test">
-                      <label class="btn btn-outline-primary" for="typeTest"><i class="fas fa-microscope me-2"></i>Lab Test</label>
-                  </div>
-              </div>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white p-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0">New Appointment</h5>
+                                    <small class="text-white-50">Fill in the details below</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <form id="bookingForm">
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">I want to book a:</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="bookingType" id="typeDoctor" value="doctor" checked>
+                                        <label class="btn btn-outline-primary py-2" for="typeDoctor">
+                                            <i class="fas fa-user-md me-2"></i>Doctor
+                                        </label>
 
-              <div class="form-group mb-3" id="doctorInputGroup">
-                <label class="form-label">Select Doctor</label>
-                <select class="form-select" id="doctorSelect">
-                  <option value="">Loading doctors...</option>
-                </select>
-              </div>
+                                        <input type="radio" class="btn-check" name="bookingType" id="typeTest" value="test">
+                                        <label class="btn btn-outline-primary py-2" for="typeTest">
+                                            <i class="fas fa-microscope me-2"></i>Lab Test
+                                        </label>
+                                    </div>
+                                </div>
 
-              <div class="form-group mb-3 d-none" id="testInputGroup">
-                <label class="form-label">Select Test</label>
-                <select class="form-select" id="testSelect">
-                  <option value="">Loading tests...</option>
-                </select>
-              </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6" id="doctorInputGroup">
+                                        <label class="form-label">Select Doctor <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="doctorSelect">
+                                            <option value="">Loading doctors...</option>
+                                        </select>
+                                    </div>
 
-              <div class="form-group mb-3">
-                <label class="form-label">Select Date</label>
-                <input type="date" class="form-control" id="appointmentDate" required>
-              </div>
+                                    <div class="col-md-6 d-none" id="testInputGroup">
+                                        <label class="form-label">Select Lab Test <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="testSelect">
+                                            <option value="">Loading tests...</option>
+                                        </select>
+                                    </div>
 
-              <hr class="my-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Preferred Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="appointmentDate" required>
+                                    </div>
+                                </div>
 
-              <h5 class="mb-3">Patient Details</h5>
-              
-              <div class="form-group mb-3">
-                <label class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="patientName" required>
-              </div>
+                                <hr class="my-4">
 
-              <div class="row">
-                  <div class="col-md-6 form-group mb-3">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="patientPhone" required>
-                  </div>
-                  <div class="col-md-6 form-group mb-3">
-                    <label class="form-label">Email Address (Optional)</label>
-                    <input type="email" class="form-control" id="patientEmail">
-                  </div>
-              </div>
+                                <h5 class="mb-3 text-primary">Patient Details</h5>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="patientName" placeholder="e.g. John Doe" required>
+                                </div>
 
-              <div class="form-group mb-3">
-                <label class="form-label">Additional Notes</label>
-                <textarea class="form-control" id="patientNotes" rows="2"></textarea>
-              </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="patientPhone" placeholder="10-digit mobile number" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email (Optional)</label>
+                                        <input type="email" class="form-control" id="patientEmail" placeholder="name@example.com">
+                                    </div>
+                                </div>
 
-              <div class="form-group mb-4">
-                <label class="form-label">Coupon Code</label>
-                <div class="input-group">
-                  <input type="text" class="form-control" id="couponCode" placeholder="Enter code">
-                  <button type="button" class="btn btn-outline-secondary" id="applyCoupon">Apply</button>
+                                <div class="mb-3">
+                                    <label class="form-label">Symptoms / Notes</label>
+                                    <textarea class="form-control" id="patientNotes" rows="2" placeholder="Briefly describe your issue..."></textarea>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Coupon Code</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="couponCode" placeholder="Enter promo code">
+                                        <button class="btn btn-outline-secondary" type="button" id="applyCoupon">Apply</button>
+                                    </div>
+                                    <div id="couponFeedback" class="form-text"></div>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg shadow-sm" id="submitBooking">
+                                        Confirm Booking
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="index.html" class="text-decoration-none text-muted">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Home
+                        </a>
+                    </div>
+
                 </div>
-                <small id="couponMessage" class="form-text text-success"></small>
-              </div>
-
-              <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="submitBooking">
-                Confirm Booking
-              </button>
-
-            </form>
-          </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <div id="footer"></div>
+    <div id="footer"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="./js/config/supabase.js"></script>
-  <script src="./js/config/constants.js"></script>
-  <script src="./js/core/auth.js"></script>
-  
-  <script src="./js/utils/helpers.js"></script>
-  <script src="./js/utils/date-utils.js"></script>
-  <script src="./js/utils/validator.js"></script>
-  <script src="./js/utils/toast.js"></script>
+    <script src="js/config/supabase.js"></script>
+    <script src="js/config/constants.js"></script>
 
-  <script src="./js/features/booking.js"></script>
-  
-  <script src="./js/features/booking-ui.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/language.js"></script>
 
-  <script src="./js/main.js"></script>
-  <script src="./js/components/navbar.js"></script>
-  <script src="./js/components/footer.js"></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/utils/validator.js"></script>
+    <script src="js/utils/toast.js"></script>
+
+    <script src="js/features/booking.js"></script>
+    <script src="js/features/coupon.js"></script> 
+    <script src="js/features/notifications.js"></script>
+
+    <script src="js/components/loader.js"></script>
+    <script src="js/components/modal.js"></script>
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/footer.js"></script>
+
+    <script src="js/features/booking-ui.js"></script>
+
+    <script src="js/main.js"></script>
 
 </body>
 </html>

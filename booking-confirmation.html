@@ -1,102 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Confirmed - Al-Ameen Diagnostic Center</title>
-  
-  <link rel="icon" type="image/x-icon" href="./assets/images/logo/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - Al-Ameen Diagnostic Center</title>
+    <meta name="robots" content="noindex"> <link rel="icon" href="assets/images/logo/logo.ico">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="./css/reset.css">
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/layout.css">
-  <link rel="stylesheet" href="./css/themes.css">
-  <link rel="stylesheet" href="./css/responsive.css">
-  <link rel="stylesheet" href="./css/utilities.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <style>
+        .confirmation-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @media print {
+            #navbar, #footer, .btn-print-hide { display: none !important; }
+            body { background: white; }
+            .card { border: none !important; box-shadow: none !important; }
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-light">
 
-  <!-- Navbar -->
-  <div id="navbar"></div>
+    <div id="navbar"></div>
 
-  <!-- Booking Confirmation -->
-  <section class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-6">
+    <section class="section-padding py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8">
 
-        <div class="card">
-          <div class="card-body text-center">
+                    <div class="card border-0 shadow-sm" id="receiptCard">
+                        <div class="card-body text-center p-5">
 
-            <div class="confirmation-icon mb-3">
-              <i class="fas fa-check-circle"></i>
+                            <div class="confirmation-icon mb-4">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+
+                            <h2 class="mb-3 fw-bold text-success" data-i18n="booking.booking_success">
+                                Booking Confirmed!
+                            </h2>
+
+                            <p class="text-muted mb-4">
+                                Thank you for choosing Al-Ameen. Your appointment has been scheduled successfully.
+                            </p>
+
+                            <div id="loadingDetails">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="small text-muted mt-2">Generating Receipt...</p>
+                            </div>
+
+                            <div id="bookingDetails" class="d-none">
+                                <div class="bg-light p-4 rounded text-start mb-4">
+                                    
+                                    <div class="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                        <span class="text-muted">Booking ID:</span>
+                                        <span class="fw-bold text-primary" id="bookingId">---</span>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Serial Number:</span>
+                                        <span class="fw-bold" id="serialNumber">---</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Patient Name:</span>
+                                        <span class="fw-bold" id="patientName">---</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Service:</span>
+                                        <span class="fw-bold text-end" id="serviceName">---</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Date:</span>
+                                        <span class="fw-bold" id="appointmentDate">---</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Est. Time:</span>
+                                        <span class="fw-bold" id="estimatedTime">---</span>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning small text-start">
+                                    <i class="fas fa-info-circle me-1"></i> 
+                                    Please arrive 15 minutes before your estimated time with a valid ID proof.
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-center btn-print-hide">
+                                <button onclick="window.print()" class="btn btn-outline-secondary px-4">
+                                    <i class="fas fa-print me-2"></i> Print Receipt
+                                </button>
+                                <a href="index.html" class="btn btn-primary px-4">
+                                    Back to Home
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
-
-            <h2 class="mb-4" data-i18n="booking.booking_success">
-              Booking Confirmed!
-            </h2>
-
-            <p class="mb-4">
-              Your appointment has been successfully booked. Please take a screenshot of this confirmation.
-            </p>
-
-            <div class="booking-details">
-              <div class="detail-row">
-                <span class="detail-label">Booking ID:</span>
-                <span class="detail-value booking-id" id="bookingId"></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Serial Number:</span>
-                <span class="detail-value" id="serialNumber"></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Date:</span>
-                <span class="detail-value" id="appointmentDate"></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Time:</span>
-                <span class="detail-value" id="estimatedTime"></span>
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <a href="./index.html" class="btn btn-primary">
-                Back to Home
-              </a>
-            </div>
-
-          </div>
         </div>
+    </section>
 
-      </div>
-    </div>
-  </section>
+    <div id="footer"></div>
 
-  <!-- Footer -->
-  <div id="footer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Vendor JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/config/supabase.js"></script>
+    <script src="js/config/constants.js"></script>
 
-  <!-- Core Config -->
-  <script src="./js/config/supabase.js" defer></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/language.js"></script>
 
-  <!-- Core (must load before components) -->
-  <script src="./js/core/language.js" defer></script>
-  <script src="./js/core/theme.js" defer></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/utils/toast.js"></script>
 
-  <!-- Components -->
-  <script src="./js/components/navbar.js" defer></script>
-  <script src="./js/components/footer.js" defer></script>
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/footer.js"></script>
 
-  <!-- App -->
-  <script src="./js/main.js" defer></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            // We expect ?id=UUID from the booking process
+            const apptId = params.get('id');
+
+            const loading = document.getElementById('loadingDetails');
+            const details = document.getElementById('bookingDetails');
+
+            if (!apptId) {
+                loading.innerHTML = `
+                    <div class="text-danger">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <p>No booking reference found.</p>
+                    </div>`;
+                return;
+            }
+
+            try {
+                // Fetch details from Supabase to ensure security and fresh data
+                const { data, error } = await window.supabase
+                    .from('appointments')
+                    .select(`
+                        booking_id, serial_number, appointment_date, estimated_time, guest_name, 
+                        doctor:doctors(name), 
+                        test:tests(name),
+                        patient:profiles(full_name)
+                    `)
+                    .eq('id', apptId)
+                    .single();
+
+                if (error) throw error;
+
+                // Populate UI
+                document.getElementById('bookingId').textContent = data.booking_id;
+                document.getElementById('serialNumber').textContent = data.serial_number;
+                
+                // Patient Name (Guest or Registered)
+                document.getElementById('patientName').textContent = 
+                    data.patient?.full_name || data.guest_name || 'Guest';
+
+                // Service Name (Doctor or Test)
+                const service = data.doctor ? `Dr. ${data.doctor.name}` : (data.test ? data.test.name : 'General Visit');
+                document.getElementById('serviceName').textContent = service;
+
+                // Date & Time
+                document.getElementById('appointmentDate').textContent = window.dateUtils.formatDisplayDate(data.appointment_date);
+                document.getElementById('estimatedTime').textContent = window.helpers.formatTime(data.estimated_time);
+
+                // Show Content
+                loading.classList.add('d-none');
+                details.classList.remove('d-none');
+
+            } catch (err) {
+                console.error("Receipt Error:", err);
+                loading.innerHTML = `<p class="text-danger">Failed to load booking details.</p>`;
+            }
+        });
+    </script>
 
 </body>
 </html>

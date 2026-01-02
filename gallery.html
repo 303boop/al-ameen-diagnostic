@@ -1,82 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gallery - Al-Ameen Diagnostic Center</title>
-  
-  <link rel="icon" type="image/x-icon" href="./assets/images/logo/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Al-Ameen Diagnostic Center</title>
+    <meta name="description" content="View our modern facilities and state-of-the-art equipment.">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="./css/reset.css">
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/layout.css">
-  <link rel="stylesheet" href="./css/themes.css">
-  <link rel="stylesheet" href="./css/responsive.css">
-  <link rel="stylesheet" href="./css/utilities.css">
+    <link rel="icon" href="assets/images/logo/logo.ico">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+    
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/utilities.css">
 </head>
 
 <body>
 
-  <!-- Navbar -->
-  <div id="navbar"></div>
+    <div id="navbar"></div>
 
-  <!-- Hero -->
-  <section class="hero" style="min-height: 40vh;">
-    <div class="container">
-      <div class="text-center text-white">
-        <h1 class="hero-title" data-i18n="gallery.title">Gallery</h1>
-        <p class="hero-subtitle" data-i18n="gallery.subtitle">Our Facilities and Team</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Gallery -->
-  <section class="container py-5">
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card">
-          <img src="./assets/images/gallery/facility-1.jpg" class="card-img-top" alt="Facility">
+    <section class="bg-dark text-white py-5 position-relative overflow-hidden">
+        <div class="container text-center position-relative z-1">
+            <h1 class="display-4 fw-bold" data-i18n="gallery.title">Our Gallery</h1>
+            <p class="lead text-white-50 mx-auto" style="max-width: 600px;" data-i18n="gallery.subtitle">
+                Take a look at our world-class facilities, advanced equipment, and dedicated team.
+            </p>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card">
-          <img src="./assets/images/gallery/facility-2.jpg" class="card-img-top" alt="Facility">
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-10"></div>
+    </section>
+
+    <section class="section-padding py-5">
+        <div class="container">
+            
+            <div class="text-center mb-5">
+                <button class="btn btn-outline-primary active rounded-pill px-4 m-1">All</button>
+                <button class="btn btn-outline-primary rounded-pill px-4 m-1">Facilities</button>
+                <button class="btn btn-outline-primary rounded-pill px-4 m-1">Equipment</button>
+                <button class="btn btn-outline-primary rounded-pill px-4 m-1">Team</button>
+            </div>
+
+            <div class="row g-4" id="galleryContainer">
+                <div class="col-lg-4 col-md-6">
+                    <a href="assets/images/gallery/facility-1.jpg" class="glightbox card border-0 shadow-sm overflow-hidden h-100 lift-hover">
+                        <img src="assets/images/gallery/facility-1.jpg" alt="Facility" class="img-fluid w-100 h-100 object-fit-cover" style="min-height: 250px;" onerror="this.src='https://placehold.co/600x400?text=Facility+Image'">
+                        <div class="card-img-overlay d-flex align-items-end p-0">
+                            <div class="bg-dark bg-opacity-75 text-white w-100 p-3">
+                                <h6 class="mb-0">Main Reception</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <a href="assets/images/gallery/facility-2.jpg" class="glightbox card border-0 shadow-sm overflow-hidden h-100 lift-hover">
+                        <img src="assets/images/gallery/facility-2.jpg" alt="Lab" class="img-fluid w-100 h-100 object-fit-cover" style="min-height: 250px;" onerror="this.src='https://placehold.co/600x400?text=Lab+Equipment'">
+                        <div class="card-img-overlay d-flex align-items-end p-0">
+                            <div class="bg-dark bg-opacity-75 text-white w-100 p-3">
+                                <h6 class="mb-0">Pathology Lab</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <a href="assets/images/gallery/facility-3.jpg" class="glightbox card border-0 shadow-sm overflow-hidden h-100 lift-hover">
+                        <img src="assets/images/gallery/facility-3.jpg" alt="MRI" class="img-fluid w-100 h-100 object-fit-cover" style="min-height: 250px;" onerror="this.src='https://placehold.co/600x400?text=MRI+Machine'">
+                        <div class="card-img-overlay d-flex align-items-end p-0">
+                            <div class="bg-dark bg-opacity-75 text-white w-100 p-3">
+                                <h6 class="mb-0">MRI Suite</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <a href="assets/images/gallery/team-1.jpg" class="glightbox card border-0 shadow-sm overflow-hidden h-100 lift-hover">
+                        <img src="assets/images/gallery/team-1.jpg" alt="Team" class="img-fluid w-100 h-100 object-fit-cover" style="min-height: 250px;" onerror="this.src='https://placehold.co/600x400?text=Medical+Team'">
+                        <div class="card-img-overlay d-flex align-items-end p-0">
+                            <div class="bg-dark bg-opacity-75 text-white w-100 p-3">
+                                <h6 class="mb-0">Expert Doctors</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <a href="assets/images/gallery/waiting-area.jpg" class="glightbox card border-0 shadow-sm overflow-hidden h-100 lift-hover">
+                        <img src="assets/images/gallery/waiting-area.jpg" alt="Waiting Area" class="img-fluid w-100 h-100 object-fit-cover" style="min-height: 250px;" onerror="this.src='https://placehold.co/600x400?text=Waiting+Area'">
+                        <div class="card-img-overlay d-flex align-items-end p-0">
+                            <div class="bg-dark bg-opacity-75 text-white w-100 p-3">
+                                <h6 class="mb-0">Patient Lounge</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <a href="assets/images/gallery/xray.jpg" class="glightbox card border-0 shadow-sm overflow-hidden h-100 lift-hover">
+                        <img src="assets/images/gallery/xray.jpg" alt="X-Ray" class="img-fluid w-100 h-100 object-fit-cover" style="min-height: 250px;" onerror="this.src='https://placehold.co/600x400?text=X-Ray+Room'">
+                        <div class="card-img-overlay d-flex align-items-end p-0">
+                            <div class="bg-dark bg-opacity-75 text-white w-100 p-3">
+                                <h6 class="mb-0">Digital X-Ray</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card">
-          <img src="./assets/images/gallery/facility-3.jpg" class="card-img-top" alt="Facility">
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Footer -->
-  <div id="footer"></div>
+    <div id="footer"></div>
 
-  <!-- Vendor JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  
-  <!-- Core Config -->
-  <script src="./js/config/supabase.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 
-  <!-- Core (must load before components) -->
-  <script src="./js/core/auth.js" defer></script>
-  <script src="./js/core/language.js" defer></script>
-  <script src="./js/core/theme.js" defer></script>
+    <script src="js/config/supabase.js"></script>
+    <script src="js/config/constants.js"></script>
 
-  <!-- Components -->
-  <script src="./js/components/navbar.js" defer></script>
-  <script src="./js/components/footer.js" defer></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/language.js"></script>
 
-  <!-- App -->
-  <script src="./js/main.js" defer></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/utils/toast.js"></script>
+
+    <script src="js/features/image-gallery.js"></script> 
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/components/loader.js"></script>
+
+    <script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lightbox
+            if (window.gallery && window.gallery.initLightbox) {
+                window.gallery.initLightbox();
+            } else {
+                // Fallback if gallery.js fails
+                const lightbox = GLightbox({
+                    touchNavigation: true,
+                    loop: true,
+                    selector: '.glightbox'
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

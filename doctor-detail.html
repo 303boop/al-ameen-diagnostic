@@ -1,65 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doctor Details - Al-Ameen Diagnostic Center</title>
-  
-  <link rel="icon" type="image/x-icon" href="./assets/images/logo/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Profile - Al-Ameen Diagnostic Center</title>
+    <meta name="description" content="View doctor profile, specialization, and schedule.">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="./css/reset.css">
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/layout.css">
-  <link rel="stylesheet" href="./css/themes.css">
-  <link rel="stylesheet" href="./css/responsive.css">
-  <link rel="stylesheet" href="./css/utilities.css">
+    <link rel="icon" href="assets/images/logo/logo.ico">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 
-<body>
+<body class="bg-light">
 
-  <!-- Navbar -->
-  <div id="navbar"></div>
+    <div id="navbar"></div>
 
-  <!-- Content -->
-  <section class="container py-5">
-    <div id="doctorDetails"></div>
-  </section>
+    <section class="section-padding py-5 min-vh-75">
+        <div class="container">
+            
+            <div class="mb-4">
+                <a href="doctors.html" class="text-decoration-none text-muted">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Doctors List
+                </a>
+            </div>
 
-  <!-- Footer -->
-  <div id="footer"></div>
+            <div id="doctorContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3 text-muted">Loading profile...</p>
+                </div>
+            </div>
 
-  <!-- Vendor JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-  
-  <!-- Core Config -->
-  <script src="./js/config/supabase.js" defer></script>
-  <script src="./js/config/constants.js" defer></script>
+        </div>
+    </section>
 
-  <!-- Core (must load before components) -->
-  <script src="./js/core/auth.js" defer></script>
-  <script src="./js/core/language.js" defer></script>
-  <script src="./js/core/theme.js" defer></script>
+    <div id="footer"></div>
 
-  <!-- Utilities -->
-  <script src="./js/utils/helpers.js" defer></script>
-  <script src="./js/utils/toast.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Features -->
-  <script src="./js/features/booking.js" defer></script>
+    <script src="js/config/supabase.js"></script>
+    <script src="js/config/constants.js"></script>
 
-  <!-- Components -->
-  <script src="./js/components/navbar.js" defer></script>
-  <script src="./js/components/footer.js" defer></script>
-  <script src="./js/components/loader.js" defer></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/language.js"></script>
 
-  <!-- App -->
-  <script src="./js/main.js" defer></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/utils/toast.js"></script>
+
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/components/loader.js"></script>
+
+    <script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('doctorContent');
+            
+            // 1. Get ID from URL
+            const params = new URLSearchParams(window.location.search);
+            const doctorId = params.get('id');
+
+            if (!doctorId) {
+                renderError("No doctor selected.");
+                return;
+            }
+
+            try {
+                // 2. Fetch Data
+                const { data: doctor, error } = await window.supabase
+                    .from('doctors')
+                    .select('*')
+                    .eq('id', doctorId)
+                    .single();
+
+                if (error) throw error;
+                if (!doctor) throw new Error("Doctor not found");
+
+                // 3. Render Profile
+                renderProfile(doctor);
+
+            } catch (error) {
+                console.error(error);
+                renderError("Doctor profile not found or unavailable.");
+            }
+
+            function renderError(msg) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-slash fa-4x text-muted mb-3 opacity-50"></i>
+                        <h4 class="text-danger">${msg}</h4>
+                        <a href="doctors.html" class="btn btn-primary mt-3">Browse All Doctors</a>
+                    </div>
+                `;
+            }
+
+            function renderProfile(doc) {
+                const imageUrl = doc.image_url || 'assets/images/doctors/placeholder.jpg';
+                const formattedFee = window.helpers.formatCurrency(doc.consultation_fee);
+                const startTime = window.helpers.formatTime(doc.start_time);
+                const endTime = window.helpers.formatTime(doc.end_time);
+
+                container.innerHTML = `
+                    <div class="card border-0 shadow-sm overflow-hidden">
+                        <div class="row g-0">
+                            
+                            <div class="col-md-4 bg-light d-flex align-items-center justify-content-center p-3">
+                                <div class="position-relative w-100 h-100" style="min-height: 300px;">
+                                    <img src="${imageUrl}" class="img-fluid rounded shadow-sm object-fit-cover w-100 h-100" alt="${doc.name}" 
+                                    style="max-height: 500px; object-position: top;">
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="card-body p-4 p-lg-5">
+                                    
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h2 class="card-title fw-bold mb-1">${doc.name}</h2>
+                                            <span class="badge bg-primary-subtle text-primary fs-6 px-3 py-2 rounded-pill">
+                                                ${doc.specialization}
+                                            </span>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-muted small">Consultation Fee</div>
+                                            <div class="h4 text-primary fw-bold mb-0">${formattedFee}</div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-4 text-muted opacity-25">
+
+                                    <h5 class="fw-bold mb-3">About</h5>
+                                    <p class="card-text text-muted mb-4 lead" style="font-size: 1rem;">
+                                        ${doc.description || "No bio available for this specialist."}
+                                    </p>
+
+                                    <div class="row g-4 mb-5">
+                                        <div class="col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light p-3 rounded-circle me-3 text-primary">
+                                                    <i class="fas fa-clock fa-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Visiting Hours</small>
+                                                    <strong>${startTime} - ${endTime}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light p-3 rounded-circle me-3 text-success">
+                                                    <i class="fas fa-user-check fa-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Availability</small>
+                                                    <strong class="${doc.is_active ? 'text-success' : 'text-danger'}">
+                                                        ${doc.is_active ? 'Available' : 'Currently Unavailable'}
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex gap-3">
+                                        <a href="booking.html?doctor=${doc.id}" class="btn btn-primary btn-lg flex-grow-1 shadow-sm ${!doc.is_active ? 'disabled' : ''}">
+                                            <i class="fas fa-calendar-check me-2"></i> Book Appointment
+                                        </a>
+                                        ${doc.video_url ? `
+                                            <a href="${doc.video_url}" target="_blank" class="btn btn-outline-danger btn-lg">
+                                                <i class="fab fa-youtube"></i> Intro
+                                            </a>
+                                        ` : ''}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
 
 </body>
 </html>

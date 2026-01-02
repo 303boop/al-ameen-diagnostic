@@ -1,91 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diagnostic Tests - Al-Ameen Diagnostic Center</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Tests - Al-Ameen Diagnostic Center</title>
+    <meta name="description" content="Browse our comprehensive list of diagnostic lab tests and health packages.">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="./assets/images/logo/logo.ico">
+    <link rel="icon" href="assets/images/logo/logo.ico">
 
-  <!-- Vendor CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-  <!-- Project CSS -->
-  <link rel="stylesheet" href="./css/reset.css">
-  <link rel="stylesheet" href="./css/variables.css">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/layout.css">
-  <link rel="stylesheet" href="./css/themes.css">
-  <link rel="stylesheet" href="./css/animations.css">
-  <link rel="stylesheet" href="./css/responsive.css">
-  <link rel="stylesheet" href="./css/utilities.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/utilities.css">
 </head>
 
 <body>
 
-  <!-- Navbar -->
-  <div id="navbar"></div>
+    <div id="navbar"></div>
 
-  <!-- Hero -->
-  <section class="hero" style="min-height: 40vh;">
-    <div class="container">
-      <div class="text-center text-white">
-        <h1 class="hero-title" data-i18n="tests.title">Diagnostic Tests</h1>
-        <p class="hero-subtitle" data-i18n="tests.subtitle">
-          Comprehensive diagnostic services with accurate results
-        </p>
-      </div>
-    </div>
-  </section>
+    <section class="bg-primary text-white py-5 position-relative overflow-hidden">
+        <div class="container text-center position-relative z-1 py-4">
+            <h1 class="display-4 fw-bold" data-i18n="tests.title" data-aos="fade-down">Diagnostic Services</h1>
+            <p class="lead text-white-50 mx-auto" style="max-width: 600px;" data-i18n="tests.subtitle" data-aos="fade-up" data-aos-delay="100">
+                Accurate, reliable, and affordable diagnostic tests powered by advanced technology.
+            </p>
+        </div>
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-10"></div>
+    </section>
 
-  <!-- Tests Grid -->
-  <section class="container py-5">
-    <div id="testsGrid"></div>
-  </section>
+    <section class="section-padding py-5">
+        <div class="container">
+            
+            <div class="row g-3 mb-5 justify-content-center align-items-center" data-aos="fade-up">
+                <div class="col-md-5">
+                    <div class="input-group shadow-sm">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="testSearch" class="form-control border-start-0 ps-0" placeholder="Search tests (e.g. Blood, X-Ray)...">
+                    </div>
+                </div>
+                <div class="col-md-auto">
+                    <div class="form-check form-switch custom-switch">
+                        <input class="form-check-input" type="checkbox" id="discountFilter">
+                        <label class="form-check-label fw-medium" for="discountFilter">Show Discounts Only</label>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Footer -->
-  <div id="footer"></div>
+            <div id="testsGrid" class="row g-4">
+                <div class="col-md-3"><div class="skeleton-card" style="height: 300px;"></div></div>
+                <div class="col-md-3"><div class="skeleton-card" style="height: 300px;"></div></div>
+                <div class="col-md-3"><div class="skeleton-card" style="height: 300px;"></div></div>
+                <div class="col-md-3"><div class="skeleton-card" style="height: 300px;"></div></div>
+            </div>
 
-  <!-- Vendor JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+            <div id="noResults" class="text-center py-5 d-none">
+                <i class="fas fa-microscope fa-3x text-muted mb-3 opacity-50"></i>
+                <h5 class="text-muted">No tests found matching your search.</h5>
+                <button class="btn btn-outline-primary mt-2" onclick="resetFilters()">Clear Search</button>
+            </div>
 
-  <!-- Core Config -->
-  <script src="./js/config/supabase.js" defer></script>
-  <script src="./js/config/constants.js" defer></script>
+        </div>
+    </section>
 
-  <!-- Core (must load before components) -->
-  <script src="./js/core/auth.js" defer></script>
-  <script src="./js/core/language.js" defer></script>
-  <script src="./js/core/theme.js" defer></script>
+    <section class="py-5 bg-light border-top">
+        <div class="container text-center">
+            <h3>Need a specific package?</h3>
+            <p class="text-muted">We offer customized health checkup packages for families.</p>
+            <a href="contact.html" class="btn btn-primary rounded-pill px-4">Contact Us</a>
+        </div>
+    </section>
 
-  <!-- Utilities -->
-  <script src="./js/utils/helpers.js" defer></script>
-  <script src="./js/utils/toast.js" defer></script>
+    <div id="footer"></div>
 
-  <!-- Components -->
-  <script src="./js/components/navbar.js" defer></script>
-  <script src="./js/components/footer.js" defer></script>
-  <script src="./js/components/loader.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-  <!-- App -->
-  <script src="./js/main.js" defer></script>
+    <script src="js/config/supabase.js"></script>
+    <script src="js/config/constants.js"></script>
 
-  <!-- Page Init -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      AOS.init({
-        once: true,
-        duration: 800,
-        easing: 'ease-in-out'
-      });
-    });
-  </script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/language.js"></script>
+
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/utils/toast.js"></script>
+
+    <script src="js/features/filter.js"></script>
+    <script src="js/features/booking.js"></script>
+
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/components/loader.js"></script>
+
+    <script src="js/main.js"></script>
+
+    <script>
+        let allTests = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            AOS.init({ once: true, duration: 800 });
+
+            await loadTestsData();
+
+            // Event Listeners
+            document.getElementById('testSearch').addEventListener('input', applyFilters);
+            document.getElementById('discountFilter').addEventListener('change', applyFilters);
+        });
+
+        async function loadTestsData() {
+            try {
+                // Fetch Tests
+                const { data, error } = await window.supabase
+                    .from('tests')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('name');
+
+                if (error) throw error;
+                allTests = data || [];
+
+                renderTests(allTests);
+
+            } catch (error) {
+                console.error("Error loading tests:", error);
+                document.getElementById('testsGrid').innerHTML = `<div class="col-12 text-center text-danger">Failed to load tests.</div>`;
+            }
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('testSearch').value.toLowerCase();
+            const showDiscounts = document.getElementById('discountFilter').checked;
+
+            let filtered = allTests.filter(test => {
+                const matchesSearch = test.name.toLowerCase().includes(query) || (test.description && test.description.toLowerCase().includes(query));
+                const matchesDiscount = showDiscounts ? (test.is_discount_active && test.discount_price) : true;
+                return matchesSearch && matchesDiscount;
+            });
+
+            renderTests(filtered);
+        }
+
+        function renderTests(tests) {
+            const container = document.getElementById('testsGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (tests.length === 0) {
+                container.innerHTML = '';
+                noResults.classList.remove('d-none');
+                return;
+            }
+
+            noResults.classList.add('d-none');
+            
+            container.innerHTML = tests.map(test => {
+                // Price Logic
+                const hasDiscount = test.is_discount_active && test.discount_price;
+                const priceDisplay = hasDiscount 
+                    ? `<span class="text-muted text-decoration-line-through me-2 small">${window.helpers.formatCurrency(test.original_price)}</span>
+                       <span class="text-success fw-bold">${window.helpers.formatCurrency(test.discount_price)}</span>`
+                    : `<span class="text-primary fw-bold">${window.helpers.formatCurrency(test.original_price)}</span>`;
+
+                const badgeHTML = hasDiscount 
+                    ? `<div class="position-absolute top-0 end-0 m-2">
+                         <span class="badge bg-danger rounded-pill shadow-sm">Offer</span>
+                       </div>` 
+                    : '';
+
+                return `
+                <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up">
+                    <div class="card h-100 border-0 shadow-sm hover-up">
+                        <div class="position-relative overflow-hidden bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                            <img src="${test.image_url || 'assets/images/tests/placeholder.jpg'}" class="img-fluid w-100 h-100 object-fit-cover" alt="${test.name}">
+                            ${badgeHTML}
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold mb-2 text-truncate" title="${test.name}">${test.name}</h5>
+                            <p class="card-text text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                ${test.description || 'No description available.'}
+                            </p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>${priceDisplay}</div>
+                                <small class="text-muted"><i class="far fa-clock me-1"></i>${test.duration_minutes || 15}m</small>
+                            </div>
+
+                            <a href="booking.html?test=${test.id}" class="btn btn-outline-primary w-100">Book Test</a>
+                            <a href="test-detail.html?id=${test.id}" class="text-center small mt-2 text-decoration-none">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function resetFilters() {
+            document.getElementById('testSearch').value = '';
+            document.getElementById('discountFilter').checked = false;
+            renderTests(allTests);
+        }
+    </script>
 
 </body>
 </html>
