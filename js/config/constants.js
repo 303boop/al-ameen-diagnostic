@@ -1,5 +1,7 @@
 // Application Constants (Read-only & Safe)
 
+window.BASE_PATH = "/al-ameen-diagnostic";
+
 // Booking ID prefix
 const BOOKING_PREFIX = "ALM";
 
