@@ -1,308 +1,184 @@
-/* Responsive Styles */
+/* =========================================
+   RESPONSIVE DESIGN & BREAKPOINTS
+   ========================================= */
 
-/* Large Devices (Desktops, 1200px and up) */
+/* -----------------------------------------
+   1. XXL & XL DEVICES (Desktops > 1200px)
+   ----------------------------------------- */
+@media (max-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+}
+
 @media (max-width: 1200px) {
-  .container {
-    max-width: var(--container-lg);
-  }
-  
-  .hero-title {
-    font-size: var(--text-4xl);
-  }
+    /* Adjust Hero Typography */
+    .hero-title {
+        font-size: 3rem;
+    }
+    
+    .display-4 {
+        font-size: 2.5rem;
+    }
 }
 
-/* Medium Devices (Tablets, 992px and up) */
-@media (max-width: 992px) {
-  .container {
-    max-width: var(--container-md);
-  }
-  
-  /* Grid adjustments */
-  .col-md-1 { flex: 0 0 8.333333%; max-width: 8.333333%; }
-  .col-md-2 { flex: 0 0 16.666667%; max-width: 16.666667%; }
-  .col-md-3 { flex: 0 0 25%; max-width: 25%; }
-  .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
-  .col-md-5 { flex: 0 0 41.666667%; max-width: 41.666667%; }
-  .col-md-6 { flex: 0 0 50%; max-width: 50%; }
-  .col-md-7 { flex: 0 0 58.333333%; max-width: 58.333333%; }
-  .col-md-8 { flex: 0 0 66.666667%; max-width: 66.666667%; }
-  .col-md-9 { flex: 0 0 75%; max-width: 75%; }
-  .col-md-10 { flex: 0 0 83.333333%; max-width: 83.333333%; }
-  .col-md-11 { flex: 0 0 91.666667%; max-width: 91.666667%; }
-  .col-md-12 { flex: 0 0 100%; max-width: 100%; }
-  
-  /* About section */
-  .about-content {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
-  }
-  
-  /* About features */
-  .about-features {
-    grid-template-columns: 1fr;
-  }
-  
-  /* Dashboard */
-  .dashboard-sidebar {
-    transform: translateX(-100%);
-  }
-  
-  .dashboard-sidebar.show {
-    transform: translateX(0);
-  }
-  
-  .dashboard-main {
-    margin-left: 0;
-    width: 100%;
-  }
+/* -----------------------------------------
+   2. LG DEVICES (Laptops/Tablets < 992px)
+   ----------------------------------------- */
+@media (max-width: 991.98px) {
+    
+    /* --- Dashboard Sidebar Behavior --- */
+    /* Sidebar slides out to the left by default */
+    .dashboard-sidebar {
+        transform: translateX(-100%);
+        box-shadow: none;
+    }
+    
+    /* When active (toggled via JS), it slides in */
+    .dashboard-sidebar.active {
+        transform: translateX(0);
+        box-shadow: 0 0 0 100vw rgba(0,0,0,0.5); /* Dim background */
+    }
+
+    /* Main content expands to fill space */
+    .dashboard-main {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Navbar Collapse Animation */
+    .navbar-collapse {
+        background-color: var(--bg-surface);
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        margin-top: 1rem;
+    }
+    
+    /* Ensure Nav buttons are full width for easier tapping */
+    .navbar-nav .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+        text-align: center;
+    }
 }
 
-/* Small Devices (Landscape Phones, 768px and up) */
-@media (max-width: 768px) {
-  .container {
-    max-width: var(--container-sm);
-  }
-  
-  /* Typography */
-  h1 { font-size: var(--text-4xl); }
-  h2 { font-size: var(--text-3xl); }
-  h3 { font-size: var(--text-2xl); }
-  
-  /* Navbar */
-  .navbar-nav {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg) 0;
-  }
-  
-  .navbar-collapse {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    width: 100%;
-    background-color: var(--white);
-    box-shadow: var(--shadow-lg);
-    padding: var(--spacing-lg);
-    transform: translateY(-100%);
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--transition-base);
-    z-index: var(--z-fixed);
-  }
-  
-  .navbar-collapse.show {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  .navbar-toggler {
-    display: block;
-    background: none;
-    border: none;
-    font-size: var(--text-2xl);
-    color: var(--black);
-    cursor: pointer;
-    padding: var(--spacing-sm);
-  }
-  
-  /* Hero */
-  .hero {
-    min-height: 80vh;
-    text-align: center;
-  }
-  
-  .hero-actions {
-    justify-content: center;
-  }
-  
-  /* Stats */
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
-  }
-  
-  /* Features */
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  /* Departments */
-  .departments-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
-  }
-  
-  /* Footer */
-  .footer-top .row {
-    flex-direction: column;
-  }
-  
-  .footer-bottom .row {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-md);
-  }
-  
-  /* Tables */
-  .table-responsive {
-    overflow-x: scroll;
-  }
-  
-  .table {
-    min-width: 600px;
-  }
-  
-  /* Dashboard */
-  .appointment-card {
-    grid-template-columns: 1fr;
-  }
-  
-  .appointment-details {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-  
-  .appointment-actions {
-    width: 100%;
-  }
-  
-  .appointment-actions .btn {
-    width: 100%;
-  }
+/* -----------------------------------------
+   3. MD DEVICES (Tablets < 768px)
+   ----------------------------------------- */
+@media (max-width: 767.98px) {
+    
+    /* --- Typography Scaling --- */
+    h1, .h1 { font-size: 2rem; }
+    h2, .h2 { font-size: 1.75rem; }
+    h3, .h3 { font-size: 1.5rem; }
+    
+    /* --- Card Adjustments --- */
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    /* --- List Views (Appointments/Reports) --- */
+    /* Stack flex items vertically on small screens */
+    .d-flex.align-items-center {
+        flex-wrap: wrap;
+    }
+    
+    .btn-group {
+        width: 100%;
+    }
+    
+    /* Stats Grid becomes 2 columns */
+    .row-cols-md-4 > * {
+        flex: 0 0 auto;
+        width: 50%;
+    }
 }
 
-/* Extra Small Devices (Portrait Phones, less than 576px) */
-@media (max-width: 576px) {
-  /* Container */
-  .container {
-    padding: 0 var(--spacing-sm);
-  }
-  
-  /* Typography */
-  h1 { font-size: var(--text-3xl); }
-  h2 { font-size: var(--text-2xl); }
-  
-  /* Buttons */
-  .btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .hero-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  /* Stats */
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .stat-card {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  /* Departments */
-  .departments-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  /* Cards */
-  .card-body,
-  .card-header,
-  .card-footer {
-    padding: var(--spacing-md);
-  }
-  
-  /* Modal */
-  .modal-dialog {
-    max-width: 95%;
-    margin: var(--spacing-md);
-  }
-  
-  .modal-body {
-    padding: var(--spacing-lg);
-  }
-  
-  /* Toast */
-  .toast-notification {
-    min-width: auto;
-    width: calc(100% - var(--spacing-xl) * 2);
-    right: var(--spacing-md);
-  }
-  
-  /* Dashboard header */
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-md);
-  }
-  
-  .dashboard-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  /* Result card */
-  .result-body .row {
-    flex-direction: column;
-  }
-  
-  .result-actions {
-    flex-direction: column;
-  }
-  
-  .result-actions .btn {
-    width: 100%;
-  }
-  
-  /* Back to top */
-  .back-to-top {
-    bottom: var(--spacing-lg);
-    right: var(--spacing-lg);
-    width: 44px;
-    height: 44px;
-  }
+/* -----------------------------------------
+   4. SM DEVICES (Mobile < 576px)
+   ----------------------------------------- */
+@media (max-width: 575.98px) {
+    
+    /* --- Critical Mobile UX --- */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Make buttons full width for thumbs */
+    .hero-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .hero-actions .btn {
+        width: 100%;
+    }
+
+    /* Login/Booking Inputs */
+    .form-control, .form-select, .btn-lg {
+        height: 50px; /* Larger touch target */
+    }
+
+    /* Tables scroll horizontally */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Hide less important elements in Dashboard headers */
+    .dashboard-header .breadcrumb {
+        display: none;
+    }
+
+    /* Stats Grid becomes 1 column for readability */
+    .row-cols-md-4 > * {
+        width: 100%;
+    }
 }
 
-/* Print Styles */
+/* -----------------------------------------
+   5. PRINT STYLES
+   ----------------------------------------- */
 @media print {
-  .navbar,
-  .footer,
-  .back-to-top,
-  .dashboard-sidebar,
-  .btn,
-  button {
-    display: none !important;
-  }
-  
-  .dashboard-main {
-    margin-left: 0;
-    width: 100%;
-  }
-  
-  body {
-    background-color: white;
-    color: black;
-  }
-  
-  .card,
-  .dashboard-card {
-    box-shadow: none;
-    border: 1px solid #ddd;
-  }
-}
+    /* Hide Navigation and Sidebar */
+    .navbar, 
+    .footer, 
+    .dashboard-sidebar, 
+    .dashboard-header,
+    #themeToggle,
+    .btn-print-hide,
+    .no-print {
+        display: none !important;
+    }
 
-@media (max-width: 768px) {
-  .navbar-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-  }
+    /* Expand content for paper */
+    .dashboard-main, 
+    .container, 
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background-color: white !important;
+        color: black !important;
+    }
 
-  /* Ensure CTAs never hide inside collapse */
-  .navbar-collapse .navbar-actions {
-    display: none;
-  }
+    /* Clean up cards */
+    .card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+
+    /* Ensure text is black */
+    * {
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    /* Page Breaks */
+    .page-break {
+        page-break-before: always;
+    }
 }

@@ -1,363 +1,178 @@
-/* Dashboard Styles */
+/* =========================================
+   HOMEPAGE SPECIFIC STYLES
+   ========================================= */
 
-/* Dashboard Layout */
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: var(--off-white);
+/* -----------------------------------------
+   1. HERO SECTION
+   ----------------------------------------- */
+.hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-surface-alt) 100%);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    overflow: hidden;
 }
 
-/* Sidebar */
-.dashboard-sidebar {
-  width: 260px;
-  background-color: var(--white);
-  box-shadow: var(--shadow-md);
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  overflow-y: auto;
-  transition: transform var(--transition-base);
-  z-index: var(--z-fixed);
+/* Decorative Circle Background (Optional Visual Flair) */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    right: -5%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
 }
 
-.sidebar-header {
-  padding: var(--spacing-xl);
-  border-bottom: 1px solid var(--light-gray);
+.hero-content {
+    position: relative;
+    z-index: 1;
 }
 
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
-  color: var(--primary);
+.hero-title span {
+    position: relative;
+    display: inline-block;
 }
 
-.sidebar-nav {
-  padding: var(--spacing-lg);
+/* Highlight underline effect for "Healthcare" */
+.hero-title span::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background-color: rgba(78, 205, 196, 0.2);
+    z-index: -1;
+    border-radius: 4px;
 }
 
-.sidebar-nav-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  color: var(--gray);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-  margin-bottom: var(--spacing-sm);
-  cursor: pointer;
+/* -----------------------------------------
+   2. STATS STRIP
+   ----------------------------------------- */
+.stat-item {
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
 }
 
-.sidebar-nav-item:hover,
-.sidebar-nav-item.active {
-  background-color: var(--gradient-light);
-  color: var(--primary);
+.stat-item:hover {
+    transform: translateY(-5px);
 }
 
-.sidebar-nav-item i {
-  font-size: var(--text-xl);
-  width: 24px;
-  text-align: center;
+.stat-item h3 {
+    color: #ffffff; /* Always white on primary bg */
+    margin-bottom: 0;
 }
 
-/* Main Content */
-.dashboard-main {
-  margin-left: 260px;
-  width: calc(100% - 260px);
-  min-height: 100vh;
+.stat-item p {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.dashboard-header {
-  background-color: var(--white);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: var(--z-sticky);
+.stat-item i {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1rem;
 }
 
-.dashboard-title {
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  color: var(--black);
-  margin: 0;
+/* -----------------------------------------
+   3. DEPARTMENT CARDS (Icon Boxes)
+   ----------------------------------------- */
+.icon-box {
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.dashboard-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
+.card:hover .icon-box {
+    transform: scale(1.1) rotate(5deg);
 }
 
-.dashboard-content {
-  padding: var(--spacing-xl);
+/* Specific Hover Colors for Icon Boxes */
+/* We use specificities to override utility classes on hover if needed */
+.card:hover .icon-box.bg-danger-subtle { background-color: var(--red-500) !important; color: white !important; }
+.card:hover .icon-box.bg-primary-subtle { background-color: var(--blue-500) !important; color: white !important; }
+.card:hover .icon-box.bg-success-subtle { background-color: var(--green-500) !important; color: white !important; }
+
+/* -----------------------------------------
+   4. SWIPER CAROUSEL CUSTOMIZATION
+   ----------------------------------------- */
+/* Pagination Bullets */
+.swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background-color: var(--border-light);
+    opacity: 1;
+    transition: all 0.3s ease;
 }
 
-/* Stats Cards */
-.stat-card {
-  background-color: var(--white);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  transition: all var(--transition-base);
+.swiper-pagination-bullet-active {
+    width: 24px;
+    border-radius: 5px;
+    background-color: var(--primary);
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+/* Navigation Arrows */
+.swiper-button-next,
+.swiper-button-prev {
+    color: var(--primary);
+    background-color: var(--bg-surface);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.stat-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: var(--white);
-  flex-shrink: 0;
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
-.stat-icon.bg-primary { background: var(--gradient-primary); }
-.stat-icon.bg-success { background-color: var(--success); }
-.stat-icon.bg-warning { background-color: var(--warning); }
-.stat-icon.bg-danger { background-color: var(--danger); }
-.stat-icon.bg-info { background-color: var(--info); }
-
-.stat-content h3 {
-  font-size: var(--text-3xl);
-  font-weight: var(--font-bold);
-  color: var(--black);
-  margin-bottom: var(--spacing-xs);
+[data-theme="dark"] .swiper-button-next,
+[data-theme="dark"] .swiper-button-prev {
+    background-color: var(--gray-800);
+    color: var(--primary);
 }
 
-.stat-content p {
-  color: var(--gray);
-  margin: 0;
-  font-size: var(--text-base);
+/* -----------------------------------------
+   5. CTA SECTION (Parallax)
+   ----------------------------------------- */
+/* The background image is set inline in HTML or via utility, 
+   but we handle the text overlay here */
+.cta-overlay {
+    background: rgba(0, 0, 0, 0.6); 
+    /* Ensures text readability over any image */
 }
 
-/* Dashboard Cards */
-.dashboard-card {
-  background-color: var(--white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-  margin-bottom: var(--spacing-xl);
+/* -----------------------------------------
+   6. RESPONSIVE HERO
+   ----------------------------------------- */
+@media (max-width: 991px) {
+    .hero {
+        text-align: center;
+        padding-bottom: 4rem;
+    }
+
+    .hero-image {
+        margin-top: 3rem;
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-actions {
+        justify-content: center;
+    }
 }
 
-.dashboard-card-header {
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--light-gray);
-  display: flex;
-  align-items: center;
-  justify-content: between;
-}
-
-.dashboard-card-header h3 {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--black);
-  margin: 0;
-}
-
-.dashboard-card-body {
-  padding: var(--spacing-lg);
-}
-
-/* Appointments List */
-.appointments-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.appointment-card {
-  background-color: var(--off-white);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--spacing-lg);
-  align-items: center;
-  transition: all var(--transition-fast);
-}
-
-.appointment-card:hover {
-  background-color: var(--light-gray);
-}
-
-.appointment-doctor {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.appointment-doctor img {
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-}
-
-.appointment-doctor h4 {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--black);
-  margin-bottom: var(--spacing-xs);
-}
-
-.appointment-doctor p {
-  font-size: var(--text-sm);
-  color: var(--gray);
-  margin: 0;
-}
-
-.appointment-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: var(--text-sm);
-  color: var(--gray);
-}
-
-.detail-item i {
-  color: var(--primary);
-}
-
-.appointment-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-/* Reports List */
-.reports-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.report-card {
-  background-color: var(--off-white);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  transition: all var(--transition-fast);
-}
-
-.report-card:hover {
-  background-color: var(--light-gray);
-}
-
-.report-icon {
-  width: 60px;
-  height: 60px;
-  background-color: var(--primary-lighter);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-.report-info {
-  flex: 1;
-}
-
-.report-info h4 {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--black);
-  margin-bottom: var(--spacing-xs);
-}
-
-.report-info p {
-  font-size: var(--text-sm);
-  color: var(--gray);
-  margin-bottom: var(--spacing-xs);
-}
-
-.report-info small {
-  font-size: var(--text-xs);
-  color: var(--gray);
-}
-
-.report-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-/* Search Result Card */
-.search-result-card {
-  background-color: var(--white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.result-header {
-  padding: var(--spacing-lg);
-  background: var(--gradient-light);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.result-header h4 {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--black);
-  margin: 0;
-}
-
-.result-body {
-  padding: var(--spacing-xl);
-}
-
-.result-body label {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--gray);
-  margin-bottom: var(--spacing-xs);
-}
-
-.result-body p {
-  font-size: var(--text-base);
-  color: var(--black);
-  margin-bottom: var(--spacing-lg);
-}
-
-.result-actions {
-  padding: var(--spacing-lg);
-  border-top: 1px solid var(--light-gray);
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-/* Chart Container */
-.chart-container {
-  position: relative;
-  height: 300px;
-  margin-bottom: var(--spacing-xl);
+@media (max-width: 576px) {
+    .hero::before {
+        width: 300px;
+        height: 300px;
+        right: -20%;
+    }
 }

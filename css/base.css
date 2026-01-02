@@ -1,363 +1,109 @@
-/* Base Styles */
+/* =========================================
+   BASE STYLES & TYPOGRAPHY
+   ========================================= */
+
+/* -----------------------------------------
+   1. GLOBAL RESET & BODY
+   ----------------------------------------- */
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
-  font-weight: var(--font-normal);
-  line-height: 1.6;
-  color: var(--black);
-  background-color: var(--white);
-  transition: background-color var(--transition-base), color var(--transition-base);
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    /* Smooth theme transition for background */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Typography */
+/* -----------------------------------------
+   2. TYPOGRAPHY
+   ----------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
-  font-weight: var(--font-bold);
-  line-height: 1.2;
-  margin-bottom: var(--spacing-md);
-  color: var(--black);
+    color: var(--text-main);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 1rem;
 }
-
-h1 { font-size: var(--text-5xl); }
-h2 { font-size: var(--text-4xl); }
-h3 { font-size: var(--text-3xl); }
-h4 { font-size: var(--text-2xl); }
-h5 { font-size: var(--text-xl); }
-h6 { font-size: var(--text-lg); }
 
 p {
-  margin-bottom: var(--spacing-md);
-  color: var(--gray);
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
 }
 
 a {
-  color: var(--primary);
-  transition: color var(--transition-fast);
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--primary-dark);
+    color: var(--primary-hover);
+    text-decoration: none;
 }
 
-/* Container */
-.container {
-  width: 100%;
-  max-width: var(--container-xl);
-  margin: 0 auto;
-  padding: 0 var(--spacing-md);
+/* -----------------------------------------
+   3. FORM ELEMENTS (Global)
+   ----------------------------------------- */
+label {
+    color: var(--text-main);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
 }
 
-.container-fluid {
-  width: 100%;
-  padding: 0 var(--spacing-md);
+.form-control, 
+.form-select {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-light);
+    color: var(--text-main);
+    border-radius: var(--radius-md);
+    padding: 0.6rem 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Sections */
-section {
-  padding: var(--spacing-3xl) 0;
-}
-
-.section-title {
-  text-align: center;
-  margin-bottom: var(--spacing-2xl);
-}
-
-.section-title h2 {
-  font-size: var(--text-4xl);
-  font-weight: var(--font-bold);
-  color: var(--black);
-  margin-bottom: var(--spacing-sm);
-}
-
-.section-title p {
-  font-size: var(--text-lg);
-  color: var(--gray);
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-/* Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  text-align: center;
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: var(--gradient-primary);
-  color: var(--white);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.btn-secondary {
-  background-color: var(--secondary);
-  color: var(--white);
-}
-
-.btn-secondary:hover {
-  background-color: var(--secondary-dark);
-}
-
-.btn-accent {
-  background-color: var(--accent);
-  color: var(--white);
-}
-
-.btn-accent:hover {
-  background-color: var(--accent-dark);
-}
-
-.btn-outline-primary {
-  background-color: transparent;
-  border: 2px solid var(--primary);
-  color: var(--primary);
-}
-
-.btn-outline-primary:hover {
-  background-color: var(--primary);
-  color: var(--white);
-}
-
-.btn-sm {
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-size: var(--text-sm);
-}
-
-.btn-lg {
-  padding: var(--spacing-lg) var(--spacing-2xl);
-  font-size: var(--text-lg);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Form Elements */
-.form-group {
-  margin-bottom: var(--spacing-lg);
-}
-
-.form-label {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  font-weight: var(--font-medium);
-  color: var(--black);
-}
-
-.form-control {
-  width: 100%;
-  padding: var(--spacing-md);
-  font-size: var(--text-base);
-  color: var(--black);
-  background-color: var(--off-white);
-  border: 2px solid var(--light-gray);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-}
-
-.form-control:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
-}
-
-.form-control.is-invalid {
-  border-color: var(--danger);
-}
-
-.error-message {
-  display: block;
-  margin-top: var(--spacing-sm);
-  font-size: var(--text-sm);
-  color: var(--danger);
-}
-
-textarea.form-control {
-  min-height: 120px;
-  resize: vertical;
-}
-
-select.form-control {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236C757D' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--spacing-md) center;
-  padding-right: var(--spacing-2xl);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--off-white);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: var(--radius-full);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
-}
-
-/* Selection */
-::selection {
-  background-color: var(--primary);
-  color: var(--white);
-}
-
-/* Images */
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-img.loading {
-  background: linear-gradient(90deg, var(--light-gray) 25%, var(--off-white) 50%, var(--light-gray) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* =========================================================
-   BASE ENHANCEMENTS (APPEND ONLY)
-   Light / Dark / Mobile / Accessibility
-========================================================= */
-
-/* ---------- Global Color Safety ---------- */
-body {
-  background-color: var(--bg);
-  color: var(--text-primary);
-}
-
-/* ---------- Headings Dark/Light Fix ---------- */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-primary);
-}
-
-/* ---------- Paragraph Readability ---------- */
-p {
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-/* ---------- Section Spacing (Mobile Friendly) ---------- */
-@media (max-width: 768px) {
-  section {
-    padding: var(--spacing-2xl) 0;
-  }
-
-  h1 { font-size: clamp(2rem, 6vw, 3rem); }
-  h2 { font-size: clamp(1.75rem, 5vw, 2.5rem); }
-  h3 { font-size: clamp(1.4rem, 4vw, 2rem); }
-}
-
-/* ---------- Links Accessibility ---------- */
-a {
-  text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
-}
-
-a:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 3px;
-}
-
-/* ---------- Buttons UX Polish ---------- */
-.btn {
-  min-height: 44px; /* touch target */
-  letter-spacing: 0.2px;
-}
-
-.btn-primary {
-  background: var(--gradient-primary);
-  color: var(--cta-primary-text, #ffffff);
-}
-
-.btn-primary:active {
-  transform: scale(0.97);
-}
-
-/* ---------- Form Dark Safety ---------- */
-.form-label {
-  color: var(--text-primary);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--text-primary);
-  border-color: var(--border);
+.form-control:focus, 
+.form-select:focus {
+    background-color: var(--bg-input);
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25); /* Teal focus ring */
+    color: var(--text-main);
 }
 
 .form-control::placeholder {
-  color: var(--text-secondary);
+    color: var(--text-muted);
+    opacity: 0.8;
 }
 
-.form-control:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.25);
+/* -----------------------------------------
+   4. SCROLLBARS (Webkit)
+   ----------------------------------------- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-/* ---------- Invalid State ---------- */
-.form-control.is-invalid {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
-}
-
-/* ---------- Select Arrow Dark Fix ---------- */
-select.form-control {
-  background-color: var(--surface);
-}
-
-/* ---------- Scrollbar Dark/Light ---------- */
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+    background: var(--bg-body);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
+    background: var(--gray-400);
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
+    background: var(--primary);
 }
 
-/* ---------- Image Loading Dark Safe ---------- */
-img.loading {
-  background: linear-gradient(
-    90deg,
-    var(--border) 25%,
-    var(--surface) 50%,
-    var(--border) 75%
-  );
-}
-
-/* ---------- Reduced Motion ---------- */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+/* -----------------------------------------
+   5. SELECTION COLOR
+   ----------------------------------------- */
+::selection {
+    background-color: var(--primary);
+    color: #fff;
 }

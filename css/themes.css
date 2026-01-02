@@ -1,141 +1,137 @@
-/* Theme Styles - Light/Dark Mode */
+/* =========================================
+   THEME STYLING & TRANSITIONS
+   ========================================= */
 
-/* Light Theme (Default) */
-:root[data-theme="light"] {
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F8F9FA;
-  --bg-tertiary: #E9ECEF;
-  
-  --text-primary: #1A1A1A;
-  --text-secondary: #6C757D;
-  --text-tertiary: #A0A0A0;
-  
-  --border-color: #E9ECEF;
-  --divider-color: #DEE2E6;
-}
-
-/* Dark Theme */
-:root[data-theme="dark"] {
-  --bg-primary: #1A1A1A;
-  --bg-secondary: #2D2D2D;
-  --bg-tertiary: #3A3A3A;
-  
-  --text-primary: #FFFFFF;
-  --text-secondary: #A0A0A0;
-  --text-tertiary: #6C757D;
-  
-  --border-color: #3A3A3A;
-  --divider-color: #4A4A4A;
-  
-  /* Override specific colors for dark mode */
-  --white: #1A1A1A;
-  --off-white: #2D2D2D;
-  --light-gray: #3A3A3A;
-  --gray: #A0A0A0;
-  --dark-gray: #E0E0E0;
-  --black: #FFFFFF;
-  
-  /* Adjusted shadows for dark mode */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,0.5);
-  --shadow-2xl: 0 25px 50px rgba(0,0,0,0.6);
-}
-
-/* Dark Mode Specific Adjustments */
-[data-theme="dark"] body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .card,
-[data-theme="dark"] .dashboard-card,
-[data-theme="dark"] .stat-card {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-}
-
-[data-theme="dark"] .navbar,
-[data-theme="dark"] .dashboard-header {
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-}
-
-[data-theme="dark"] .footer {
-  background-color: var(--bg-secondary);
-}
-
-[data-theme="dark"] .form-control {
-  background-color: var(--bg-tertiary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .form-control:focus {
-  background-color: var(--bg-tertiary);
-  border-color: var(--primary);
-}
-
-[data-theme="dark"] .modal-dialog,
-[data-theme="dark"] .search-modal-content {
-  background-color: var(--bg-secondary);
-}
-
-[data-theme="dark"] .table {
-  background-color: var(--bg-secondary);
-}
-
-[data-theme="dark"] .table thead {
-  background-color: var(--bg-tertiary);
-}
-
-[data-theme="dark"] .table tbody tr:hover {
-  background-color: var(--bg-tertiary);
-}
-
-[data-theme="dark"] ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-[data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: var(--primary);
-}
-
-[data-theme="dark"] .skeleton-line,
-[data-theme="dark"] .skeleton-image {
-  background: var(--bg-tertiary);
-}
-
-[data-theme="dark"] .appointment-card,
-[data-theme="dark"] .report-card {
-  background-color: var(--bg-tertiary);
-}
-
-[data-theme="dark"] .appointment-card:hover,
-[data-theme="dark"] .report-card:hover {
-  background-color: var(--bg-secondary);
-}
-
-/* Theme Toggle Button */
-#themeToggle {
-  position: relative;
-  transition: transform var(--transition-base);
-}
-
-#themeToggle:hover {
-  transform: rotate(20deg);
-}
-
-/* Smooth theme transition */
+/* -----------------------------------------
+   1. GLOBAL THEME TRANSITIONS
+   ----------------------------------------- */
+/* We apply transitions to background and border colors 
+   so the theme switch feels smooth and premium.
+*/
 body,
 .card,
 .navbar,
 .footer,
 .form-control,
-.modal-dialog,
-.table {
-  transition: background-color var(--transition-base), 
-              color var(--transition-base),
-              border-color var(--transition-base);
+.modal-content,
+.list-group-item,
+.dropdown-menu,
+.btn-light,
+.btn-outline-secondary {
+    transition: background-color 0.3s ease, 
+                border-color 0.3s ease, 
+                color 0.3s ease, 
+                box-shadow 0.3s ease;
+}
+
+/* -----------------------------------------
+   2. COMPONENT OVERRIDES (Dark Mode Specifics)
+   ----------------------------------------- */
+/* Note: Most colors are handled automatically by variables.css.
+   These are specific fixes for Bootstrap components that need help.
+*/
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--bg-input);
+    border-color: var(--border-light);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--bg-input);
+    border-color: var(--primary);
+    color: var(--text-main);
+    box-shadow: 0 0 0 0.25rem rgba(78, 205, 196, 0.25);
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--bg-surface);
+    border-color: var(--border-light);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--bg-surface-alt);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-main);
+    border-color: var(--border-light);
+}
+
+[data-theme="dark"] .table > :not(caption) > * > * {
+    background-color: transparent; /* Let row background handle it */
+    border-bottom-color: var(--border-light);
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(255,255,255, 0.03);
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-light);
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--border-light);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* -----------------------------------------
+   3. MOBILE OPTIMIZATIONS (Patient Focus)
+   ----------------------------------------- */
+@media (max-width: 768px) {
+    /* Larger touch targets for inputs */
+    .form-control, 
+    .form-select,
+    .btn {
+        min-height: 48px; /* Easier to tap */
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+
+    /* Adjust Card Spacing */
+    .card-body {
+        padding: 1rem !important; /* Save space on small screens */
+    }
+
+    /* Theme Toggle Position */
+    #themeToggle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* -----------------------------------------
+   4. SCROLLBARS (Dark Mode)
+   ----------------------------------------- */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-body);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background-color: var(--gray-600);
+    border: 2px solid var(--bg-body);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
 }
