@@ -99,11 +99,11 @@ async function signIn(email, password) {
       .single();
 
     if (profile.role === "admin")
-      location.href = "`${BASE_PATH}/dashboards/admin/index.html`";
+      location.href = `${BASE_PATH}/dashboards/admin/index.html`;
     else if (profile.role === "lab")
-      location.href = "`${BASE_PATH}/dashboards/lab/index.html`";
+      location.href = `${BASE_PATH}/dashboards/lab/index.html`;
     else
-      location.href = "`${BASE_PATH}/dashboards/patient/index.html`";
+      location.href = `${BASE_PATH}/dashboards/patient/index.html`
 
     return { success: true };
   } catch (error) {
