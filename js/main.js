@@ -456,23 +456,32 @@ window.app = {
 
 console.log("📝 main.js loaded successfully");
 
-async function redirectAfterLogin() {
+  async function redirectAfterLogin() {
+  // ✅ only run on public pages
+  const publicPages = [
+    "/index.html",
+    "/login.html",
+    "/signup.html",
+    "/"
+  ];
+
+  const path = location.pathname;
+
+  if (!publicPages.some(p => path.endsWith(p))) return;
+
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) return; // not logged in
+  if (!user) return;
 
-  const { data: profile, error } = await supabase
+  const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (error || !profile) return;
-
-  // 🚫 STOP infinite redirect
-  if (location.pathname.includes(`/dashboards/${profile.role}`)) return;
+  if (!profile) return;
 
   if (profile.role === "admin")
     location.href = "/dashboards/admin/index.html";
@@ -483,4 +492,3 @@ async function redirectAfterLogin() {
 }
 
 redirectAfterLogin();
-
