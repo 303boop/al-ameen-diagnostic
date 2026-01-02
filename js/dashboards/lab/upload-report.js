@@ -41,20 +41,20 @@ async function uploadReport(e) {
 
   const file = fileInput.files[0];
   if (!file) {
-    toast.error('Select a file');
+    toast.error('Please select a file');
     return;
   }
 
   loader.showButtonLoader(uploadBtn);
 
-  /* 🔹 Get appointment to fetch patient user_id */
-  const { data: appointment } = await supabaseClient
+  /* 🔹 Fetch appointment to get patient_id */
+  const { data: appointment, error: apptError } = await supabaseClient
     .from('appointments')
-    .select('user_id')
+    .select('patient_id')
     .eq('id', appointmentId)
     .single();
 
-  if (!appointment) {
+  if (apptError || !appointment) {
     loader.hideButtonLoader(uploadBtn);
     toast.error('Invalid appointment');
     return;
@@ -63,7 +63,7 @@ async function uploadReport(e) {
   const safeName = file.name.replace(/\s+/g, '_');
   const filePath = `${appointmentId}/${Date.now()}_${safeName}`;
 
-  /* Upload to private bucket */
+  /* 🔹 Upload to PRIVATE reports bucket */
   const { error: uploadError } = await supabaseClient
     .storage
     .from(APP_CONSTANTS.STORAGE_BUCKETS.REPORTS)
@@ -71,18 +71,21 @@ async function uploadReport(e) {
 
   if (uploadError) {
     loader.hideButtonLoader(uploadBtn);
-    toast.error('Upload failed');
+    toast.error('File upload failed');
     return;
   }
 
-  /* Save report record */
+  const currentUser = await getCurrentUser();
+
+  /* 🔹 Insert report record (MATCHES YOUR DB SCHEMA) */
   const { error: dbError } = await supabaseClient
     .from('reports')
     .insert({
       appointment_id: appointmentId,
-      user_id: appointment.user_id,
-      file_name: safeName,
-      file_path: filePath,
+      patient_id: appointment.patient_id,
+      file_url: filePath,
+      file_type: file.type,
+      uploaded_by: currentUser.id,
       report_type: reportType.value
     });
 
@@ -92,14 +95,14 @@ async function uploadReport(e) {
     return;
   }
 
-  /* Mark appointment completed */
+  /* 🔹 Mark appointment completed */
   await supabaseClient
     .from('appointments')
     .update({ status: 'completed' })
     .eq('id', appointmentId);
 
   loader.hideButtonLoader(uploadBtn);
-
   toast.success('Report uploaded successfully');
+
   window.location.href = '/dashboards/lab/search-booking.html';
 }

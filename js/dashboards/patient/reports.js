@@ -42,13 +42,13 @@ async function loadReports() {
     .from('reports')
     .select(`
       id,
-      file_name,
-      file_path,
+      file_url,
+      file_type,
       report_type,
       created_at,
       appointments ( booking_id )
     `)
-    .eq('user_id', user.id)
+    .eq('patient_id', user.id)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -66,13 +66,17 @@ async function loadReports() {
 }
 
 function renderReport(r) {
+  const fileName = r.file_url.split('/').pop();
+
   return `
     <div class="dashboard-card report-card">
       <div class="dashboard-card-body">
 
         <div class="report-header">
-          <strong>${r.file_name}</strong>
-          <span class="badge badge-info">${r.report_type.replace('_', ' ')}</span>
+          <strong>${fileName}</strong>
+          <span class="badge badge-info">
+            ${r.report_type.replace('_', ' ')}
+          </span>
         </div>
 
         <div class="report-meta">
@@ -82,7 +86,7 @@ function renderReport(r) {
 
         <div class="report-actions">
           <button class="btn btn-outline-primary btn-sm"
-            onclick="downloadReport('${r.file_path}', '${r.file_name}')">
+            onclick="downloadReport('${r.file_url}', '${fileName}')">
             <i class="fas fa-download"></i> Download
           </button>
         </div>
