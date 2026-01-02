@@ -1,140 +1,115 @@
-// js/components/navbar.js
+/* =========================================
+   DYNAMIC NAVBAR COMPONENT
+   ========================================= */
 
-// =====================================================
-// Dynamic Navbar Component
-// =====================================================
-
-const Navbar = {
-    async renderNavbar() {
+const navbarComponent = {
+    async render() {
         const navbar = document.getElementById('navbar');
         if (!navbar) return;
 
-        // 1. Get Base Path (Fixes navigation from subfolders)
-        const BP = window.BASE_PATH || '';
+        // 1. Check User Session
+        let user = null;
+        let role = 'patient';
+        
+        if (window.auth) {
+            user = await window.auth.getCurrentUser();
+            if (user) {
+                // Fetch profile to get role
+                const { data } = await window.supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+                if (data) role = data.role;
+            }
+        }
 
-        // 2. Get User State
-        const user = window.auth && window.auth.getCurrentUser 
-            ? await window.auth.getCurrentUser() 
-            : null;
-
-        const profile = user && window.auth.getUserRole 
-            ? await window.auth.getUserRole() 
-            : null;
-
-        const currentLang = window.language && window.language.getCurrentLanguage 
-            ? window.language.getCurrentLanguage() 
-            : 'en';
+        // 2. Define Dashboard Path based on Role
+        let dashboardPath = 'dashboards/patient/index.html';
+        if (role === 'admin') dashboardPath = 'dashboards/admin/index.html';
+        if (role === 'lab') dashboardPath = 'dashboards/lab/index.html';
 
         // 3. Build HTML
-        const navHTML = `
-            <nav class="navbar navbar-expand-lg navbar-light sticky-top bg-white shadow-sm">
+        navbar.innerHTML = `
+        <nav class="navbar navbar-expand-lg sticky-top">
             <div class="container">
-
-                <a class="navbar-brand" href="${BP}/index.html">
-                    <img src="${BP}/assets/images/logo/logo.png" alt="Al-Ameen" class="logo" style="height: 40px;">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+                    <img src="assets/images/logo/logo.png" alt="Logo" class="logo" height="40" onerror="this.style.display='none'">
+                    <span class="fw-bold text-primary">Al-Ameen</span>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="fas fa-bars"></i>
                 </button>
 
-                <div class="collapse navbar-collapse" id="navbarContent">
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav mx-auto">
-                        <li class="nav-item"><a class="nav-link" href="${BP}/index.html">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${BP}/about.html">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${BP}/doctors.html">Doctors</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${BP}/tests.html">Tests</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${BP}/contact.html">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" href="index.html" data-i18n="nav.home">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="about.html" data-i18n="nav.about">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="doctors.html" data-i18n="nav.doctors">Doctors</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tests.html" data-i18n="nav.tests">Tests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contact.html" data-i18n="nav.contact">Contact</a></li>
                     </ul>
 
-                    <div class="navbar-actions d-flex align-items-center gap-2">
-
-                        <button class="btn btn-sm btn-outline-secondary rounded-circle" id="langToggle" title="Switch Language">
+                    <div class="navbar-actions d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                        
+                        <button class="btn btn-outline-primary btn-sm rounded-circle lang-toggle" style="width: 35px; height: 35px; padding: 0;">
                             <i class="fas fa-globe"></i>
                         </button>
 
-                        <button class="btn btn-sm btn-outline-secondary rounded-circle" id="themeToggle" title="Toggle Theme">
+                        <button class="btn btn-outline-primary btn-sm rounded-circle" id="themeToggle" style="width: 35px; height: 35px; padding: 0;">
                             <i class="fas fa-moon"></i>
                         </button>
 
-                        ${user ? this.renderUserMenu(profile, BP) : `<a href="${BP}/login.html" class="btn btn-primary btn-sm">Login</a>`}
-
-                        <a href="${BP}/booking.html" class="btn btn-accent btn-sm text-white" style="background-color: var(--primary-color);">
-                            <i class="fas fa-calendar-plus"></i> Book Now
-                        </a>
+                        ${user ? `
+                            <a href="${dashboardPath}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-columns me-1"></i> <span data-i18n="nav.dashboard">Dashboard</span>
+                            </a>
+                        ` : `
+                            <a href="login.html" class="btn btn-outline-primary btn-sm" data-i18n="nav.login">Login</a>
+                            <a href="booking.html" class="btn btn-primary btn-sm shadow-sm" data-i18n="nav.book_appointment">Book Now</a>
+                        `}
                     </div>
                 </div>
             </div>
-            </nav>
+        </nav>
         `;
 
-        navbar.innerHTML = navHTML;
+        // 4. Initialize Logic
         this.initEvents();
-        this.highlightActivePage(BP);
-    },
-
-    renderUserMenu(profile, BP) {
-        const role = profile?.role || 'patient';
-        const name = profile?.full_name || 'User';
         
-        // Determine Dashboard Link
-        let dashboardLink = `${BP}/dashboards/patient/index.html`;
-        if (role === 'admin') dashboardLink = `${BP}/dashboards/admin/index.html`;
-        if (role === 'lab') dashboardLink = `${BP}/dashboards/lab/index.html`;
-
-        return `
-            <div class="dropdown">
-                <button class="btn btn-outline-primary btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user-circle"></i>
-                    <span class="d-none d-md-inline">${name}</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuBtn">
-                    <li><a class="dropdown-item" href="${dashboardLink}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><button class="dropdown-item text-danger" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</button></li>
-                </ul>
-            </div>
-        `;
+        // Re-apply translations for the newly injected HTML
+        if(window.language && window.language.applyTranslations) {
+            window.language.applyTranslations();
+        }
     },
 
     initEvents() {
-        // Logout
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                if (window.auth) window.auth.signOut();
-            });
-        }
-
-        // Theme Toggle
+        // Theme Toggle Logic
         const themeBtn = document.getElementById('themeToggle');
         if (themeBtn) {
             themeBtn.addEventListener('click', () => {
-                // Simple toggle logic (requires css variables)
-                const html = document.documentElement;
-                const current = html.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                html.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
+                if(window.theme) window.theme.toggleTheme();
             });
         }
-    },
 
-    highlightActivePage(BP) {
-        const path = window.location.pathname;
-        const links = document.querySelectorAll('.nav-link');
-        
-        links.forEach(link => {
-            const href = link.getAttribute('href');
-            // Check if current path ends with the link href (handling base path)
-            if (href && href !== '#' && path.endsWith(href.replace(BP, ''))) {
-                link.classList.add('active');
-                link.classList.add('fw-bold');
-                link.classList.add('text-primary');
+        // Language Toggle Logic
+        const langBtn = document.querySelector('.lang-toggle');
+        if (langBtn) {
+            langBtn.addEventListener('click', () => {
+                if(window.language) window.language.toggleLanguage();
+            });
+        }
+
+        // Highlight Active Link
+        const path = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if(link.getAttribute('href') === path) {
+                link.classList.add('active', 'text-primary', 'fw-bold');
             }
         });
     }
 };
 
-// Global Export
-window.navbar = Navbar;
+// Initialize
+document.addEventListener('DOMContentLoaded', () => navbarComponent.render());

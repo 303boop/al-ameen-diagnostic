@@ -1,18 +1,13 @@
-// js/components/footer.js
-
-// =====================================================
-// Dynamic Footer Component
-// =====================================================
+/* =========================================
+   DYNAMIC FOOTER COMPONENT
+   ========================================= */
 
 const Footer = {
     async renderFooter() {
         const footer = document.getElementById('footer');
         if (!footer) return;
 
-        const BP = window.BASE_PATH || '';
-        const year = new Date().getFullYear();
-
-        // Default Info
+        // Default Info (Fallback)
         let clinicInfo = {
             clinic_name: 'Al-Ameen Diagnostic Center',
             address: 'Baharampur, West Bengal, India',
@@ -20,7 +15,7 @@ const Footer = {
             email: 'info@alameendiagnostic.com'
         };
 
-        // Try Fetching Settings (Silent Fail Safe)
+        // Try Fetching Real Settings from Supabase
         try {
             if (window.supabase) {
                 const { data } = await window.supabase
@@ -31,66 +26,91 @@ const Footer = {
                 if (data) clinicInfo = { ...clinicInfo, ...data };
             }
         } catch (e) {
-            // Use defaults if offline or table missing
+            // Silently fail to defaults if offline
+            console.warn("Using default footer info");
         }
 
+        const year = new Date().getFullYear();
+
+        // Render HTML
         footer.innerHTML = `
             <footer class="bg-dark text-white pt-5 pb-3 mt-auto">
                 <div class="container">
-                    <div class="row">
+                    <div class="row g-4">
+                        
                         <div class="col-lg-4 col-md-6 mb-4">
-                            <h5 class="text-uppercase mb-3 text-primary">${clinicInfo.clinic_name}</h5>
-                            <p class="small text-muted">
+                            <h5 class="text-uppercase mb-3 text-primary d-flex align-items-center gap-2">
+                                <img src="assets/images/logo/logo.png" height="30" alt="Logo" style="filter: brightness(0) invert(1);"> 
+                                ${clinicInfo.clinic_name}
+                            </h5>
+                            <p class="small text-white-50" data-i18n="footer.about_text">
                                 Providing quality healthcare services with modern facilities and expert professionals.
                             </p>
-                            <div class="d-flex gap-3">
-                                <a href="#" class="text-white"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                            <div class="d-flex gap-3 mt-3">
+                                <a href="#" class="text-white-50 hover-white"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="text-white-50 hover-white"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="text-white-50 hover-white"><i class="fab fa-linkedin-in"></i></a>
                             </div>
                         </div>
 
                         <div class="col-lg-2 col-md-6 mb-4">
-                            <h6 class="text-uppercase mb-3 fw-bold">Quick Links</h6>
+                            <h6 class="text-uppercase mb-3 fw-bold text-white" data-i18n="footer.quick_links">Quick Links</h6>
                             <ul class="list-unstyled small">
-                                <li><a href="${BP}/index.html" class="text-white-50 text-decoration-none">Home</a></li>
-                                <li><a href="${BP}/about.html" class="text-white-50 text-decoration-none">About</a></li>
-                                <li><a href="${BP}/doctors.html" class="text-white-50 text-decoration-none">Doctors</a></li>
-                                <li><a href="${BP}/tests.html" class="text-white-50 text-decoration-none">Tests</a></li>
+                                <li class="mb-2"><a href="index.html" class="text-white-50 text-decoration-none hover-primary">Home</a></li>
+                                <li class="mb-2"><a href="about.html" class="text-white-50 text-decoration-none hover-primary">About Us</a></li>
+                                <li class="mb-2"><a href="doctors.html" class="text-white-50 text-decoration-none hover-primary">Doctors</a></li>
+                                <li class="mb-2"><a href="tests.html" class="text-white-50 text-decoration-none hover-primary">Tests</a></li>
                             </ul>
                         </div>
 
                         <div class="col-lg-2 col-md-6 mb-4">
-                            <h6 class="text-uppercase mb-3 fw-bold">Patient Care</h6>
+                            <h6 class="text-uppercase mb-3 fw-bold text-white" data-i18n="footer.services">Patient Care</h6>
                             <ul class="list-unstyled small">
-                                <li><a href="${BP}/booking.html" class="text-white-50 text-decoration-none">Book Appointment</a></li>
-                                <li><a href="${BP}/track-booking.html" class="text-white-50 text-decoration-none">Track Status</a></li>
-                                <li><a href="${BP}/dashboards/patient/index.html" class="text-white-50 text-decoration-none">Patient Login</a></li>
+                                <li class="mb-2"><a href="booking.html" class="text-white-50 text-decoration-none hover-primary">Book Appointment</a></li>
+                                <li class="mb-2"><a href="track-booking.html" class="text-white-50 text-decoration-none hover-primary">Track Status</a></li>
+                                <li class="mb-2"><a href="login.html" class="text-white-50 text-decoration-none hover-primary">Patient Login</a></li>
+                                <li class="mb-2"><a href="contact.html" class="text-white-50 text-decoration-none hover-primary">Contact Support</a></li>
                             </ul>
                         </div>
 
                         <div class="col-lg-4 col-md-6 mb-4">
-                            <h6 class="text-uppercase mb-3 fw-bold">Contact Us</h6>
+                            <h6 class="text-uppercase mb-3 fw-bold text-white" data-i18n="footer.contact">Contact Us</h6>
                             <ul class="list-unstyled small text-white-50">
-                                <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> ${clinicInfo.address}</li>
-                                <li class="mb-2"><i class="fas fa-phone me-2"></i> ${clinicInfo.phone}</li>
-                                <li class="mb-2"><i class="fas fa-envelope me-2"></i> ${clinicInfo.email}</li>
+                                <li class="mb-3 d-flex gap-2">
+                                    <i class="fas fa-map-marker-alt mt-1 text-primary"></i> 
+                                    <span>${clinicInfo.address}</span>
+                                </li>
+                                <li class="mb-3 d-flex gap-2">
+                                    <i class="fas fa-phone mt-1 text-primary"></i> 
+                                    <span>${clinicInfo.phone}</span>
+                                </li>
+                                <li class="mb-3 d-flex gap-2">
+                                    <i class="fas fa-envelope mt-1 text-primary"></i> 
+                                    <span>${clinicInfo.email}</span>
+                                </li>
                             </ul>
                         </div>
                     </div>
 
-                    <hr class="border-secondary my-4">
+                    <hr class="border-secondary my-4 opacity-25">
 
-                    <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <small class="text-muted">&copy; ${year} ${clinicInfo.clinic_name}. All rights reserved.</small>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <small class="text-white-50">
+                            &copy; ${year} ${clinicInfo.clinic_name}. All rights reserved.
+                        </small>
                         <div class="small">
-                            <a href="${BP}/privacy-policy.html" class="text-muted text-decoration-none me-3">Privacy</a>
-                            <a href="${BP}/terms.html" class="text-muted text-decoration-none">Terms</a>
+                            <a href="privacy-policy.html" class="text-white-50 text-decoration-none me-3 hover-white">Privacy Policy</a>
+                            <a href="terms.html" class="text-white-50 text-decoration-none hover-white">Terms & Conditions</a>
                         </div>
                     </div>
                 </div>
             </footer>
         `;
+        
+        // Re-apply translation if available
+        if(window.language && window.language.applyTranslations) {
+            window.language.applyTranslations();
+        }
     }
 };
 

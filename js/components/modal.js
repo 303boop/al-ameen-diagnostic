@@ -1,197 +1,138 @@
-// ===============================
-// Modal Component (FIXED & SAFE)
-// ===============================
+/* =========================================
+   DYNAMIC MODAL COMPONENT (Bootstrap 5)
+   ========================================= */
 
-// Create and show modal
-function showModal(options = {}) {
-  const {
-    title = '',
-    content = '',
-    size = 'md', // sm | md | lg
-    showClose = true,
-    buttons = [],
-    onClose = null
-  } = options;
+const Modal = {
+    
+    // Core function to create and show any modal
+    show({ title = '', body = '', footer = '', size = 'md', staticBackdrop = false }) {
+        // 1. cleanup old modal if exists
+        const existingModal = document.getElementById('dynamicModal');
+        if (existingModal) existingModal.remove();
 
-  // Remove existing modal
-  document.getElementById('dynamicModal')?.remove();
+        // 2. Template
+        const modalHtml = `
+            <div class="modal fade" id="dynamicModal" tabindex="-1" aria-hidden="true" ${staticBackdrop ? 'data-bs-backdrop="static"' : ''}>
+                <div class="modal-dialog modal-dialog-centered modal-${size}">
+                    <div class="modal-content border-0 shadow-lg">
+                        ${title ? `
+                        <div class="modal-header border-bottom-0">
+                            <h5 class="modal-title fw-bold">${title}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="modal-body p-4">
+                            ${body}
+                        </div>
 
-  const modalHTML = `
-    <div class="modal fade" id="dynamicModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-${size}">
-        <div class="modal-content">
-          ${title || showClose ? `
-            <div class="modal-header">
-              ${title ? `<h5 class="modal-title">${title}</h5>` : ''}
-              ${showClose ? `<button type="button" class="btn-close" data-bs-dismiss="modal"></button>` : ''}
+                        ${footer ? `
+                        <div class="modal-footer border-top-0 bg-light">
+                            ${footer}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
             </div>
-          ` : ''}
-          <div class="modal-body">
-            ${content}
-          </div>
-          ${buttons.length ? `
-            <div class="modal-footer">
-              ${buttons.map(btn => `
-                <button
-                  type="button"
-                  class="btn btn-${btn.type || 'secondary'}"
-                  id="${btn.id}"
-                >
-                  ${btn.text}
-                </button>
-              `).join('')}
-            </div>
-          ` : ''}
-        </div>
-      </div>
-    </div>
-  `;
+        `;
 
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
+        // 3. Inject to DOM
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-  const modalEl = document.getElementById('dynamicModal');
-  const modal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+        // 4. Initialize Bootstrap Modal
+        const modalElement = document.getElementById('dynamicModal');
+        const bsModal = new bootstrap.Modal(modalElement);
 
-  // Button handlers
-  buttons.forEach(btn => {
-    if (!btn.id) return;
-    const el = document.getElementById(btn.id);
-    if (!el) return;
+        // 5. Show
+        bsModal.show();
 
-    el.addEventListener('click', () => {
-      btn.onClick?.();
-      if (btn.closeOnClick !== false) modal.hide();
-    });
-  });
+        // 6. Cleanup on close
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            bsModal.dispose(); // Destroy instance
+            modalElement.remove(); // Remove from DOM
+        });
 
-  if (onClose) {
-    modalEl.addEventListener('hidden.bs.modal', onClose, { once: true });
-  }
+        return {
+            element: modalElement,
+            instance: bsModal,
+            hide: () => bsModal.hide()
+        };
+    },
 
-  modalEl.addEventListener('hidden.bs.modal', () => modalEl.remove(), { once: true });
+    // --- SHORTCUTS ---
 
-  modal.show();
-  return modal;
-}
+    // Simple Alert
+    alert(message, title = 'Alert') {
+        return this.show({
+            title,
+            body: `<p class="mb-0 text-secondary">${message}</p>`,
+            footer: `<button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">OK</button>`,
+            size: 'sm'
+        });
+    },
 
-// Confirm dialog
-function showConfirm(title, message, onConfirm, onCancel) {
-  return showModal({
-    title,
-    content: `<p class="mb-0">${message}</p>`,
-    size: 'sm',
-    buttons: [
-      {
-        id: 'confirmCancel',
-        text: 'Cancel',
-        type: 'secondary',
-        onClick: onCancel
-      },
-      {
-        id: 'confirmOk',
-        text: 'Confirm',
-        type: 'primary',
-        onClick: onConfirm
-      }
-    ]
-  });
-}
+    // Confirmation Dialog (Returns Promise)
+    confirm(message, title = 'Confirm Action') {
+        return new Promise((resolve) => {
+            const modal = this.show({
+                title,
+                body: `<p class="mb-0 text-secondary">${message}</p>`,
+                footer: `
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger px-4" id="confirmBtn">Confirm</button>
+                `,
+                size: 'sm',
+                staticBackdrop: true
+            });
 
-// Alert dialog
-function showAlert(title, message, type = 'info') {
-  const icons = {
-    success: 'fa-check-circle text-success',
-    error: 'fa-times-circle text-danger',
-    warning: 'fa-exclamation-triangle text-warning',
-    info: 'fa-info-circle text-info'
-  };
+            // Handle Confirm Click
+            const confirmBtn = modal.element.querySelector('#confirmBtn');
+            confirmBtn.addEventListener('click', () => {
+                resolve(true);
+                modal.instance.hide();
+            });
 
-  return showModal({
-    title,
-    content: `
-      <div class="text-center">
-        <i class="fas ${icons[type]} fa-3x mb-3"></i>
-        <p class="mb-0">${message}</p>
-      </div>
-    `,
-    size: 'sm',
-    buttons: [
-      {
-        id: 'alertOk',
-        text: 'OK',
-        type: 'primary'
-      }
-    ]
-  });
-}
+            // Handle Cancel/Close (Resolve false)
+            modal.element.addEventListener('hidden.bs.modal', () => {
+                resolve(false);
+            }, { once: true });
+        });
+    },
 
-// Loading modal
-function showLoading(message = 'Loading...') {
-  return showModal({
-    content: `
-      <div class="text-center py-4">
-        <div class="spinner-border text-primary mb-3"></div>
-        <p class="mb-0">${message}</p>
-      </div>
-    `,
-    size: 'sm',
-    showClose: false,
-    buttons: []
-  });
-}
+    // Success Message
+    success(message) {
+        this.show({
+            body: `
+                <div class="text-center py-3">
+                    <div class="mb-3 text-success">
+                        <i class="fas fa-check-circle fa-4x"></i>
+                    </div>
+                    <h4 class="fw-bold">Success!</h4>
+                    <p class="text-muted">${message}</p>
+                    <button type="button" class="btn btn-success px-5 mt-3" data-bs-dismiss="modal">Great</button>
+                </div>
+            `,
+            size: 'sm'
+        });
+    },
 
-// Booking confirmation modal
-function showBookingConfirmation(data) {
-  if (!data) return;
-
-  const content = `
-    <div class="booking-confirmation text-center">
-      <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
-      <h4 class="mb-3">Booking Confirmed</h4>
-
-      <div class="booking-details text-start">
-        <div class="detail-row"><strong>ID:</strong> ${data.booking_id}</div>
-        <div class="detail-row"><strong>Serial:</strong> ${data.serial_number}</div>
-        <div class="detail-row"><strong>Date:</strong> ${helpers?.formatDate?.(data.appointment_date) || '-'}</div>
-        <div class="detail-row"><strong>Time:</strong> ${helpers?.formatTime?.(data.estimated_time) || '-'}</div>
-        <div class="detail-row"><strong>Doctor:</strong> ${data.doctor?.name || '-'}</div>
-      </div>
-
-      <p class="mt-3 text-muted">
-        Please keep a screenshot of this confirmation.
-      </p>
-    </div>
-  `;
-
-  return showModal({
-    title: 'Appointment Confirmation',
-    content,
-    size: 'md',
-    buttons: [
-      {
-        id: 'printReceipt',
-        text: 'Print',
-        type: 'secondary',
-        closeOnClick: false,
-        onClick: () => window.print()
-      },
-      {
-        id: 'doneBooking',
-        text: 'Done',
-        type: 'primary',
-        onClick: () => {
-          window.location.href = './index.html';
-        }
-      }
-    ]
-  });
-}
-
-// Global export
-window.modal = {
-  showModal,
-  showConfirm,
-  showAlert,
-  showLoading,
-  showBookingConfirmation
+    // Error Message
+    error(message) {
+        this.show({
+            body: `
+                <div class="text-center py-3">
+                    <div class="mb-3 text-danger">
+                        <i class="fas fa-times-circle fa-4x"></i>
+                    </div>
+                    <h4 class="fw-bold">Error</h4>
+                    <p class="text-muted">${message}</p>
+                    <button type="button" class="btn btn-danger px-5 mt-3" data-bs-dismiss="modal">Close</button>
+                </div>
+            `,
+            size: 'sm'
+        });
+    }
 };
+
+// Global Export
+window.Modal = Modal;

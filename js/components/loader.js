@@ -1,179 +1,142 @@
-// ===============================
-// Loader Utilities (FIXED & SAFE)
-// ===============================
+/* =========================================
+   LOADER & SKELETON UTILITIES
+   ========================================= */
 
-// Show full page loader
-function showPageLoader(message = 'Loading...') {
-  hidePageLoader();
+const Loader = {
+    
+    // -------------------------------------
+    // 1. FULL PAGE LOADER
+    // -------------------------------------
+    showPageLoader(message = 'Loading...') {
+        this.hidePageLoader(); // Prevent duplicates
 
-  const loaderHTML = `
-    <div class="page-loader" id="pageLoader">
-      <div class="loader-content">
-        <div class="loader-spinner"></div>
-        <p class="loader-message">${message}</p>
-      </div>
-    </div>
-  `;
+        const loaderHTML = `
+            <div class="page-loader" id="globalPageLoader">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <p class="mt-3 text-muted fw-bold">${message}</p>
+                </div>
+            </div>
+        `;
 
-  document.body.insertAdjacentHTML('beforeend', loaderHTML);
-  document.body.style.overflow = 'hidden';
-}
+        document.body.insertAdjacentHTML('beforeend', loaderHTML);
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    },
 
-// Hide full page loader
-function hidePageLoader() {
-  const loader = document.getElementById('pageLoader');
-  if (loader) {
-    loader.remove();
-    document.body.style.overflow = '';
-  }
-}
+    hidePageLoader() {
+        const loader = document.getElementById('globalPageLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.remove();
+                document.body.style.overflow = '';
+            }, 300); // Wait for fade out
+        }
+    },
 
-// Show section loader
-function showSectionLoader(sectionElement, message = 'Loading...') {
-  if (!sectionElement) return;
+    // -------------------------------------
+    // 2. SECTION LOADER (Overlay)
+    // -------------------------------------
+    showSectionLoader(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
 
-  hideSectionLoader(sectionElement);
+        // Ensure parent is relative
+        if (getComputedStyle(element).position === 'static') {
+            element.style.position = 'relative';
+        }
 
-  const loaderHTML = `
-    <div class="section-loader">
-      <div class="loader-spinner"></div>
-      <p class="loader-message">${message}</p>
-    </div>
-  `;
+        const loaderHTML = `
+            <div class="section-loader" id="loader-${elementId}">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        `;
+        
+        // Add styling dynamically if not in CSS
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .section-loader {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(255,255,255,0.8); z-index: 10;
+                display: flex; align-items: center; justify-content: center;
+                border-radius: inherit;
+            }
+        `;
+        document.head.appendChild(style);
 
-  sectionElement.style.position = 'relative';
-  sectionElement.insertAdjacentHTML('beforeend', loaderHTML);
-}
+        element.insertAdjacentHTML('beforeend', loaderHTML);
+    },
 
-// Hide section loader
-function hideSectionLoader(sectionElement) {
-  if (!sectionElement) return;
-  const loader = sectionElement.querySelector('.section-loader');
-  if (loader) loader.remove();
-}
+    hideSectionLoader(elementId) {
+        const loader = document.getElementById(`loader-${elementId}`);
+        if (loader) loader.remove();
+    },
 
-// Skeleton loader generator
-function createSkeletonLoader(type = 'card', count = 3) {
-  let skeletonHTML = '';
+    // -------------------------------------
+    // 3. BUTTON STATE
+    // -------------------------------------
+    showButtonLoader(btnElement) {
+        if (!btnElement) return;
 
-  if (type === 'card') {
-    for (let i = 0; i < count; i++) {
-      skeletonHTML += `
-        <div class="skeleton-card">
-          <div class="skeleton-image"></div>
-          <div class="skeleton-content">
-            <div class="skeleton-line skeleton-title"></div>
-            <div class="skeleton-line skeleton-text"></div>
-            <div class="skeleton-line skeleton-text short"></div>
-          </div>
-        </div>
-      `;
+        // Save original content width to prevent layout jump
+        const width = btnElement.offsetWidth;
+        btnElement.style.minWidth = `${width}px`;
+        
+        btnElement.dataset.originalContent = btnElement.innerHTML;
+        btnElement.disabled = true;
+        btnElement.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Loading...
+        `;
+    },
+
+    hideButtonLoader(btnElement) {
+        if (!btnElement) return;
+
+        btnElement.disabled = false;
+        if (btnElement.dataset.originalContent) {
+            btnElement.innerHTML = btnElement.dataset.originalContent;
+            delete btnElement.dataset.originalContent;
+        }
+        btnElement.style.minWidth = ''; // Reset width
+    },
+
+    // -------------------------------------
+    // 4. SKELETON GENERATOR
+    // -------------------------------------
+    createSkeleton(type = 'card', count = 1) {
+        let html = '';
+
+        const cardSkeleton = `
+            <div class="col">
+                <div class="card border-0 shadow-sm" aria-hidden="true">
+                    <div class="skeleton-loading" style="height: 180px; width: 100%;"></div>
+                    <div class="card-body">
+                        <div class="skeleton-loading mb-2" style="height: 20px; width: 80%;"></div>
+                        <div class="skeleton-loading" style="height: 15px; width: 60%;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const listSkeleton = `
+            <div class="d-flex align-items-center mb-3">
+                <div class="skeleton-loading rounded-circle me-3" style="width: 50px; height: 50px;"></div>
+                <div class="flex-grow-1">
+                    <div class="skeleton-loading mb-2" style="height: 15px; width: 40%;"></div>
+                    <div class="skeleton-loading" style="height: 10px; width: 30%;"></div>
+                </div>
+            </div>
+        `;
+
+        for (let i = 0; i < count; i++) {
+            if (type === 'card') html += cardSkeleton;
+            else if (type === 'list') html += listSkeleton;
+        }
+
+        return html;
     }
-  }
-
-  if (type === 'list') {
-    for (let i = 0; i < count; i++) {
-      skeletonHTML += `
-        <div class="skeleton-list-item">
-          <div class="skeleton-avatar"></div>
-          <div class="skeleton-list-content">
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line short"></div>
-          </div>
-        </div>
-      `;
-    }
-  }
-
-  if (type === 'table') {
-    skeletonHTML = `
-      <div class="skeleton-table">
-        ${Array.from({ length: count }).map(() => `
-          <div class="skeleton-table-row">
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line"></div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }
-
-  return skeletonHTML;
-}
-
-// Button loader
-function showButtonLoader(buttonElement) {
-  if (!buttonElement) return;
-
-  buttonElement.disabled = true;
-  buttonElement.dataset.originalText = buttonElement.innerHTML;
-  buttonElement.innerHTML = `
-    <span class="spinner-border spinner-border-sm me-2"></span>
-    Loading...
-  `;
-}
-
-// Hide button loader
-function hideButtonLoader(buttonElement) {
-  if (!buttonElement) return;
-
-  buttonElement.disabled = false;
-  if (buttonElement.dataset.originalText) {
-    buttonElement.innerHTML = buttonElement.dataset.originalText;
-    delete buttonElement.dataset.originalText;
-  }
-}
-
-// Global progress bar
-function showProgressBar(percentage) {
-  let progressBar = document.getElementById('globalProgressBar');
-
-  if (!progressBar) {
-    const progressHTML = `
-      <div class="global-progress-bar" id="globalProgressBar">
-        <div class="progress-bar-fill" id="progressBarFill"></div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('afterbegin', progressHTML);
-  }
-
-  const fill = document.getElementById('progressBarFill');
-  if (fill) fill.style.width = `${percentage}%`;
-
-  if (percentage >= 100) {
-    setTimeout(() => {
-      document.getElementById('globalProgressBar')?.remove();
-    }, 400);
-  }
-}
-
-// Image shimmer
-function addImageShimmer(imgElement) {
-  if (!imgElement) return;
-
-  imgElement.classList.add('loading');
-
-  imgElement.addEventListener('load', () => {
-    imgElement.classList.remove('loading');
-    imgElement.classList.add('loaded');
-  });
-
-  imgElement.addEventListener('error', () => {
-    imgElement.classList.remove('loading');
-    imgElement.src = './assets/images/placeholder.jpg';
-  });
-}
-
-// Global export
-window.loader = {
-  showPageLoader,
-  hidePageLoader,
-  showSectionLoader,
-  hideSectionLoader,
-  createSkeletonLoader,
-  showButtonLoader,
-  hideButtonLoader,
-  showProgressBar,
-  addImageShimmer
 };
+
+// Global Export
+window.loader = Loader;

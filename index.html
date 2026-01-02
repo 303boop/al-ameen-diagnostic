@@ -37,25 +37,29 @@
                         <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill">
                             <i class="fas fa-heartbeat me-2"></i>Health comes first
                         </span>
+                        
                         <h1 class="hero-title display-4 fw-bold mb-4" data-i18n="hero.title">
                             We Provide Best <span class="text-primary">Healthcare</span>
                         </h1>
+                        
                         <p class="hero-subtitle lead text-muted mb-5" data-i18n="hero.subtitle">
                             Professional medical care with modern facilities and expert doctors dedicated to your wellbeing.
                         </p>
-                        <div class="hero-actions d-flex gap-3">
-                            <a href="booking.html" class="btn btn-primary btn-lg px-4" data-i18n="hero.cta_primary">
+                        
+                        <div class="hero-actions d-flex gap-3 flex-wrap">
+                            <a href="booking.html" class="btn btn-primary btn-lg px-4 shadow-sm" data-i18n="hero.cta_primary">
                                 Book Appointment
                             </a>
-                            <a href="about.html" class="btn btn-outline-dark btn-lg px-4" data-i18n="hero.cta_secondary">
+                            <a href="about.html" class="btn btn-outline-primary btn-lg px-4" data-i18n="hero.cta_secondary">
                                 Learn More
                             </a>
                         </div>
                     </div>
                 </div>
+                
                 <div class="col-lg-6 d-none d-lg-block" data-aos="fade-left">
                     <div class="hero-image text-center">
-                        <img src="assets/images/hero/doctor-hero.png" alt="Doctor" class="img-fluid" style="max-height: 600px;">
+                        <img src="assets/images/hero/doctor-hero.png" alt="Doctor" class="img-fluid" style="max-height: 600px;" onerror="this.style.display='none'">
                     </div>
                 </div>
             </div>
@@ -69,28 +73,28 @@
                     <div class="stat-item">
                         <i class="fas fa-users fa-2x mb-3 opacity-75"></i>
                         <h3 class="fw-bold display-6">500+</h3>
-                        <p class="mb-0 opacity-75">Happy Patients</p>
+                        <p class="mb-0 opacity-75" data-i18n="stats.patients">Happy Patients</p>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-item">
                         <i class="fas fa-user-md fa-2x mb-3 opacity-75"></i>
                         <h3 class="fw-bold display-6">50+</h3>
-                        <p class="mb-0 opacity-75">Expert Doctors</p>
+                        <p class="mb-0 opacity-75" data-i18n="stats.doctors">Expert Doctors</p>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-item">
                         <i class="fas fa-flask fa-2x mb-3 opacity-75"></i>
                         <h3 class="fw-bold display-6">100+</h3>
-                        <p class="mb-0 opacity-75">Lab Tests</p>
+                        <p class="mb-0 opacity-75" data-i18n="stats.tests">Lab Tests</p>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-item">
                         <i class="fas fa-ambulance fa-2x mb-3 opacity-75"></i>
                         <h3 class="fw-bold display-6">24/7</h3>
-                        <p class="mb-0 opacity-75">Emergency Support</p>
+                        <p class="mb-0 opacity-75" data-i18n="stats.emergency">Emergency</p>
                     </div>
                 </div>
             </div>
@@ -100,48 +104,50 @@
     <section class="section-padding py-5">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="fw-bold">Our Departments</h2>
-                <p class="text-muted">Comprehensive medical services across multiple specializations</p>
+                <h2 class="fw-bold" data-i18n="departments.title">Our Departments</h2>
+                <p class="text-muted" data-i18n="departments.subtitle">Comprehensive medical services across multiple specializations</p>
             </div>
 
             <div class="row g-4">
-                <div class="col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card h-100 border-0 shadow-sm hover-up">
-                        <div class="card-body text-center p-4">
-                            <div class="icon-box bg-danger-subtle text-danger rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                                <i class="fas fa-heartbeat fa-xl"></i>
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card h-100 border-0 shadow-sm hover-up text-center p-4">
+                        <div class="mb-3">
+                            <div class="icon-box bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                <i class="fas fa-heartbeat fa-2x"></i>
                             </div>
-                            <h5>Cardiology</h5>
-                            <p class="text-muted small">Expert care for heart conditions with advanced diagnostics.</p>
                         </div>
+                        <h5 class="fw-bold" data-i18n="departments.cardiology">Cardiology</h5>
+                        <p class="text-muted small" data-i18n="departments.cardiology_desc">Heart care and cardiovascular treatments.</p>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card h-100 border-0 shadow-sm hover-up">
-                        <div class="card-body text-center p-4">
-                            <div class="icon-box bg-primary-subtle text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                                <i class="fas fa-brain fa-xl"></i>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card h-100 border-0 shadow-sm hover-up text-center p-4">
+                        <div class="mb-3">
+                            <div class="icon-box bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                <i class="fas fa-brain fa-2x"></i>
                             </div>
-                            <h5>Neurology</h5>
-                            <p class="text-muted small">Comprehensive treatment for neurological disorders.</p>
                         </div>
+                        <h5 class="fw-bold" data-i18n="departments.neurology">Neurology</h5>
+                        <p class="text-muted small" data-i18n="departments.neurology_desc">Brain and nervous system care.</p>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="300">
-                    <div class="card h-100 border-0 shadow-sm hover-up">
-                        <div class="card-body text-center p-4">
-                            <div class="icon-box bg-success-subtle text-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                                <i class="fas fa-microscope fa-xl"></i>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card h-100 border-0 shadow-sm hover-up text-center p-4">
+                        <div class="mb-3">
+                            <div class="icon-box bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                <i class="fas fa-microscope fa-2x"></i>
                             </div>
-                            <h5>Pathology</h5>
-                            <p class="text-muted small">Accurate diagnostic testing with state-of-the-art labs.</p>
                         </div>
+                        <h5 class="fw-bold" data-i18n="departments.pathology">Pathology</h5>
+                        <p class="text-muted small" data-i18n="departments.pathology_desc">Lab testing and analysis.</p>
                     </div>
                 </div>
             </div>
             
-            <div class="text-center mt-4">
-                <a href="departments.html" class="btn btn-outline-primary">View All Departments</a>
+            <div class="text-center mt-5">
+                <a href="departments.html" class="btn btn-outline-primary px-4" data-i18n="departments.view_all">View All Departments</a>
             </div>
         </div>
     </section>
@@ -149,8 +155,8 @@
     <section class="section-padding bg-light py-5">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="fw-bold">Meet Our Specialists</h2>
-                <p class="text-muted">Qualified doctors ready to help you.</p>
+                <h2 class="fw-bold" data-i18n="doctors.title">Meet Our Specialists</h2>
+                <p class="text-muted" data-i18n="doctors.subtitle">Qualified doctors ready to help you.</p>
             </div>
 
             <div id="featuredDoctors" class="position-relative" data-aos="fade-up">
@@ -160,7 +166,7 @@
             </div>
 
             <div class="text-center mt-4">
-                <a href="doctors.html" class="btn btn-primary">View All Doctors</a>
+                <a href="doctors.html" class="btn btn-primary px-4" data-i18n="doctors.view_profile">View All Doctors</a>
             </div>
         </div>
     </section>
@@ -168,8 +174,8 @@
     <section class="section-padding py-5">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="fw-bold">Popular Lab Tests</h2>
-                <p class="text-muted">High-quality diagnostics at affordable prices.</p>
+                <h2 class="fw-bold" data-i18n="tests.title">Popular Lab Tests</h2>
+                <p class="text-muted" data-i18n="tests.subtitle">High-quality diagnostics at affordable prices.</p>
             </div>
 
             <div id="featuredTests" class="position-relative" data-aos="fade-up">
@@ -179,7 +185,7 @@
             </div>
 
             <div class="text-center mt-4">
-                <a href="tests.html" class="btn btn-outline-primary">View All Tests</a>
+                <a href="tests.html" class="btn btn-outline-primary px-4" data-i18n="tests.view_details">View All Tests</a>
             </div>
         </div>
     </section>
@@ -189,7 +195,7 @@
             <div data-aos="zoom-in">
                 <h2 class="display-5 fw-bold mb-3">Your Health is Our Priority</h2>
                 <p class="lead mb-4">Book an appointment online and skip the waiting line.</p>
-                <a href="booking.html" class="btn btn-primary btn-lg rounded-pill px-5">Book Now</a>
+                <a href="booking.html" class="btn btn-primary btn-lg rounded-pill px-5 shadow-lg">Book Now</a>
             </div>
         </div>
     </section>
@@ -227,7 +233,8 @@
             AOS.init({
                 duration: 800,
                 once: true,
-                offset: 100
+                offset: 100,
+                easing: 'ease-in-out'
             });
         });
     </script>

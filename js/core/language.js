@@ -1,119 +1,73 @@
-// Language Management (Fixed & Robust)
+/* =========================================
+   LANGUAGE & TRANSLATION CORE
+   ========================================= */
+const language = {
+    currentLang: localStorage.getItem('app_lang') || 'en',
+    translations: {},
 
-let currentLanguage = localStorage.getItem("language") || "en";
-let translations = {};
+    async init() {
+        await this.loadTranslations(this.currentLang);
+        this.bindEvents();
+    },
 
-/* =========================
-   LOAD TRANSLATIONS
-========================= */
-async function loadTranslations(lang) {
-  try {
-    const response = await fetch(`./translations/${lang}.json`, {
-      cache: "no-store",
-    });
+    async loadTranslations(lang) {
+        try {
+            // Adjust path if needed. Assuming /assets/i18n/ exists.
+            const response = await fetch(`assets/i18n/${lang}.json`);
+            if (!response.ok) throw new Error('Language file not found');
+            this.translations = await response.json();
+            this.currentLang = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = this.translations.meta?.direction || 'ltr';
+            localStorage.setItem('app_lang', lang);
+            this.applyTranslations();
+        } catch (error) {
+            console.error('Failed to load language:', error);
+        }
+    },
 
-    if (!response.ok) {
-      throw new Error(`Translation file not found: ${lang}.json`);
+    applyTranslations() {
+        const elements = document.querySelectorAll('[data-i18n]');
+        
+        elements.forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const text = this.getNestedValue(this.translations, key);
+            
+            if (text) {
+                // [CRITICAL FIX] Use innerHTML to render <span> tags correctly
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = text;
+                } else {
+                    el.innerHTML = text; 
+                }
+            }
+        });
+    },
+
+    getNestedValue(obj, path) {
+        return path.split('.').reduce((prev, curr) => prev ? prev[curr] : null, obj);
+    },
+
+    async setLanguage(lang) {
+        if (lang === this.currentLang) return;
+        await this.loadTranslations(lang);
+        
+        // Dispatch event for other components (like Navbar) to re-render if needed
+        window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+    },
+
+    bindEvents() {
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.lang-toggle')) {
+                const lang = e.target.closest('.lang-toggle').dataset.lang;
+                if(lang) this.setLanguage(lang);
+            }
+        });
     }
-
-    translations = await response.json();
-    currentLanguage = lang;
-    localStorage.setItem("language", lang);
-
-    updatePageLanguage();
-
-    // Notify other modules
-    window.dispatchEvent(
-      new CustomEvent("languageChanged", { detail: { lang } })
-    );
-  } catch (error) {
-    console.error("❌ Failed to load translations:", error);
-  }
-}
-
-/* =========================
-   TRANSLATION GETTER
-========================= */
-function t(key) {
-  if (!translations || Object.keys(translations).length === 0) {
-    return key;
-  }
-
-  return (
-    key
-      .split(".")
-      .reduce((obj, k) => (obj && obj[k] !== undefined ? obj[k] : null), translations) ||
-    key
-  );
-}
-
-/* =========================
-   UPDATE PAGE TEXT
-========================= */
-function updatePageLanguage() {
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const key = el.getAttribute("data-i18n");
-    const translation = t(key);
-
-    if (
-      el.tagName === "INPUT" ||
-      el.tagName === "TEXTAREA"
-    ) {
-      el.placeholder = translation;
-    } else {
-      el.textContent = translation;
-    }
-  });
-
-  // HTML language attribute
-  document.documentElement.lang = currentLanguage;
-
-  // Language toggle button
-  const langToggle = document.getElementById("langToggle");
-  if (langToggle) {
-    langToggle.textContent =
-      currentLanguage === "en" ? "বাংলা" : "English";
-  }
-
-  // Direction (both en & bn are LTR)
-  document.documentElement.dir = "ltr";
-}
-
-/* =========================
-   TOGGLE LANGUAGE
-========================= */
-function toggleLanguage() {
-  const nextLang = currentLanguage === "en" ? "bn" : "en";
-  loadTranslations(nextLang);
-}
-
-/* =========================
-   GET CURRENT LANGUAGE
-========================= */
-function getCurrentLanguage() {
-  return currentLanguage;
-}
-
-/* =========================
-   INIT (SAFE)
-========================= */
-function initLanguage() {
-  loadTranslations(currentLanguage);
-}
-
-// DOM ready + fallback (important)
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initLanguage);
-} else {
-  initLanguage();
-}
-
-/* =========================
-   EXPORT
-========================= */
-window.language = {
-  t,
-  toggleLanguage,
-  getCurrentLanguage,
-  loadTranslations,
 };
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => language.init());
+
+// Expose to window
+window.language = language;
