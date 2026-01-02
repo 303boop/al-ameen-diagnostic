@@ -1,90 +1,55 @@
-(async function () {
-  const ok = await auth.requireAuth(['lab']);
-  if (!ok) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lab Appointments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  loadSidebar();
+  <link rel="icon" href="/assets/images/logo/favicon.png">
 
-  const params = new URLSearchParams(window.location.search);
-  window.appointmentId = params.get('appointment');
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/dashboards.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/utilities.css">
 
-  if (!appointmentId) {
-    toast.error('Missing appointment reference');
-    return;
-  }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
 
-  document
-    .getElementById('reportForm')
-    .addEventListener('submit', uploadReport);
-})();
+<div class="dashboard-container">
 
-function loadSidebar() {
-  document.getElementById('labSidebar').innerHTML = `
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <i class="fas fa-flask"></i> Lab
+  <aside class="dashboard-sidebar" id="labSidebar"></aside>
+
+  <main class="dashboard-main">
+
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">Today's Appointments</h1>
+    </header>
+
+    <section class="dashboard-content">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body" id="appointmentsTable"></div>
       </div>
-    </div>
+    </section>
 
-    <nav class="sidebar-nav">
-      <a class="sidebar-nav-item" href="/dashboards/lab/search-booking.html">
-        <i class="fas fa-search"></i> Search Booking
-      </a>
-      <a class="sidebar-nav-item active" href="#">
-        <i class="fas fa-file-upload"></i> Upload Report
-      </a>
-    </nav>
-  `;
-}
+  </main>
 
-async function uploadReport(e) {
-  e.preventDefault();
+</div>
 
-  const file = fileInput.files[0];
-  if (!file) {
-    toast.error('Select a file');
-    return;
-  }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  loader.showButtonLoader(uploadBtn);
+<script src="/js/config/supabase.js"></script>
+<script src="/js/utils/helpers.js"></script>
+<script src="/js/utils/toast.js"></script>
+<script src="/js/core/auth.js"></script>
+<script src="/js/components/loader.js"></script>
 
-  const filePath =
-    `${appointmentId}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+<script src="/js/dashboards/lab/appointments.js"></script>
 
-  // Upload to private bucket
-  const { error: uploadError } = await supabaseClient
-    .storage
-    .from('reports')
-    .upload(filePath, file);
-
-  if (uploadError) {
-    loader.hideButtonLoader(uploadBtn);
-    toast.error('Upload failed');
-    return;
-  }
-
-  // Save report record
-  const { error: dbError } = await supabaseClient
-    .from('reports')
-    .insert({
-      appointment_id: appointmentId,
-      file_path: filePath,
-      report_type: reportType.value
-    });
-
-  if (dbError) {
-    loader.hideButtonLoader(uploadBtn);
-    toast.error('Failed to save report');
-    return;
-  }
-
-  // Optional: mark appointment completed
-  await supabaseClient
-    .from('appointments')
-    .update({ status: 'completed' })
-    .eq('id', appointmentId);
-
-  loader.hideButtonLoader(uploadBtn);
-
-  toast.success('Report uploaded successfully');
-  window.location.href = '/dashboards/lab/search-booking.html';
-}
+</body>
+</html>

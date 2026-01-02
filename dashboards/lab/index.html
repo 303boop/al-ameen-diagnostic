@@ -1,112 +1,84 @@
-(async function () {
-  const ok = await auth.requireAuth(['lab']);
-  if (!ok) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lab Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  loadSidebar();
-  loadTodayAppointments();
-})();
+  <link rel="icon" href="/assets/images/logo/favicon.png">
 
-function loadSidebar() {
-  document.getElementById('labSidebar').innerHTML = `
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <i class="fas fa-flask"></i> Lab
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/dashboards.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  <aside class="dashboard-sidebar" id="labSidebar"></aside>
+
+  <main class="dashboard-main">
+
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">Lab Dashboard</h1>
+    </header>
+
+    <section class="dashboard-content">
+
+      <div class="dashboard-grid grid-3">
+        <div class="stat-card">
+          <h4>Today's Appointments</h4>
+          <p id="todayCount">—</p>
+        </div>
+        <div class="stat-card">
+          <h4>Completed</h4>
+          <p id="completedCount">—</p>
+        </div>
+        <div class="stat-card">
+          <h4>Pending</h4>
+          <p id="pendingCount">—</p>
+        </div>
       </div>
-    </div>
 
-    <nav class="sidebar-nav">
-      <a class="sidebar-nav-item" href="/dashboards/lab/search-booking.html">
-        <i class="fas fa-search"></i> Search Booking
-      </a>
-      <a class="sidebar-nav-item active" href="/dashboards/lab/appointments.html">
-        <i class="fas fa-calendar-day"></i> Appointments
-      </a>
-      <a class="sidebar-nav-item" href="/dashboards/lab/upload-report.html">
-        <i class="fas fa-file-upload"></i> Upload Report
-      </a>
-    </nav>
-  `;
-}
+      <div class="dashboard-card mt-4">
+        <div class="dashboard-card-body">
+          <h3>Quick Actions</h3>
 
-async function loadTodayAppointments() {
-  const container = document.getElementById('appointmentsTable');
-  loader.showSectionLoader(container);
+          <div class="mt-3">
+            <a href="/dashboards/lab/search-booking.html"
+               class="btn btn-primary me-2">
+              <i class="fas fa-search"></i> Search Booking
+            </a>
 
-  const today = new Date().toISOString().split('T')[0];
+            <a href="/dashboards/lab/appointments.html"
+               class="btn btn-outline-primary">
+              <i class="fas fa-calendar-day"></i> Today’s Appointments
+            </a>
+          </div>
+        </div>
+      </div>
 
-  const { data, error } = await supabaseClient
-    .from('appointments')
-    .select(`
-      id,
-      booking_id,
-      serial_number,
-      patient_name,
-      status,
-      doctors ( name )
-    `)
-    .eq('appointment_date', today)
-    .order('serial_number');
+    </section>
 
-  loader.hideSectionLoader(container);
+  </main>
 
-  if (error) {
-    toast.error('Failed to load appointments');
-    return;
-  }
+</div>
 
-  if (!data.length) {
-    container.innerHTML = `<p class="text-muted">No appointments today</p>`;
-    return;
-  }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  container.innerHTML = `
-    <div class="table-responsive">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Serial</th>
-            <th>Booking ID</th>
-            <th>Patient</th>
-            <th>Doctor</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data.map(renderRow).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
+<script src="/js/config/supabase.js"></script>
+<script src="/js/utils/toast.js"></script>
+<script src="/js/core/auth.js"></script>
 
-function renderRow(a) {
-  return `
-    <tr>
-      <td>#${a.serial_number}</td>
-      <td>${a.booking_id}</td>
-      <td>${helpers.sanitizeHTML(a.patient_name || 'Guest')}</td>
-      <td>${a.doctors?.name || '-'}</td>
-      <td>
-        <span class="badge ${statusClass(a.status)}">
-          ${a.status}
-        </span>
-      </td>
-      <td class="text-end">
-        <a class="btn btn-sm btn-outline-primary"
-          href="/dashboards/lab/upload-report.html?appointment=${a.id}">
-          Upload
-        </a>
-      </td>
-    </tr>
-  `;
-}
+<script src="/js/dashboards/lab/index.js"></script>
 
-function statusClass(status) {
-  return {
-    booked: 'bg-primary',
-    checked_in: 'bg-info',
-    completed: 'bg-success',
-    cancelled: 'bg-danger'
-  }[status] || 'bg-secondary';
-}
+</body>
+</html>

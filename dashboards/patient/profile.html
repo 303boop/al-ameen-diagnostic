@@ -1,105 +1,95 @@
-(async function () {
-  const ok = await auth.requireAuth(['patient']);
-  if (!ok) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  loadSidebar();
-  loadReports();
-})();
+  <link rel="icon" href="/assets/images/logo/favicon.png">
 
-function loadSidebar() {
-  document.getElementById('patientSidebar').innerHTML = `
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <i class="fas fa-user"></i> Patient
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/dashboards.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  <aside class="dashboard-sidebar" id="patientSidebar"></aside>
+
+  <main class="dashboard-main">
+
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">My Profile</h1>
+    </header>
+
+    <section class="dashboard-content">
+
+      <!-- Profile Info -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3>Personal Information</h3>
+        </div>
+        <div class="dashboard-card-body">
+          <form id="profileForm">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="fullName" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-control" id="phone" required>
+            </div>
+
+            <button class="btn btn-primary" type="submit">
+              <i class="fas fa-save"></i> Update Profile
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
 
-    <nav class="sidebar-nav">
-      <a class="sidebar-nav-item" href="/dashboards/patient/index.html">
-        <i class="fas fa-home"></i> Dashboard
-      </a>
-      <a class="sidebar-nav-item" href="/dashboards/patient/appointments.html">
-        <i class="fas fa-calendar-check"></i> Appointments
-      </a>
-      <a class="sidebar-nav-item active" href="/dashboards/patient/reports.html">
-        <i class="fas fa-file-medical"></i> Reports
-      </a>
-      <a class="sidebar-nav-item" href="/dashboards/patient/profile.html">
-        <i class="fas fa-user-cog"></i> Profile
-      </a>
-    </nav>
-  `;
-}
-
-async function loadReports() {
-  const user = await getCurrentUser();
-  if (!user) return;
-
-  const container = document.getElementById('reportsList');
-  container.innerHTML = loader.createSkeletonLoader('card', 3);
-
-  const { data, error } = await supabaseClient
-    .from('reports')
-    .select(`
-      id,
-      file_name,
-      file_path,
-      report_type,
-      created_at,
-      appointments ( booking_id )
-    `)
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    toast.error('Failed to load reports');
-    container.innerHTML = '';
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    container.innerHTML = `<p class="text-muted">No reports available yet.</p>`;
-    return;
-  }
-
-  container.innerHTML = data.map(renderReport).join('');
-}
-
-function renderReport(r) {
-  return `
-    <div class="dashboard-card report-card">
-      <div class="dashboard-card-body">
-
-        <div class="report-header">
-          <strong>${r.file_name}</strong>
-          <span class="badge badge-info">${r.report_type.replace('_', ' ')}</span>
+      <!-- Password -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3>Change Password</h3>
         </div>
+        <div class="dashboard-card-body">
+          <form id="passwordForm">
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-control" id="newPassword" required>
+            </div>
 
-        <div class="report-meta">
-          <p><i class="fas fa-id-card"></i> ${r.appointments?.booking_id || ''}</p>
-          <p><i class="fas fa-calendar"></i> ${helpers.formatDate(r.created_at)}</p>
+            <button class="btn btn-outline-primary" type="submit">
+              <i class="fas fa-key"></i> Update Password
+            </button>
+          </form>
         </div>
-
-        <div class="report-actions">
-          <button class="btn btn-outline-primary btn-sm"
-            onclick="downloadReport('${r.file_path}', '${r.file_name}')">
-            <i class="fas fa-download"></i> Download
-          </button>
-        </div>
-
       </div>
-    </div>
-  `;
-}
 
-async function downloadReport(path, filename) {
-  try {
-    const { data, error } = await supabaseClient
-      .storage
-      .from(APP_CONSTANTS.STORAGE_BUCKETS.REPORTS)
-      .download(path);
+    </section>
 
-    if (error) throw error;
+  </main>
+</div>
 
-    const url = URL.createObjectURL(data);
-    const a = doc
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="/js/config/supabase.js"></script>
+<script src="/js/utils/validator.js"></script>
+<script src="/js/utils/toast.js"></script>
+<script src="/js/core/auth.js"></script>
+<script src="/js/components/loader.js"></script>
+
+<script src="/js/dashboards/patient/profile.js"></script>
+
+</body>
+</html>
