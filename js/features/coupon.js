@@ -1,177 +1,202 @@
-// Coupon Management
+// Coupon Management (Fixed & Production-Safe)
 
-// Validate and apply coupon
+/* =========================
+   SAFETY CHECKS
+========================= */
+if (!window.supabase) {
+  console.error("❌ Supabase not initialized");
+}
+
+/* =========================
+   HELPERS (LOCAL)
+========================= */
+function formatCurrency(amount) {
+  return `₹${Number(amount).toFixed(2)}`;
+}
+
+function showToast(type, message) {
+  if (window.toast && typeof window.toast[type] === "function") {
+    window.toast[type](message);
+  } else {
+    console.log(`[${type.toUpperCase()}]`, message);
+  }
+}
+
+/* =========================
+   VALIDATE COUPON
+========================= */
 async function validateCoupon(couponCode) {
   try {
-    if (!couponCode || couponCode.trim().length === 0) {
-      return { success: false, error: 'Please enter a coupon code' };
+    if (!couponCode || !couponCode.trim()) {
+      return { success: false, error: "Please enter a coupon code" };
     }
 
     const code = couponCode.trim().toUpperCase();
+    const today = new Date().toISOString();
 
-    // Fetch coupon from database
-    const { data, error } = await supabaseClient
-      .from('coupons')
-      .select('*')
-      .eq('code', code)
-      .eq('is_active', true)
+    const { data, error } = await supabase
+      .from("coupons")
+      .select("*")
+      .eq("code", code)
+      .eq("is_active", true)
+      .or(`expires_at.is.null,expires_at.gte.${today}`)
       .single();
 
     if (error || !data) {
-      return { success: false, error: 'Invalid coupon code' };
-    }
-
-    // Check expiry
-    if (data.expires_at) {
-      const expiryDate = new Date(data.expires_at);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (expiryDate < today) {
-        return { success: false, error: 'Coupon has expired' };
-      }
+      return { success: false, error: "Invalid or expired coupon code" };
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error('Coupon validation error:', error);
-    return { success: false, error: 'Failed to validate coupon' };
+    console.error("Coupon validation error:", error);
+    return { success: false, error: "Failed to validate coupon" };
   }
 }
 
-// Calculate discount
+/* =========================
+   CALCULATE DISCOUNT
+========================= */
 function calculateDiscount(originalPrice, coupon) {
   if (!coupon) return 0;
 
-  if (coupon.discount_type === 'percent') {
-    return (parseFloat(originalPrice) * parseFloat(coupon.discount_value)) / 100;
-  } else if (coupon.discount_type === 'flat') {
-    return parseFloat(coupon.discount_value);
+  const price = Number(originalPrice);
+  const value = Number(coupon.discount_value);
+
+  if (coupon.discount_type === "percent") {
+    return (price * value) / 100;
+  }
+
+  if (coupon.discount_type === "flat") {
+    return value;
   }
 
   return 0;
 }
 
-// Apply coupon to price
+/* =========================
+   APPLY DISCOUNT
+========================= */
 function applyDiscount(originalPrice, coupon) {
   const discount = calculateDiscount(originalPrice, coupon);
-  const finalPrice = parseFloat(originalPrice) - discount;
-  
+  const final = Math.max(Number(originalPrice) - discount, 0);
+
   return {
-    original: parseFloat(originalPrice),
-    discount: discount,
-    final: finalPrice > 0 ? finalPrice : 0,
-    savings: discount
+    original: Number(originalPrice),
+    discount,
+    final,
+    savings: discount,
   };
 }
 
-// Format coupon for display
+/* =========================
+   FORMAT DISPLAY
+========================= */
 function formatCouponDisplay(coupon) {
-  if (!coupon) return '';
+  if (!coupon) return "";
 
-  if (coupon.discount_type === 'percent') {
-    return `${coupon.discount_value}% OFF`;
-  } else {
-    return `${helpers.formatCurrency(coupon.discount_value)} OFF`;
-  }
+  return coupon.discount_type === "percent"
+    ? `${coupon.discount_value}% OFF`
+    : `${formatCurrency(coupon.discount_value)} OFF`;
 }
 
-// Initialize coupon input
-function initCouponInput(inputElement, applyButton, priceElement, originalPrice) {
+/* =========================
+   INIT COUPON INPUT
+========================= */
+function initCouponInput(inputEl, buttonEl, priceEl, originalPrice) {
   let appliedCoupon = null;
+  let isApplied = false;
 
-  applyButton.addEventListener('click', async () => {
-    const code = inputElement.value.trim();
-
+  async function applyHandler() {
+    const code = inputEl.value.trim();
     if (!code) {
-      toast.error('Please enter a coupon code');
+      showToast("error", "Please enter a coupon code");
       return;
     }
 
-    // Show loading
-    applyButton.disabled = true;
-    applyButton.textContent = 'Applying...';
+    buttonEl.disabled = true;
+    buttonEl.textContent = "Applying...";
 
-    // Validate coupon
     const result = await validateCoupon(code);
 
     if (!result.success) {
-      toast.error(result.error);
-      applyButton.disabled = false;
-      applyButton.textContent = 'Apply';
+      showToast("error", result.error);
+      buttonEl.disabled = false;
+      buttonEl.textContent = "Apply";
       return;
     }
 
-    // Apply coupon
     appliedCoupon = result.data;
     const pricing = applyDiscount(originalPrice, appliedCoupon);
 
-    // Update UI
-    priceElement.innerHTML = `
-      <span class="original-price">${helpers.formatCurrency(pricing.original)}</span>
-      <span class="final-price">${helpers.formatCurrency(pricing.final)}</span>
-      <span class="savings">You save ${helpers.formatCurrency(pricing.savings)}!</span>
+    priceEl.innerHTML = `
+      <span class="original-price">${formatCurrency(pricing.original)}</span>
+      <span class="final-price">${formatCurrency(pricing.final)}</span>
+      <span class="savings">You save ${formatCurrency(pricing.savings)}</span>
     `;
 
-    toast.success(`Coupon applied: ${formatCouponDisplay(appliedCoupon)}`);
+    showToast("success", `Coupon applied: ${formatCouponDisplay(appliedCoupon)}`);
 
-    // Change button to "Remove"
-    applyButton.textContent = 'Remove';
-    applyButton.classList.add('btn-danger');
-    inputElement.disabled = true;
+    inputEl.disabled = true;
+    buttonEl.textContent = "Remove";
+    buttonEl.classList.add("btn-danger");
+    buttonEl.disabled = false;
+    isApplied = true;
+  }
 
-    // Handle remove
-    applyButton.onclick = () => {
-      appliedCoupon = null;
-      priceElement.innerHTML = helpers.formatCurrency(originalPrice);
-      inputElement.value = '';
-      inputElement.disabled = false;
-      applyButton.textContent = 'Apply';
-      applyButton.classList.remove('btn-danger');
-      toast.info('Coupon removed');
-    };
+  function removeHandler() {
+    appliedCoupon = null;
+    isApplied = false;
+
+    priceEl.textContent = formatCurrency(originalPrice);
+    inputEl.value = "";
+    inputEl.disabled = false;
+    buttonEl.textContent = "Apply";
+    buttonEl.classList.remove("btn-danger");
+
+    showToast("info", "Coupon removed");
+  }
+
+  buttonEl.addEventListener("click", () => {
+    isApplied ? removeHandler() : applyHandler();
   });
 
   return {
     getAppliedCoupon: () => appliedCoupon,
-    reset: () => {
-      appliedCoupon = null;
-      inputElement.value = '';
-      inputElement.disabled = false;
-      applyButton.textContent = 'Apply';
-      applyButton.classList.remove('btn-danger');
-      applyButton.disabled = false;
-    }
+    reset: () => removeHandler(),
   };
 }
 
-// Get active coupons (for display)
+/* =========================
+   GET ACTIVE COUPONS
+========================= */
 async function getActiveCoupons() {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString();
 
-    const { data, error } = await supabaseClient
-      .from('coupons')
-      .select('*')
-      .eq('is_active', true)
+    const { data, error } = await supabase
+      .from("coupons")
+      .select("*")
+      .eq("is_active", true)
       .or(`expires_at.is.null,expires_at.gte.${today}`)
-      .order('created_at', { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
     return { success: true, data: data || [] };
   } catch (error) {
-    console.error('Error fetching coupons:', error);
+    console.error("Error fetching coupons:", error);
     return { success: false, error: error.message };
   }
 }
 
-// Export
+/* =========================
+   EXPORT
+========================= */
 window.coupon = {
   validateCoupon,
   calculateDiscount,
   applyDiscount,
   formatCouponDisplay,
   initCouponInput,
-  getActiveCoupons
+  getActiveCoupons,
 };

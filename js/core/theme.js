@@ -1,43 +1,71 @@
-// Theme Management
-let currentTheme = localStorage.getItem('theme') || 'light';
+// Theme Management (Safe & Minimal)
 
-// Apply theme
+// Default to light theme
+let currentTheme = localStorage.getItem("theme") || "light";
+
+/* =========================
+   APPLY THEME
+========================= */
 function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  currentTheme = theme;
-  localStorage.setItem('theme', theme);
-  
-  // Update toggle icon
-  const themeToggle = document.getElementById('themeToggle');
-  if (themeToggle) {
-    themeToggle.innerHTML = theme === 'light' 
-      ? '<i class="fas fa-moon"></i>' 
-      : '<i class="fas fa-sun"></i>';
+  // Only allow known themes
+  if (theme !== "light" && theme !== "dark") {
+    theme = "light";
   }
 
-  // Dispatch event for other components
-  window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
+  document.documentElement.setAttribute("data-theme", theme);
+  currentTheme = theme;
+  localStorage.setItem("theme", theme);
+
+  // Update toggle icon (if exists)
+  const themeToggle = document.getElementById("themeToggle");
+  if (themeToggle) {
+    themeToggle.innerHTML =
+      theme === "light"
+        ? '<i class="fas fa-moon"></i>'
+        : '<i class="fas fa-sun"></i>';
+  }
+
+  // Notify listeners (optional usage)
+  window.dispatchEvent(
+    new CustomEvent("themeChanged", { detail: { theme } })
+  );
 }
 
-// Toggle theme
+/* =========================
+   TOGGLE THEME
+========================= */
 function toggleTheme() {
-  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-  applyTheme(newTheme);
+  // If you ever want to DISABLE dark mode,
+  // just comment the next line and return.
+  const nextTheme = currentTheme === "light" ? "dark" : "light";
+  applyTheme(nextTheme);
 }
 
-// Get current theme
+/* =========================
+   GET CURRENT THEME
+========================= */
 function getCurrentTheme() {
   return currentTheme;
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+/* =========================
+   INIT (SAFE)
+========================= */
+function initTheme() {
   applyTheme(currentTheme);
-});
+}
 
-// Export
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initTheme);
+} else {
+  initTheme();
+}
+
+/* =========================
+   EXPORT
+========================= */
 window.theme = {
   toggleTheme,
   getCurrentTheme,
-  applyTheme
+  applyTheme,
 };

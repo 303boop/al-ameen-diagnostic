@@ -1,74 +1,119 @@
-// Language Management
-let currentLanguage = localStorage.getItem('language') || 'en';
+// Language Management (Fixed & Robust)
+
+let currentLanguage = localStorage.getItem("language") || "en";
 let translations = {};
 
-// Load translations
+/* =========================
+   LOAD TRANSLATIONS
+========================= */
 async function loadTranslations(lang) {
   try {
-    const response = await fetch(`/translations/${lang}.json`);
+    const response = await fetch(`./translations/${lang}.json`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Translation file not found: ${lang}.json`);
+    }
+
     translations = await response.json();
     currentLanguage = lang;
-    localStorage.setItem('language', lang);
+    localStorage.setItem("language", lang);
+
     updatePageLanguage();
-    
-    // Dispatch event for other components
-    window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+
+    // Notify other modules
+    window.dispatchEvent(
+      new CustomEvent("languageChanged", { detail: { lang } })
+    );
   } catch (error) {
-    console.error('Failed to load translations:', error);
+    console.error("❌ Failed to load translations:", error);
   }
 }
 
-// Get translation by key path (e.g., "nav.home")
+/* =========================
+   TRANSLATION GETTER
+========================= */
 function t(key) {
-  return key.split('.').reduce((obj, k) => obj?.[k], translations) || key;
+  if (!translations || Object.keys(translations).length === 0) {
+    return key;
+  }
+
+  return (
+    key
+      .split(".")
+      .reduce((obj, k) => (obj && obj[k] !== undefined ? obj[k] : null), translations) ||
+    key
+  );
 }
 
-// Update all elements with data-i18n attribute
+/* =========================
+   UPDATE PAGE TEXT
+========================= */
 function updatePageLanguage() {
-  document.querySelectorAll('[data-i18n]').forEach(element => {
-    const key = element.getAttribute('data-i18n');
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
     const translation = t(key);
-    
-    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-      element.placeholder = translation;
+
+    if (
+      el.tagName === "INPUT" ||
+      el.tagName === "TEXTAREA"
+    ) {
+      el.placeholder = translation;
     } else {
-      element.textContent = translation;
+      el.textContent = translation;
     }
   });
-  
-  // Update HTML lang attribute
+
+  // HTML language attribute
   document.documentElement.lang = currentLanguage;
-  
-  // Update toggle button
-  const langToggle = document.getElementById('langToggle');
+
+  // Language toggle button
+  const langToggle = document.getElementById("langToggle");
   if (langToggle) {
-    langToggle.textContent = currentLanguage === 'en' ? 'বাংলা' : 'English';
+    langToggle.textContent =
+      currentLanguage === "en" ? "বাংলা" : "English";
   }
 
-  // Update direction for Bengali (if needed)
-  document.documentElement.dir = currentLanguage === 'bn' ? 'ltr' : 'ltr';
+  // Direction (both en & bn are LTR)
+  document.documentElement.dir = "ltr";
 }
 
-// Toggle language
+/* =========================
+   TOGGLE LANGUAGE
+========================= */
 function toggleLanguage() {
-  const newLang = currentLanguage === 'en' ? 'bn' : 'en';
-  loadTranslations(newLang);
+  const nextLang = currentLanguage === "en" ? "bn" : "en";
+  loadTranslations(nextLang);
 }
 
-// Get current language
+/* =========================
+   GET CURRENT LANGUAGE
+========================= */
 function getCurrentLanguage() {
   return currentLanguage;
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+/* =========================
+   INIT (SAFE)
+========================= */
+function initLanguage() {
   loadTranslations(currentLanguage);
-});
+}
 
-// Export
+// DOM ready + fallback (important)
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initLanguage);
+} else {
+  initLanguage();
+}
+
+/* =========================
+   EXPORT
+========================= */
 window.language = {
   t,
   toggleLanguage,
   getCurrentLanguage,
-  loadTranslations
+  loadTranslations,
 };
