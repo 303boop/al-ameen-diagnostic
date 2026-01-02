@@ -1,5 +1,5 @@
 /* =========================================
-   LANGUAGE & TRANSLATION CORE
+   LANGUAGE & TRANSLATION CORE (FIXED)
    ========================================= */
 const language = {
     currentLang: localStorage.getItem('app_lang') || 'en',
@@ -12,14 +12,19 @@ const language = {
 
     async loadTranslations(lang) {
         try {
-            // Adjust path if needed. Assuming /assets/i18n/ exists.
-            const response = await fetch(`assets/i18n/${lang}.json`);
+            // Ensure this path matches where your json files actually are
+            const response = await fetch(`assets/i18n/${lang}.json`); 
             if (!response.ok) throw new Error('Language file not found');
+            
             this.translations = await response.json();
             this.currentLang = lang;
+            
+            // Set HTML attributes
             document.documentElement.lang = lang;
             document.documentElement.dir = this.translations.meta?.direction || 'ltr';
             localStorage.setItem('app_lang', lang);
+            
+            // Apply immediately
             this.applyTranslations();
         } catch (error) {
             console.error('Failed to load language:', error);
@@ -34,7 +39,7 @@ const language = {
             const text = this.getNestedValue(this.translations, key);
             
             if (text) {
-                // [CRITICAL FIX] Use innerHTML to render <span> tags correctly
+                // [CRITICAL FIX] Use innerHTML to allow <span> tags to render
                 if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                     el.placeholder = text;
                 } else {
@@ -48,19 +53,12 @@ const language = {
         return path.split('.').reduce((prev, curr) => prev ? prev[curr] : null, obj);
     },
 
-    async setLanguage(lang) {
-        if (lang === this.currentLang) return;
-        await this.loadTranslations(lang);
-        
-        // Dispatch event for other components (like Navbar) to re-render if needed
-        window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
-    },
-
     bindEvents() {
+        // Global listener for any language toggle button
         document.addEventListener('click', (e) => {
             if (e.target.closest('.lang-toggle')) {
-                const lang = e.target.closest('.lang-toggle').dataset.lang;
-                if(lang) this.setLanguage(lang);
+                const newLang = this.currentLang === 'en' ? 'bn' : 'en';
+                this.loadTranslations(newLang);
             }
         });
     }
@@ -69,5 +67,5 @@ const language = {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => language.init());
 
-// Expose to window
+// Expose globally
 window.language = language;

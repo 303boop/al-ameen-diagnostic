@@ -9,7 +9,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <link rel="stylesheet" href="../../css/reset.css">
     <link rel="stylesheet" href="../../css/variables.css">
     <link rel="stylesheet" href="../../css/base.css">
@@ -32,17 +32,9 @@
             </div>
 
             <nav class="sidebar-nav">
-                <div class="nav-label">Overview</div>
+                <div class="nav-label">Management</div>
                 <a href="./index.html" class="sidebar-nav-item">
                     <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
-                </a>
-                <a href="./analytics.html" class="sidebar-nav-item">
-                    <i class="fas fa-chart-line"></i><span>Analytics</span>
-                </a>
-
-                <div class="nav-label">Management</div>
-                <a href="./appointments.html" class="sidebar-nav-item">
-                    <i class="fas fa-calendar-check"></i><span>Appointments</span>
                 </a>
                 <a href="./doctors.html" class="sidebar-nav-item active">
                     <i class="fas fa-user-md"></i><span>Doctors</span>
@@ -50,26 +42,10 @@
                 <a href="./tests.html" class="sidebar-nav-item">
                     <i class="fas fa-microscope"></i><span>Lab Tests</span>
                 </a>
-                <a href="./users.html" class="sidebar-nav-item">
-                    <i class="fas fa-users"></i><span>Patients</span>
+                <a href="./appointments.html" class="sidebar-nav-item">
+                    <i class="fas fa-calendar-check"></i><span>Appointments</span>
                 </a>
-
-                <div class="nav-label">Finance</div>
-                <a href="./reports.html" class="sidebar-nav-item">
-                    <i class="fas fa-file-invoice"></i><span>Reports</span>
-                </a>
-                <a href="./coupons.html" class="sidebar-nav-item">
-                    <i class="fas fa-tags"></i><span>Coupons</span>
-                </a>
-
-                <div class="nav-label">System</div>
-                <a href="./audit-logs.html" class="sidebar-nav-item">
-                    <i class="fas fa-history"></i><span>Audit Logs</span>
-                </a>
-                <a href="./settings.html" class="sidebar-nav-item">
-                    <i class="fas fa-cog"></i><span>Settings</span>
-                </a>
-
+                
                 <div class="mt-auto">
                     <button id="logoutBtn" class="sidebar-nav-item text-danger border-0 bg-transparent w-100 text-start">
                         <i class="fas fa-sign-out-alt"></i><span>Logout</span>
@@ -83,9 +59,7 @@
             <header class="dashboard-header d-flex justify-content-between align-items-center">
                 <h1 class="h4 mb-0">Add New Doctor</h1>
                 <div class="dashboard-actions d-flex gap-2">
-                    <button class="btn btn-light rounded-circle" id="themeToggle" title="Toggle Theme">
-                        <i class="fas fa-moon"></i>
-                    </button>
+                    <button class="btn btn-light rounded-circle" id="themeToggle"><i class="fas fa-moon"></i></button>
                     <a href="./doctors.html" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-1"></i> Back
                     </a>
@@ -98,64 +72,64 @@
                         <div class="card border-0 shadow-sm">
                             <div class="card-body p-4">
 
-                                <form id="doctorForm">
+                                <form id="addDoctorForm">
                                     
-                                    <h5 class="mb-3 text-primary">Basic Information</h5>
+                                    <h5 class="mb-3 text-primary border-bottom pb-2">Basic Information</h5>
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-6">
                                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="doctorName" placeholder="Dr. John Doe" required>
+                                            <input type="text" class="form-control" id="docName" placeholder="Dr. John Doe" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Specialization <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="specialization" placeholder="e.g. Cardiologist" required>
+                                            <input type="text" class="form-control" id="docSpec" placeholder="e.g. Cardiologist" required>
                                         </div>
                                         <div class="col-12">
-                                            <label class="form-label">Description</label>
-                                            <textarea class="form-control" id="description" rows="3" placeholder="Brief bio..."></textarea>
+                                            <label class="form-label">Bio / Description</label>
+                                            <textarea class="form-control" id="docBio" rows="3" placeholder="Brief professional background..."></textarea>
                                         </div>
                                     </div>
 
-                                    <h5 class="mb-3 text-primary">Schedule & Fees</h5>
+                                    <h5 class="mb-3 text-primary border-bottom pb-2">Schedule & Fees</h5>
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-6">
                                             <label class="form-label">Start Time <span class="text-danger">*</span></label>
-                                            <input type="time" class="form-control" id="startTime" required>
+                                            <input type="time" class="form-control" id="docStart" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">End Time <span class="text-danger">*</span></label>
-                                            <input type="time" class="form-control" id="endTime" required>
+                                            <input type="time" class="form-control" id="docEnd" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Consultation Fee (₹) <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="consultationFee" min="0" placeholder="0.00" required>
+                                            <input type="number" class="form-control" id="docFee" min="0" placeholder="0.00" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Max Patients/Day <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="maxPatients" min="1" placeholder="e.g. 20" required>
+                                            <label class="form-label">Max Patients/Day</label>
+                                            <input type="number" class="form-control" id="docLimit" min="1" value="20">
                                         </div>
                                     </div>
 
-                                    <h5 class="mb-3 text-primary">Media</h5>
+                                    <h5 class="mb-3 text-primary border-bottom pb-2">Media & Status</h5>
                                     <div class="row g-3 mb-4">
                                         <div class="col-12">
                                             <label class="form-label">Profile Image URL</label>
-                                            <input type="url" class="form-control" id="imageUrl" placeholder="https://example.com/image.jpg">
+                                            <input type="url" class="form-control" id="docImage" placeholder="https://example.com/photo.jpg">
                                         </div>
                                         <div class="col-12">
-                                            <label class="form-label">Intro Video URL</label>
-                                            <input type="url" class="form-control" id="videoUrl" placeholder="https://youtube.com/...">
+                                            <label class="form-label">Intro Video URL (Optional)</label>
+                                            <input type="url" class="form-control" id="docVideo" placeholder="https://youtube.com/...">
                                         </div>
                                     </div>
 
                                     <div class="form-check form-switch mb-4">
-                                        <input class="form-check-input" type="checkbox" id="isActive" checked>
-                                        <label class="form-check-label" for="isActive">Active Status</label>
+                                        <input class="form-check-input" type="checkbox" id="docStatus" checked>
+                                        <label class="form-check-label" for="docStatus">Active Status (Visible to Patients)</label>
                                     </div>
 
                                     <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary btn-lg" id="saveDoctorBtn">
-                                            <i class="fas fa-save me-2"></i> Save Doctor
+                                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                            <i class="fas fa-save me-2"></i> Save Doctor Profile
                                         </button>
                                     </div>
 
@@ -174,68 +148,23 @@
 
     <script src="../../js/config/supabase.js"></script>
     <script src="../../js/config/constants.js"></script>
-
     <script src="../../js/core/auth.js"></script>
     <script src="../../js/core/theme.js"></script>
-
+    
     <script src="../../js/utils/helpers.js"></script>
     <script src="../../js/utils/toast.js"></script>
-    <script src="../../js/utils/validator.js"></script>
-
     <script src="../../js/components/loader.js"></script>
     
     <script src="../../js/dashboards/admin.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Theme & Logout
+            // UI Initialization
             document.getElementById('themeToggle')?.addEventListener('click', () => window.theme.toggleTheme());
             document.getElementById('logoutBtn')?.addEventListener('click', () => window.auth.signOut());
 
-            // Handle Form Submit
-            const form = document.getElementById("doctorForm");
-            
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                
-                const btn = document.getElementById("saveDoctorBtn");
-                const originalText = btn.innerHTML;
-
-                // 1. Logic Check: Start vs End Time
-                const start = document.getElementById("startTime").value;
-                const end = document.getElementById("endTime").value;
-                
-                if(start && end && start >= end) {
-                    window.toast.error("End time must be after start time");
-                    return;
-                }
-
-                // 2. Prepare Data
-                const doctorData = {
-                    name: document.getElementById("doctorName").value,
-                    specialization: document.getElementById("specialization").value,
-                    description: document.getElementById("description").value,
-                    start_time: start,
-                    end_time: end,
-                    consultation_fee: parseFloat(document.getElementById("consultationFee").value) || 0,
-                    max_patients_per_day: parseInt(document.getElementById("maxPatients").value) || 0,
-                    image_url: document.getElementById("imageUrl").value,
-                    video_url: document.getElementById("videoUrl").value,
-                    is_active: document.getElementById("isActive").checked
-                };
-
-                // 3. UI Loading State
-                btn.disabled = true;
-                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
-
-                // 4. Send to Backend
-                // Note: admin.js handles the Supabase Insert and Redirection
-                await window.adminDashboard.saveDoctor(doctorData);
-
-                // 5. Reset UI (If saveDoctor doesn't redirect immediately)
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            });
+            // Note: The form submission logic is handled automatically by admin.js 
+            // because we used the ID "addDoctorForm".
         });
     </script>
 </body>
