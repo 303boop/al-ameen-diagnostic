@@ -1,55 +1,69 @@
-// Supabase Configuration
-import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://hdlwflzgpphkdhhojldt.supabase.co'
-const supabaseKey = process.env.sb_secret_uNd_r6dUsgdVa9MY6ea0Pw_Tyg3tlm2
-const supabase = createClient(supabaseUrl, supabaseKey)
+// =====================================================
+// Supabase Configuration (BROWSER + GITHUB PAGES SAFE)
+// =====================================================
 
-// 🚨 SAFETY CHECK (THIS WAS MISSING)
+// ❗ IMPORTANT:
+// This file MUST be loaded AFTER the Supabase CDN script:
+//
+// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+// =========================
+// CONFIG (PUBLIC ONLY)
+// =========================
+const SUPABASE_URL = "https://hdlwflzgpphkdhhojldt.supabase.co";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_PUBLIC_ANON_KEY_HERE";
+
+// =========================
+// SAFETY CHECK
+// =========================
 if (!window.supabase) {
   console.error("❌ Supabase SDK not loaded. Check script order.");
 } else {
-  // Initialize Supabase client
-  const supabase = window.supabase.createClient(
+  // =========================
+  // CREATE CLIENT
+  // =========================
+  const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
 
-  // Make global (IMPORTANT)
-  window.supabase = supabase;
+  // Expose globally
+  window.supabase = supabaseClient;
 
-  /* =========================
-     AUTH HELPERS
-  ========================== */
+  console.log("✅ Supabase client initialized");
+
+  // =========================
+  // AUTH HELPERS
+  // =========================
 
   async function getCurrentUser() {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-
-    if (error) {
-      console.error("Auth error:", error);
+    try {
+      const { data, error } = await supabaseClient.auth.getUser();
+      if (error) throw error;
+      return data.user;
+    } catch (err) {
+      console.error("getCurrentUser error:", err);
       return null;
     }
-    return user;
   }
 
   async function getUserRole() {
     const user = await getCurrentUser();
     if (!user) return null;
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("role, full_name, phone")
-      .eq("id", user.id)
-      .single();
+    try {
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("role, full_name, phone")
+        .eq("id", user.id)
+        .single();
 
-    if (error) {
-      console.error("Error fetching role:", error);
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("getUserRole error:", err);
       return null;
     }
-
-    return data;
   }
 
   async function isAuthenticated() {
@@ -57,10 +71,10 @@ if (!window.supabase) {
     return Boolean(user);
   }
 
-  // Export helpers globally
+  // =========================
+  // EXPORT HELPERS
+  // =========================
   window.getCurrentUser = getCurrentUser;
   window.getUserRole = getUserRole;
   window.isAuthenticated = isAuthenticated;
-
-  console.log("✅ Supabase initialized correctly");
 }
