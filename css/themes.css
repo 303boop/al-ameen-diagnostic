@@ -1,0 +1,141 @@
+/* Theme Styles - Light/Dark Mode */
+
+/* Light Theme (Default) */
+:root[data-theme="light"] {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: #E9ECEF;
+  
+  --text-primary: #1A1A1A;
+  --text-secondary: #6C757D;
+  --text-tertiary: #A0A0A0;
+  
+  --border-color: #E9ECEF;
+  --divider-color: #DEE2E6;
+}
+
+/* Dark Theme */
+:root[data-theme="dark"] {
+  --bg-primary: #1A1A1A;
+  --bg-secondary: #2D2D2D;
+  --bg-tertiary: #3A3A3A;
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --text-tertiary: #6C757D;
+  
+  --border-color: #3A3A3A;
+  --divider-color: #4A4A4A;
+  
+  /* Override specific colors for dark mode */
+  --white: #1A1A1A;
+  --off-white: #2D2D2D;
+  --light-gray: #3A3A3A;
+  --gray: #A0A0A0;
+  --dark-gray: #E0E0E0;
+  --black: #FFFFFF;
+  
+  /* Adjusted shadows for dark mode */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.5);
+  --shadow-2xl: 0 25px 50px rgba(0,0,0,0.6);
+}
+
+/* Dark Mode Specific Adjustments */
+[data-theme="dark"] body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .dashboard-card,
+[data-theme="dark"] .stat-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .dashboard-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .footer {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .form-control {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus {
+  background-color: var(--bg-tertiary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .modal-dialog,
+[data-theme="dark"] .search-modal-content {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .table {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .table thead {
+  background-color: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+  background-color: var(--bg-tertiary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+[data-theme="dark"] .skeleton-line,
+[data-theme="dark"] .skeleton-image {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .appointment-card,
+[data-theme="dark"] .report-card {
+  background-color: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .appointment-card:hover,
+[data-theme="dark"] .report-card:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Theme Toggle Button */
+#themeToggle {
+  position: relative;
+  transition: transform var(--transition-base);
+}
+
+#themeToggle:hover {
+  transform: rotate(20deg);
+}
+
+/* Smooth theme transition */
+body,
+.card,
+.navbar,
+.footer,
+.form-control,
+.modal-dialog,
+.table {
+  transition: background-color var(--transition-base), 
+              color var(--transition-base),
+              border-color var(--transition-base);
+}

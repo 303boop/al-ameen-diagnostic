@@ -1,0 +1,119 @@
+/* CSS Variables - Teal Medical Theme */
+:root {
+  /* Primary Colors */
+  --primary: #4ECDC4;
+  --primary-dark: #3AB6AD;
+  --primary-light: #7FE3DB;
+  --primary-lighter: #B3F0EC;
+  
+  /* Secondary Colors */
+  --secondary: #44A08D;
+  --secondary-dark: #357A6D;
+  --secondary-light: #6BC4AC;
+  
+  /* Accent Colors */
+  --accent: #FF6B6B;
+  --accent-dark: #E85555;
+  --accent-light: #FF9999;
+  
+  /* Neutral Colors */
+  --white: #FFFFFF;
+  --off-white: #F8F9FA;
+  --light-gray: #E9ECEF;
+  --gray: #6C757D;
+  --dark-gray: #343A40;
+  --black: #1A1A1A;
+  
+  /* Status Colors */
+  --success: #28A745;
+  --warning: #FFC107;
+  --danger: #DC3545;
+  --info: #17A2B8;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+  --gradient-overlay: linear-gradient(135deg, rgba(78,205,196,0.9) 0%, rgba(68,160,141,0.9) 100%);
+  --gradient-light: linear-gradient(180deg, rgba(78,205,196,0.1) 0%, rgba(68,160,141,0.1) 100%);
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+  --shadow-2xl: 0 25px 50px rgba(0,0,0,0.25);
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: 'Courier New', monospace;
+  
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  
+  /* Font Weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* Z-Index */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+  
+  /* Container Width */
+  --container-sm: 540px;
+  --container-md: 720px;
+  --container-lg: 960px;
+  --container-xl: 1140px;
+  --container-2xl: 1320px;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --white: #1A1A1A;
+  --off-white: #2D2D2D;
+  --light-gray: #3A3A3A;
+  --gray: #A0A0A0;
+  --dark-gray: #E0E0E0;
+  --black: #FFFFFF;
+  
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.3);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.4);
+}

@@ -1,0 +1,41 @@
+{
+  "name": "al-ameen-diagnostic",
+  "version": "1.0.0",
+  "description": "Modern medical diagnostic center website with appointment booking and management system",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve",
+    "dev": "npx live-server",
+    "build": "echo 'No build step required for vanilla JS'",
+    "deploy": "gh-pages -d ."
+  },
+  "keywords": [
+    "medical",
+    "diagnostic",
+    "healthcare",
+    "appointment",
+    "booking",
+    "hospital",
+    "clinic"
+  ],
+  "author": "Al-Ameen Diagnostic Center",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/al-ameen-diagnostic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/al-ameen-diagnostic/issues"
+  },
+  "homepage": "https://yourusername.github.io/al-ameen-diagnostic",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.1"
+  },
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

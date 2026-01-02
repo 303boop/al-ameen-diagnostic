@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Booking - Al-Ameen Diagnostic Center</title>
+  
+  <link rel="icon" type="image/png" href="/assets/images/logo/favicon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/themes.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <section class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="mb-0" data-i18n="track.title">Track Your Appointment</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label" data-i18n="track.enter_booking_id">Enter Booking ID</label>
+              <input type="text" class="form-control" id="bookingIdInput" placeholder="ALM-DDMMYY-XXX">
+            </div>
+            <button class="btn btn-primary w-100" id="searchBtn" data-i18n="track.search">Search</button>
+          </div>
+        </div>
+        
+        <div id="searchResult" class="mt-4"></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script src="/js/config/supabase.js"></script>
+  <script src="/js/utils/helpers.js"></script>
+  <script src="/js/utils/date-utils.js"></script>
+  <script src="/js/utils/toast.js"></script>
+  <script src="/js/core/language.js"></script>
+  <script src="/js/core/theme.js"></script>
+  <script src="/js/features/booking.js"></script>
+  <script src="/js/components/navbar.js"></script>
+  <script src="/js/components/footer.js"></script>
+  <script src="/js/components/loader.js"></script>
+  <script src="/js/main.js"></script>
+  
+  <script>
+    document.getElementById('searchBtn').addEventListener('click', async () => {
+      const bookingId = document.getElementById('bookingIdInput').value.trim();
+      if (!bookingId) {
+        toast.error('Please enter a booking ID');
+        return;
+      }
+      
+      loader.showPageLoader('Searching...');
+      const result = await booking.getAppointmentByBookingId(bookingId);
+      loader.hidePageLoader();
+      
+      if (result.success) {
+        displayResult(result.data);
+      } else {
+        toast.error('Booking not found');
+      }
+    });
+    
+    function displayResult(data) {
+      const container = document.getElementById('searchResult');
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-body">
+            <h4>Appointment Found</h4>
+            <p><strong>Booking ID:</strong> ${data.booking_id}</p>
+            <p><strong>Serial:</strong> #${data.serial_number}</p>
+            <p><strong>Date:</strong> ${helpers.formatDate(data.appointment_date)}</p>
+            <p><strong>Time:</strong> ${helpers.formatTime(data.estimated_time)}</p>
+            <p><strong>Status:</strong> <span class="badge bg-primary">${data.status}</span></p>
+            <p><strong>Doctor:</strong> ${data.doctor?.name}</p>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
