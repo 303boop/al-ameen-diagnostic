@@ -193,3 +193,25 @@ window.auth = {
 
 authReadyResolve();
 console.log("✅ Auth module ready");
+
+const { data, error } = await supabase.auth.signInWithPassword({
+  email,
+  password,
+});
+
+if (error) throw error;
+
+// 🔁 REDIRECT ONLY HERE
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role")
+  .eq("id", data.user.id)
+  .single();
+
+if (profile.role === "admin")
+  location.href = "/dashboards/admin/index.html";
+else if (profile.role === "lab")
+  location.href = "/dashboards/lab/index.html";
+else
+  location.href = "/dashboards/patient/index.html";
+

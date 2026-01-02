@@ -456,39 +456,4 @@ window.app = {
 
 console.log("📝 main.js loaded successfully");
 
-  async function redirectAfterLogin() {
-  // ✅ only run on public pages
-  const publicPages = [
-    "/index.html",
-    "/login.html",
-    "/signup.html",
-    "/"
-  ];
-
-  const path = location.pathname;
-
-  if (!publicPages.some(p => path.endsWith(p))) return;
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) return;
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) return;
-
-  if (profile.role === "admin")
-    location.href = "/dashboards/admin/index.html";
-  else if (profile.role === "lab")
-    location.href = "/dashboards/lab/index.html";
-  else
-    location.href = "/dashboards/patient/index.html";
-}
-
-redirectAfterLogin();
+  
